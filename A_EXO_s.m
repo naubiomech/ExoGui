@@ -57,7 +57,7 @@ handles.output = hObject;
 % bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
-bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
+bt = Bluetooth('Capstone_Bluetooth_1',1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
 disp('')
 str_uno=input('Would you use the arduino trigger? [y/n] ','s');
 
@@ -798,19 +798,19 @@ pause(.5);
 flushoutput(bt);
 pause(.5);
 
-lkf=0;
-rkf=0;
-
-lfsr=0;
-rfsr=0;
-
-lkp=0;
-lki=0;
-lkd=0;
-
-rkp=0;
-rki=0;
-rkd=0;
+% lkf=0;
+% rkf=0;
+% 
+% lfsr=0;
+% rfsr=0;
+% 
+% lkp=0;
+% lki=0;
+% lkd=0;
+% 
+% rkp=0;
+% rki=0;
+% rkd=0;
 
 try
 [n1,n2,n3]=Get_Smoothing_Callback(hObject, eventdata, handles);

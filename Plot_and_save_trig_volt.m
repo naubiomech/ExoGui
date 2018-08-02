@@ -42,6 +42,11 @@ RLVOLT_HEEL=MAT(:,17);
 LL_RATIO=MAT(:,18);
 RL_RATIO=MAT(:,19);
 
+SIG1=MAT(:,17);
+SIG2=MAT(:,18);
+SIG3=MAT(:,19);
+SIG4=MAT(:,20);
+
 str_fld=[str,'_fld'];
 mkdir(str_fld);
 
@@ -72,6 +77,19 @@ ylabel('#')
 grid on
 set(gca,'FontSize',15)
 saveas(gcf,[str_fld,'\Right'],'fig')
+
+
+figure('Name','SIGS')
+subplot(2,1,1)
+plot(time,SIG1)
+hold on
+plot(time,SIG2)
+
+subplot(2,1,2)
+plot(time,SIG3)
+hold on
+plot(time,SIG4)
+
 
 % % % 
 % % % figure('Name','Left')
