@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 18-Jun-2018 20:25:10
+% Last Modified by GUIDE v2.5 14-Aug-2018 15:15:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,7 +58,8 @@ handles.output = hObject;
 % bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
 bt = Bluetooth('Capstone_Bluetooth_1',1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
-disp('')
+disp('')%Exo_Bluetooth_2
+% Capstone_Bluetooth_1
 str_uno=input('Would you use the arduino trigger? [y/n] ','s');
 
 if (strcmp(str_uno,'y'))
@@ -1749,6 +1750,8 @@ end
 %set(handles.plotBut,'Enable','off');
 NewSetpoint = str2double(get(handles.R_Setpoint_Edit,'String'));               %Gets the Value entered into the edit Box in the G
 fwrite(bt,NewSetpoint,'double'); 
+NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+fwrite(bt,NewSetpoint_Dorsi,'double'); 
 
 function R_Setpoint_Edit_Callback(hObject, eventdata, handles)
 % hObject    handle to R_Setpoint_Edit (see GCBO)
@@ -1787,9 +1790,12 @@ if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
     if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'd'
         indexes = find(message==44);
         Setpoint_RL = str2double(message((indexes(1)+1):(indexes(2)-1)));
+        Setpoint_Dorsi_RL = str2double(message((indexes(2)+1):(indexes(3)-1)));
             disp("Right New Setpoint")
     disp(Setpoint_RL)
-    set(handles.R_Setpoint_Text,'String',Setpoint_RL); 
+    disp(Setpoint_Dorsi_RL)
+    set(handles.R_Setpoint_Text,'String',Setpoint_RL);
+    set(handles.R_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_RL); 
     end
 
 end
@@ -1799,7 +1805,7 @@ function L_Get_Setpoint_Callback(hObject, eventdata, handles)
 global GUI_Variables
 bt = GUI_Variables.BT;
 
-fwrite(bt,char(68));                                                  %Sends the character corresponding to ASCII value 68 to Arduino
+fwrite(bt,'D');                                                  %Sends the character corresponding to ASCII value 68 to Arduino
                                                                            %Which the Arduino understands to send parameters back
 %Setpoint_LL = fgets(bt);                                              %Gets the Current Arduino Torque Setpoint
 if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
@@ -1807,7 +1813,9 @@ if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
         if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'D'
             indexes = find(message==44);
             Setpoint_LL = str2double(message((indexes(1)+1):(indexes(2)-1)));
+            Setpoint_Dorsi_LL = str2double(message((indexes(2)+1):(indexes(3)-1)));
             set(handles.L_Setpoint_Text,'String',Setpoint_LL); 
+            set(handles.L_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_LL); 
                         disp("Left New Setpoint")
     disp(Setpoint_LL)
         end
@@ -1855,6 +1863,8 @@ end
 %set(handles.plotBut,'Enable','off');
 NewSetpoint = str2double(get(handles.L_Setpoint_Edit,'String'));               %Gets the Value entered into the edit Box in the G
 fwrite(bt,NewSetpoint,'double'); 
+NewSetpoint_Dorsi = str2double(get(handles.L_Setpoint_Dorsi_Edit,'String'));
+fwrite(bt,NewSetpoint_Dorsi,'double'); 
 
 GUI_Variables.Setpoint=NewSetpoint;
     axes(handles.PROP_FUNCTION_axes);
@@ -3118,5 +3128,136 @@ fwrite(bt,'B');
 
 %   end
 
+catch
+end
+
+
+
+function L_Setpoint_Dorsi_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to L_Setpoint_Dorsi_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of L_Setpoint_Dorsi_Edit as text
+%        str2double(get(hObject,'String')) returns contents of L_Setpoint_Dorsi_Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function L_Setpoint_Dorsi_Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to L_Setpoint_Dorsi_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function R_Setpoint_Dorsi_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to R_Setpoint_Dorsi_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of R_Setpoint_Dorsi_Edit as text
+%        str2double(get(hObject,'String')) returns contents of R_Setpoint_Dorsi_Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function R_Setpoint_Dorsi_Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to R_Setpoint_Dorsi_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function L_Zero_Modif_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to L_Zero_Modif_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of L_Zero_Modif_Edit as text
+%        str2double(get(hObject,'String')) returns contents of L_Zero_Modif_Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function L_Zero_Modif_Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to L_Zero_Modif_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in L_Set_Zero_Modif.
+function L_Set_Zero_Modif_Callback(hObject, eventdata, handles)
+% hObject    handle to L_Set_Zero_Modif (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+try
+if(bt.Status=="open")
+fwrite(bt,'W');
+end
+
+L_Zero_Modif = str2double(get(handles.L_Zero_Modif_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+fwrite(bt,L_Zero_Modif,'double'); 
+disp(L_Zero_Modif);
+catch
+end
+
+
+function R_Zero_Modif_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to R_Zero_Modif_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of R_Zero_Modif_Edit as text
+%        str2double(get(hObject,'String')) returns contents of R_Zero_Modif_Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function R_Zero_Modif_Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to R_Zero_Modif_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in R_Set_Zero_Modif.
+function R_Set_Zero_Modif_Callback(hObject, eventdata, handles)
+% hObject    handle to R_Set_Zero_Modif (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+try
+if(bt.Status=="open")
+fwrite(bt,'X');
+end
+
+R_Zero_Modif = str2double(get(handles.R_Zero_Modif_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+fwrite(bt,R_Zero_Modif,'double');
+disp(R_Zero_Modif);
 catch
 end
