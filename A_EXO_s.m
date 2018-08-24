@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 16-Aug-2018 15:03:24
+% Last Modified by GUIDE v2.5 14-Aug-2018 15:15:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -2844,13 +2844,13 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in Activate_Balance.
-function Activate_Balance_Callback(hObject, eventdata, handles)
-% hObject    handle to Activate_Balance (see GCBO)
+% --- Executes on button press in L_Activate_Prop_Ctrl.
+function L_Activate_Prop_Ctrl_Callback(hObject, eventdata, handles)
+% hObject    handle to L_Activate_Prop_Ctrl (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of Activate_Balance
+% Hint: get(hObject,'Value') returns toggle state of L_Activate_Prop_Ctrl
 global GUI_Variables
 bt = GUI_Variables.BT;
 
@@ -2865,11 +2865,11 @@ try
 if PC
     %activate prop control
     fwrite(bt,'+'); 
-    disp('Activate Balance Ctrl');
+    disp('Activate Prop Ctrl');
 else
     %deactivate prop control
     fwrite(bt,'='); 
-    disp('Deactivate Balance Ctrl');
+    disp('Deactivate Prop Ctrl');
 end
     catch
     end
@@ -2901,13 +2901,13 @@ function R_Torque_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 
-% --- Executes on button press in Activate_Balance.
+% --- Executes on button press in L_Activate_Prop_Ctrl.
 function radiobutton13_Callback(hObject, eventdata, handles)
-% hObject    handle to Activate_Balance (see GCBO)
+% hObject    handle to L_Activate_Prop_Ctrl (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of Activate_Balance
+% Hint: get(hObject,'Value') returns toggle state of L_Activate_Prop_Ctrl
 
 
 % --- Executes on button press in L_Auto_KF.
@@ -3259,23 +3259,5 @@ end
 R_Zero_Modif = str2double(get(handles.R_Zero_Modif_Edit,'String'));               %Gets the Value entered into the edit Box in the G
 fwrite(bt,R_Zero_Modif,'double');
 disp(R_Zero_Modif);
-catch
-end
-
-
-% --- Executes on button press in Balance_Baseline.
-function Balance_Baseline_Callback(hObject, eventdata, handles)
-% hObject    handle to Balance_Baseline (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global GUI_Variables
-bt = GUI_Variables.BT;
-
-try
-if(bt.Status=="open")
-fwrite(bt,'&');
-end
-
-disp('Balance Baseline');
 catch
 end
