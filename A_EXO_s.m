@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 14-Aug-2018 15:15:38
+% Last Modified by GUIDE v2.5 13-Sep-2018 09:40:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -57,7 +57,9 @@ handles.output = hObject;
 % bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
-bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
+
+BT_NAME={'Exo_Bluetooth_3','Capstone_Bluetooth_1','Exo_Bluetooth_2','Exo_High_Power'};
+bt = Bluetooth(BT_NAME{1},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
 disp('')%Exo_Bluetooth_2
 % Capstone_Bluetooth_1
 str_uno=input('Would you use the arduino trigger? [y/n] ','s');
@@ -86,7 +88,7 @@ GUI_Variables = struct('BT',bt,'Timer',NaN,'state',0,'RLTorque',NaN(1,60000), ..
     'L_COUNT_SPEED',[],'R_COUNT_SPEED',[],...
     'RLSET',NaN(1,60000),'LLSET',NaN(1,60000),'MEM',ones(1,3)*2,...
     'SIG1',NaN(1,60000),'SIG2',NaN(1,60000),'SIG3',NaN(1,60000),'SIG4',NaN(1,60000),...
-    'BASEL',NaN(1,60000),'BASER',NaN(1,60000),'basel',0,'baser',0); 
+    'BASEL',NaN(1,60000),'BASER',NaN(1,60000),'basel',0,'baser',0,'counter',0); 
 % Update handles structure
 guidata(hObject, handles);
 
@@ -170,6 +172,10 @@ GUI_Variables.SIG4=SIG4;
 
 GUI_Variables.BASEL=BASEL;
 GUI_Variables.BASER=BASER;
+
+
+GUI_Variables.counter=0;
+set(handles.TRIG_NUM_TEXT,'String',0);
 
 if(bt.Status == "open") 
     state = 1;
@@ -901,6 +907,9 @@ set(handles.Start_Trial,'Enable','on');
 set(handles.End_Trial,'Enable','off');                                      %Disables the button to stop the trial
 set(handles.Start_Trial,'Enable','on');
 
+GUI_Variables.counter=0;
+set(handles.TRIG_NUM_TEXT,'String',0);
+
 GUI_Variables.RLTorque = RLTorque;
 GUI_Variables.LLTorque = LLTorque;
 GUI_Variables.RLFSR = RLFSR;
@@ -1211,6 +1220,7 @@ function Send_Trig_Callback(hObject, eventdata, handles)
 % hObject    handle to Send_Trig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+% tic
 global GUI_Variables
 RLCount=GUI_Variables.RLCount;
 LLCount=GUI_Variables.LLCount;
@@ -1226,10 +1236,22 @@ if state==1
 end
 
 % GUI_Variables.TRIG(count_trig)=writeDigitalPin(GUI_Variables.UNO, 'D0', 5);
+try
+    tic
 writeDigitalPin(GUI_Variables.UNO, 'D5', 1);
+toc
+catch
+end
 GUI_Variables.COUNT=[GUI_Variables.COUNT;count_trig];
+GUI_Variables.counter=GUI_Variables.counter+1;
+cane=GUI_Variables.counter;
+% disp(cane)
+set(handles.TRIG_NUM_TEXT,'String',num2str(cane));
+try
 writeDigitalPin(GUI_Variables.UNO, 'D5', 0);
-
+catch
+end
+% toc
 
 % --- Executes on button press in Check_Bluetooth.
 function valBT=Check_Bluetooth_Callback(hObject, eventdata, handles)
@@ -2844,13 +2866,13 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in L_Activate_Prop_Ctrl.
-function L_Activate_Prop_Ctrl_Callback(hObject, eventdata, handles)
-% hObject    handle to L_Activate_Prop_Ctrl (see GCBO)
+% --- Executes on button press in Activate_Balance.
+function Activate_Balance_Callback(hObject, eventdata, handles)
+% hObject    handle to Activate_Balance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of L_Activate_Prop_Ctrl
+% Hint: get(hObject,'Value') returns toggle state of Activate_Balance
 global GUI_Variables
 bt = GUI_Variables.BT;
 
@@ -2865,11 +2887,11 @@ try
 if PC
     %activate prop control
     fwrite(bt,'+'); 
-    disp('Activate Prop Ctrl');
+    disp('Activate Balance Ctrl');
 else
     %deactivate prop control
     fwrite(bt,'='); 
-    disp('Deactivate Prop Ctrl');
+    disp('Deactivate Balance Ctrl');
 end
     catch
     end
@@ -2901,13 +2923,13 @@ function R_Torque_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 
-% --- Executes on button press in L_Activate_Prop_Ctrl.
+% --- Executes on button press in Activate_Balance.
 function radiobutton13_Callback(hObject, eventdata, handles)
-% hObject    handle to L_Activate_Prop_Ctrl (see GCBO)
+% hObject    handle to Activate_Balance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of L_Activate_Prop_Ctrl
+% Hint: get(hObject,'Value') returns toggle state of Activate_Balance
 
 
 % --- Executes on button press in L_Auto_KF.
@@ -3259,5 +3281,23 @@ end
 R_Zero_Modif = str2double(get(handles.R_Zero_Modif_Edit,'String'));               %Gets the Value entered into the edit Box in the G
 fwrite(bt,R_Zero_Modif,'double');
 disp(R_Zero_Modif);
+catch
+end
+
+
+% --- Executes on button press in Balance_Baseline.
+function Balance_Baseline_Callback(hObject, eventdata, handles)
+% hObject    handle to Balance_Baseline (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+try
+if(bt.Status=="open")
+fwrite(bt,'&');
+end
+
+disp('Balance Baseline');
 catch
 end
