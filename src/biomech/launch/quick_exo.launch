@@ -1,0 +1,10 @@
+<launch>
+  <include file="$(find biomech)/launch/exo_core.launch"/>
+
+  <node
+      pkg="biomech"
+      type="bt_quick_setup.py"
+      name="bt_quick_setup"
+     />
+
+</launch>

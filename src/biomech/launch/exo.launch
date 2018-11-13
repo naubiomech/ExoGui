@@ -1,0 +1,11 @@
+<launch>
+  <group ns="Exo">
+    <node>
+      pkg = "biomech"
+      type = "Bluetooth.py"
+      name = "bluetooth"
+
+    </node>
+  </group>
+
+</launch>
