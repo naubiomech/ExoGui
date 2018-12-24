@@ -54,14 +54,9 @@ function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
 
 handles.output = hObject;
 
-% bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
-% bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
-% bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
-
 BT_NAME={'Exo_Bluetooth_3','Capstone_Bluetooth_1','Exo_Bluetooth_2','Exo_High_Power'};
 bt = Bluetooth(BT_NAME{1},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
-disp('')%Exo_Bluetooth_2
-        % Capstone_Bluetooth_1
+disp('')
 str_uno=input('Would you use the arduino trigger? [y/n] ','s');
 
 if (strcmp(str_uno,'y'))
@@ -119,12 +114,6 @@ pause(0.01)
 global GUI_Variables
 bt = GUI_Variables.BT;
 
-% if(bt.Status == "open")
-%     try
-% fwrite(bt,'C');
-%     catch
-%     end
-% end
 flushinput(bt);
 flushoutput(bt);
 allocated = 100000;
@@ -142,7 +131,7 @@ BASER=NaN(1,allocated);
 basel=0;
 baser=0;
 
-RLCount = 1;                                                             %Initializes the starting space for the Vector holding the Torque Values
+RLCount = 1; %Initializes the starting space for the Vector holding the Torque Values
 LLCount = 1;
 GUI_Variables.LLFSR = LLFSR;
 GUI_Variables.RLFSR = RLFSR;
@@ -197,58 +186,18 @@ else
 end
 
 
-%set(handles.L_Get_Setpoint,'Enable','off');
-%set(handles.R_Get_Setpoint,'Enable','off');
-%set(handles.Get_Smoothing,'Enable','off');
 set(handles.Calibrate_FSR,'Enable','on');
 set(handles.Calibrate_Torque,'Enable','off');
 set(handles.Check_Memory,'Enable','off');
 set(handles.Clean_Memory,'Enable','off');
-%set(handles.L_Get_PID,'Enable','off');
-%set(handles.R_Get_PID,'Enable','off');
-%set(handles.L_Check_KF,'Enable','off');
-%set(handles.R_Check_KF,'Enable','off');
-%set(handles.L_Check_FSR_Th,'Enable','off');
-%set(handles.R_Check_FSR_Th,'Enable','off');
 set(handles.Start_Trial,'Enable','off');
 set(handles.End_Trial,'Enable','on'); 
 
 GUI_Variables.flag_start=1;
 
-% set(handles.getRightPIDParamBut,'Enable','off');
-%Disables Manual communication with the Arduino
-% set(handles.calTorqBut,'Enable','off');                                   %Disables Manual communication with the Arduino
-%Enables Manual "End Trial" with Bluetooth
-% set(handles.waitRadioBut,'Enable','off');
-% set(handles.noWaitRadioBut,'Enable','off');
-% set(handles.getLeftAnkleValsBut,'Enable','off');
-% set(handles.getRightAnkleValsBut,'Enable','off'); 
-% 
-% %FSR calib
-% set(handles.calFSRBut,'Enable','on');
-% %clean memory
-% set(handles.Clean_Memory,'Enable','on');
-% %check memory
-% set(handles.Check_Sensor_Bias_Status,'Enable','off');
-% %check memory
-% set(handles.Get_Smoothing,'Enable','off');
-% set(handles.Check_FSR_Th,'Enable','off');
-% set(handles.L_Check_KF,'Enable','off');
-
-% if get(handles.waitRadioBut,'Value') == 1
-%     set(handles.statusText,'String','Waiting for external Switch');
-%     pause(.001);
-%     
-%     Uno = arduino;
-%     while readVoltage(Uno,'A0') < 3.8
-%         pause(.00001);%Double check if This is necessary
-%     end
-%     set(handles.statusText,'String','External switch has been pushed');
-% end
-
 pause(.01);
 if state == 1 
-    fwrite(bt,char(69));                                                   %Sends ASCII character 69 to the Arduino, which the Arduino will
+    fwrite(bt,char(69)); % Sends ASCII character 69 to the Arduino, which the Arduino will
 end
 pause(.001);
 
@@ -259,7 +208,7 @@ set(handles.statusText,'String','Trial has been started');
 tic
 if state == 1 % both connected
     disp('both connected')
-    while strcmp(get(handles.Start_Trial,'Enable'), 'off')                         %Will Loop continuously until the "End Trial" button is pressed
+    while strcmp(get(handles.Start_Trial,'Enable'), 'off') % Will Loop continuously until the "End Trial" button is pressed
         if RLCount > 1
             if toc > 0.9
                 toc
@@ -274,15 +223,12 @@ if state == 1 % both connected
         end
         
         if GUI_Variables.flag_calib==1
-            % % %         flushinput(bt);   % Not sure if this was commented? Giamma
-            % please check
             if GUI_Variables.first_calib==0
                 start_count=clock;
                 start_count=start_count(6);
                 disp("Start FSR Calib")
                 GUI_Variables.first_calib=1;
             end
-            %             disp(" Calib")
             v=clock;
             if (v(6)-start_count)>5
                 set(handles.statusText,'String','Finished Calibrating the FSRs');
@@ -294,41 +240,8 @@ if state == 1 % both connected
         end
         pause(.000000001); 
         if ((bt.bytesAvailable > 0))
-            %           disp('saving in global variables');%Checks if Knee Arduino Sent a new Torque Value
             tic
             message = fgetl(bt);
-            %             if message(1) == 83 && message(length(message)-1) == 90% && length(find(A==90)) == 1 && length(find(A==69)) == 1
-            %                 indexes = find(message==44);
-            %                 if(indexes(1) == 2) % It means it is data message to plot and update signals
-
-            %                     for index_iterator = 1:(length(indexes)-1)
-            %                         Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));
-            %                     end
-            %                     GUI_Variables.RLTorque(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
-            %                     GUI_Variables.RLFSR(RLCount) = Data(2);
-            %                     GUI_Variables.RLSET(RLCount) = Data(3); %New to save also the set point
-            %                     GUI_Variables.RLVOLT(RLCount) = Data(4);
-            %                     GUI_Variables.SIG3(RLCount) = Data(9);
-            %                     RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value
-            %                     GUI_Variables.RLCount = RLCount;
-            %                     GUI_Variables.LLTorque(LLCount) = Data(5);              %Gets the new Torque Value and stores it
-            %                     GUI_Variables.LLFSR(LLCount) = Data(6);
-            %                     GUI_Variables.LLSET(LLCount) = Data(7); %New to save also the set point
-            %                     GUI_Variables.LLVOLT(LLCount) = Data(8);
-            %                     GUI_Variables.SIG2(LLCount) = Data(10);
-            %                     GUI_Variables.SIG1(LLCount) = Data(11);
-            %                     LLCount = LLCount + 1;
-            %                     GUI_Variables.LLCount = LLCount;
-            % %                   pause(.000000001);                                               %Pauses to give time for the user to possibly hit stop button
-            %                     if(Data(3)==9)||(Data(7)==9)
-            %                        disp("Torque value problem    Trq > 25Nm");
-            %                        set(handles.statusText,'String','Problem Trq Ctrl, Trq > 25 Nm');
-            %
-            %                     end
-            %                 else % it is a non data message
-            %                     command(message,indexes,hObject, eventdata, handles)
-            %                 end
-            %             end
             [RLCount,LLCount] = Receive_Data_Message(message,RLCount,LLCount,hObject, eventdata, handles);
             if(mod(RLCount,100) == 0)
                 axes(handles.Bottom_Axes);
@@ -378,8 +291,7 @@ if state == 1 % both connected
                     end
                 end
                 if whichPlotLeft == 5
-                    %                     whichPlotLeft = GUI_Variables.LLVOLT;
-                    
+
                     if LLCount <= 1000
                         plot(1:length(GUI_Variables.LLVOLT), [GUI_Variables.LLVOLT;GUI_Variables.LLVOLT_H;GUI_Variables.BASEL] );
                         title("LL Force Toe and Heel");
@@ -390,7 +302,6 @@ if state == 1 % both connected
                     end
                 end
                 if whichPlotLeft == 6
-                    %                     whichPlotLeft = GUI_Variables.RLVOLT;
                     if RLCount <= 1000
                         plot(1:length(GUI_Variables.RLVOLT), [GUI_Variables.RLVOLT;GUI_Variables.RLVOLT_H; GUI_Variables.BASER]);
                         title("RL Force Toe and Heel");
@@ -493,7 +404,6 @@ if state == 1 % both connected
                     end
                 end
                 if whichPlotRight == 5
-                    %                     plotThisRight = GUI_Variables.LLVOLT;
                     if LLCount <= 1000
                         plot(1:length(GUI_Variables.LLVOLT), [GUI_Variables.LLVOLT;GUI_Variables.LLVOLT_H;GUI_Variables.BASEL]);
                         title("LL Force Toe and Heel");
@@ -558,8 +468,6 @@ if state == 1 % both connected
                         title("SIG4");
                     end
                 end
-                
-                %toc
             end
         end
     end
@@ -605,59 +513,42 @@ if bt.Status=="open"
 
     if state == 1
         try
-            fwrite(bt,char(71));                                                   %Recognizes as stopping the motor and stop sending torque values
+            fwrite(bt,char(71)); % Recognizes as stopping the motor and stop sending torque values
         catch
         end
     end
 
-    try %if you turn off the motor before I push end trail this shouldn't be executed
-        while((bt.bytesAvailable > 0))%I use the double while loop so I can incorporate a pause without having to pause every loop
+    try % if you turn off the motor before I push end trail this shouldn't be executed
+        while((bt.bytesAvailable > 0))% I use the double while loop so I can incorporate a pause without having to pause every loop
                                       %I can pause after it think its finished looping (emptied the buffer), and then check if it should have finished looping (emptied the buffer) and if it is not finished, have it loop again
-            while((bt.bytesAvailable > 0))     %While there are still torque values in the bluetooth buffer
+            while((bt.bytesAvailable > 0)) % While there are still torque values in the bluetooth buffer
                 if(bt.bytesAvailable > 0)
                     message = fgetl(bt);
-                    if message(1) == 83 && message(length(message)-1) == 90% && length(find(A==90)) == 1 && length(find(A==69)) == 1
+                    if message(1) == 83 && message(length(message)-1) == 90
                         indexes = find(message==44);
                         if(indexes(1) == 2)
                             for index_iterator = 1:(length(indexes)-1)
                                 Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));
                             end
-                            %                     RLTorque(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
-                            %                     RLFSR(RLCount) = Data(2);
-                            %                     RLSET(RLCount) = Data(3); %New to save also the set point
-                            %                     RLVOLT(RLCount) = Data(4);
-                            %                     SIG3(RLCount) = Data(9);
-                            %                     SIG1(RLCount) = Data(11);
-                            %                     RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value
-                            %                     RLCount = RLCount;
-                            %                     LLTorque(LLCount) = Data(5);              %Gets the new Torque Value and stores it
-                            %                     LLFSR(LLCount) = Data(6);
-                            %                     LLSET(LLCount) = Data(7); %New to save also the set point
-                            %                     LLVOLT(LLCount) = Data(8);
-                            %                     SIG2(LLCount) = Data(10);
-                            %
-                            %                     LLCount = LLCount + 1;
-                            %                     LLCount = LLCount;
-                            RLTorque(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
+                            RLTorque(RLCount) = Data(1); % Gets the new Torque Value and Stores it
                             RLFSR(RLCount) = Data(2);
-                            RLSET(RLCount) = Data(3); %New to save also the set point
+                            RLSET(RLCount) = Data(3); % New to save also the set point
                             RLVOLT(RLCount) = Data(4);
                             RLVOLT_H(RLCount) = Data(5);
                             SIG1(RLCount) = Data(11);
                             SIG3(RLCount) = Data(13);
                             SIG4(RLCount) = Data(14);
                             BASER(RLCount)=GUI_Variables.baser;
-                            RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value
+                            RLCount = RLCount + 1; % Increments kneeCount Checks if Ankle Arduino Sent a new Torque Value
                             RLCount = RLCount;
-                            LLTorque(LLCount) = Data(6);              %Gets the new Torque Value and stores it
+                            LLTorque(LLCount) = Data(6); % Gets the new Torque Value and stores it
                             LLFSR(LLCount) = Data(7);
-                            LLSET(LLCount) = Data(8); %New to save also the set point
+                            LLSET(LLCount) = Data(8); % New to save also the set point
                             LLVOLT(LLCount) = Data(9);
                             LLVOLT_H(LLCount) = Data(10);
                             SIG2(LLCount) = Data(12);
                             BASEL(LLCount)=GUI_Variables.basel;
 
-                            %                   pause(.000000001);                                               %Pauses to give time for the user to possibly hit stop button
                         else
                             command(message,indexes,hObject, eventdata, handles)
                         end
@@ -693,15 +584,15 @@ if bt.Status=="open"
     BASER=BASER(1:(RLCount-1));
 
     if(state ==1)  %If both are on
-        lengthDif = length(RLTorque) - length(LLTorque);                   %When both are on there is a possibility that one arduino sent more datapoints than the other
+        lengthDif = length(RLTorque) - length(LLTorque); % When both are on there is a possibility that one arduino sent more datapoints than the other
         disp(" ");
         disp(" Length DIF in state 1 : ");
-        disp(lengthDif);                                                   %This would be caused by them not starting or stopping at the exact same time (to the nearest 10 ms)
+        disp(lengthDif); % This would be caused by them not starting or stopping at the exact same time (to the nearest 10 ms)
         disp(" ");
-        if lengthDif > 0                                                   %It looks for the difference in legnth of datapoints to determine which has more datapoints
-            addOn = NaN(1,lengthDif);                                      %If the Left Or Right has more datapoints, it prepends the NaNs to start of the list with less datapoints
-            LLTorque = [addOn, LLTorque];                                  %There is room for some error here, but the NaNs usually do not exceed 4, meaning that its at maximum,
-            LLFSR = [addOn, LLFSR];                                        %40 ms out of sync
+        if lengthDif > 0 % It looks for the difference in legnth of datapoints to determine which has more datapoints
+            addOn = NaN(1,lengthDif); % If the Left Or Right has more datapoints, it prepends the NaNs to start of the list with less datapoints
+            LLTorque = [addOn, LLTorque]; % There is room for some error here, but the NaNs usually do not exceed 4, meaning that its at maximum,
+            LLFSR = [addOn, LLFSR]; % 40 ms out of sync
             LLSET = [addOn,LLSET];
             LLVOLT = [addOn,LLVOLT];
             LLVOLT_H = [addOn,LLVOLT_H];
@@ -723,7 +614,7 @@ if bt.Status=="open"
             BASEL=[BASEL;addOn];
             BASER=[BASER;addOn];
         end
-        if lengthDif == 0                                                  %If they are the same length, everything is dandy
+        if lengthDif == 0 % If they are the same length, everything is dandy
         end
     end
 
@@ -737,57 +628,53 @@ if bt.Status=="open"
         R_SPEED=zeros(size(LLTorque));
     end
     
-    dt = .01;                                                              %Since the Arduino is set to send values every 10 ms, dt is .01 S
-    t = 1:length(RLTorque);                                                %Creates a time Vector equal in length to the number of Torque Values Recieved
-    t = t .* dt;                                                         %Scales the time Vector, knowing how often Arduino sends values,
+    dt = .01; % Since the Arduino is set to send values every 10 ms, dt is .01 S
+    t = 1:length(RLTorque); % Creates a time Vector equal in length to the number of Torque Values Recieved
+    t = t .* dt; % Scales the time Vector, knowing how often Arduino sends values,
     
     if isempty(GUI_Variables.COUNT) || (length(GUI_Variables.COUNT)==1) %beacuse the first is zero
     else
-        %     disp('ok')
         count_trig_c=GUI_Variables.COUNT(2:end);
 
         for i=1:length(count_trig_c)
-            %     count_trig_c(i)
             TRIG(count_trig_c(i))=1;
-            % find(TRIG(count_trig_c(i))==1)
         end
 
     end
 
     if isempty(GUI_Variables.L_COUNT_SPEED)  %beacuse the first is zero
     else
-        %     disp('ok')
-
         for i=1:size(GUI_Variables.L_COUNT_SPEED,1)
-            %     count_trig_c(i)
             L_SPEED(GUI_Variables.L_COUNT_SPEED(i,1))=GUI_Variables.L_COUNT_SPEED(i,2);
-            % find(TRIG(count_trig_c(i))==1)
         end
     end
 
     if isempty(GUI_Variables.R_COUNT_SPEED)  %beacuse the first is zero
     else
-        %     disp('ok')
         for i=1:size(GUI_Variables.R_COUNT_SPEED,1)
-            %     count_trig_c(i)
             R_SPEED(GUI_Variables.R_COUNT_SPEED(i,1))=GUI_Variables.R_COUNT_SPEED(i,2);
-            % find(TRIG(count_trig_c(i))==1)
         end
     end
 
-    % TRIG
-    % size(TRIG)
-    % size(LLSET)
-    A = [t; RLTorque; RLFSR; RLSET; RLVOLT; RLVOLT_H; LLTorque; LLFSR; LLSET; LLVOLT; LLVOLT_H; TRIG; BASEL; BASER ;L_SPEED; R_SPEED; SIG1; SIG2; SIG3; SIG4];                                 %Creates a vector that holds the time and data
-                                                                                                                                                                                               % A = [t; RLTorque; RLSET; LLTorque; LLSET]
+    A = [t; RLTorque; RLFSR; RLSET; RLVOLT; RLVOLT_H; LLTorque; ...
+         LLFSR; LLSET; LLVOLT; LLVOLT_H; TRIG; BASEL; BASER ;L_SPEED; ...
+         R_SPEED; SIG1; SIG2; SIG3; SIG4]; % Creates a vector that holds the time and data
+                                           % A = [t; RLTorque; RLSET; LLTorque; LLSET]
 
 
-    Filename = sprintf('%s_%d','Trial_Number_',bt.UserData);               %Creates a new filename called "Torque_#"
-                                                                           %Where # is the trial number                                                                           
-    fileID = fopen(Filename,'w');                                      %Actually creates that file
+    Filename = sprintf('%s_%d','Trial_Number_',bt.UserData); % Creates a new filename called "Torque_#"
+                                                             % Where # is the trial number
+    fileID = fopen(Filename,'w'); % Actually creates that file
     pause(.01);
-    fprintf(fileID,'\tTime\t\t RLTRQ\t\t RLFSR\t\t RLSET\t\t RLVOLT\t\t RLVOLT_H\t\t LLTRQ\t\t LLFSR\t\t LLSET\t\t LLVOLT\t\t LLVOLT_H\t\t TRIG\t\t BASEL\t\t BASER\t\t L_SPEED\t\t R_SPEED\t\t SIG1\t\t SIG2\t\t SIG3\t\t SIG4\t\t\n');
-    fprintf(fileID,'%6.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\n',A);     %Puts the Time and Torque values in the txt columns
+
+    fprintf(fileID,['\tTime\t\t RLTRQ\t\t RLFSR\t\t RLSET\t\t ' ...
+                    'RLVOLT\t\t RLVOLT_H\t\t LLTRQ\t\t LLFSR\t\t ' ...
+                    'LLSET\t\t LLVOLT\t\t LLVOLT_H\t\t TRIG\t\t ' ...
+                    'BASEL\t\t BASER\t\t L_SPEED\t\t R_SPEED\t\t SIG1\t\t SIG2\t\t SIG3\t\t SIG4\t\t\n']);
+
+    fprintf(fileID,['%6.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t ' ...
+                    '%12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t ' ...
+                    '%12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\n'],A); % Puts the Time and Torque values in the txt columns
     fclose(fileID);
 
     if(bt.Status == "open")
@@ -796,6 +683,7 @@ if bt.Status=="open"
         catch
         end
     end
+
     set(handles.Start_Trial,'Enable','on');
     flushinput(bt);
     pause(.5);
@@ -806,45 +694,21 @@ if bt.Status=="open"
     flushoutput(bt);
     pause(.5);
 
-    % lkf=0;
-    % rkf=0;
-    %
-    % lfsr=0;
-    % rfsr=0;
-    %
-    % lkp=0;
-    % lki=0;
-    % lkd=0;
-    %
-    % rkp=0;
-    % rki=0;
-    % rkd=0;
-
     try
         [n1,n2,n3]=Get_Smoothing_Callback(hObject, eventdata, handles);
         pause(0.5);
         lfsr=L_Check_FSR_Th_Callback(hObject, eventdata, handles);
-        % pause(0.5);
         rfsr=R_Check_FSR_Th_Callback(hObject, eventdata, handles);
-        % pause(0.5);
         lkf=L_Check_KF_Callback(hObject, eventdata, handles);
-        % pause(0.5);
         rkf=R_Check_KF_Callback(hObject, eventdata, handles);
-        % pause(0.5);
         [lkp,lkd,lki]=L_Get_PID_Callback(hObject, eventdata, handles);
-        % pause(0.5);
         [rkp,rkd,rki]=R_Get_PID_Callback(hObject, eventdata, handles);
-        % pause(0.5);
     catch
     end
 
-    Filename = sprintf('%s_%d','Parameters_Trial_Number_',bt.UserData);               %Creates a new filename called "Torque_#"
-                                                                                      %Where # is the trial number
-    fileID = fopen(Filename,'w');                                      %Actually creates that file
+    Filename = sprintf('%s_%d','Parameters_Trial_Number_',bt.UserData); % Creates a new filename called "Torque_#" Where # is the trial number
+    fileID = fopen(Filename,'w'); % Actually creates that file
     pause(.01);
-    % Smooth_params=['N1 = ',num2str(n1)];
-    % Smooth_params_2=['N2 = ',num2str(n2),'N3 = ',num2str(n3),'\n'];
-    % Filename = fprintf(fileID,Smooth_params);
     Filename = fprintf(fileID,['N1 = ',num2str(n1),'\n']);
     Filename = fprintf(fileID,['N2 = ',num2str(n2),'\n']);
     Filename = fprintf(fileID,['N3 = ',num2str(n3),'\n']);
@@ -859,9 +723,6 @@ if bt.Status=="open"
     Filename = fprintf(fileID,['KD_R = ',num2str(rkd),'\n']);
     Filename = fprintf(fileID,['KI_R = ',num2str(rki),'\n']);
 
-    % ,'KD_L = ',num2str(lkd),'KI_L = ',num2str(lki),'\n']);
-    % Filename = fprintf(fileID,['KP_R = ',num2str(rkp),'KD_R = ',num2str(rkd),'KI_R = ',num2str(rki),'\n']);
-
     fclose(fileID);
     %Closes the txt file
     set(handles.statusText,'String','Data has finished being Saved');
@@ -875,8 +736,7 @@ if bt.Status=="open"
     TRIG=[];
     LLVOLT=[];
     RLVOLT=[];
-    LLVOLT_H=[]
-    ;
+    LLVOLT_H=[];
     RLVOLT_H=[];
 
     SIG1=[];
@@ -889,7 +749,7 @@ if bt.Status=="open"
 
     LLCount = 1;
     RLCount = 1;
-    bt.UserData = bt.UserData + 1;                                     %Increments the trial number
+    bt.UserData = bt.UserData + 1; % Increments the trial number
 
 
     set(handles.L_Get_Setpoint,'Enable','on');
@@ -906,7 +766,7 @@ if bt.Status=="open"
     set(handles.L_Check_FSR_Th,'Enable','on');
     set(handles.R_Check_FSR_Th,'Enable','on');
     set(handles.Start_Trial,'Enable','on');
-    set(handles.End_Trial,'Enable','off');                                      %Disables the button to stop the trial
+    set(handles.End_Trial,'Enable','off'); % Disables the button to stop the trial
     set(handles.Start_Trial,'Enable','on');
 
     GUI_Variables.counter=0;
@@ -925,7 +785,6 @@ if bt.Status=="open"
     GUI_Variables.RLVOLT = RLVOLT;
     GUI_Variables.LLVOLT_H = LLVOLT_H;
     GUI_Variables.RLVOLT_H = RLVOLT_H;
-    % GUI_Variables.TRIG=TRIG;
     GUI_Variables.COUNT =0;
 
     GUI_Variables.flag_calib=0;
@@ -981,10 +840,8 @@ if(bt.Status == "open")
     catch
     end
 end
-% pause(2);
-% set(handles.statusText,'String',"The Torque Sensors have been Calibrated! (>^_^)>");
 pause(2);
-set(handles.statusText,'String',"The Torque Sensors have been Calibrated!");
+set(handles.statusText,'String',"The Torque Sensors have been Calibrated! (>^_^)>");
 
 % --- Executes on button press in Calibrate_FSR.
 function Calibrate_FSR_Callback(hObject, eventdata, handles)
@@ -1092,15 +949,13 @@ global GUI_Variables;
 bt = GUI_Variables.BT; 
 lkf=0;
 if (bt.Status=="open")
-    %    try
-    fwrite(bt,'`'); %send the character "`"
+    fwrite(bt,'`'); % send the character "`"
     if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
         message = fgetl(bt)
         if message(1) == 83 && message(length(message)-1) == 90 && message(2) == '`'
             indexes = find(message==44);
             KF_LL = str2double(message((indexes(1)+1):(indexes(2)-1)));
-            
-            %Curr_KF = str2double(fgets(bt));                                              %Gets the Current Arduino Torque Setpoint
+
             set(handles.L_Check_KF_Text,'String',KF_LL);
             disp("Left Current KF ");
             disp(KF_LL);
@@ -1110,10 +965,6 @@ if (bt.Status=="open")
             set(handles.L_Check_KF_Text,'String',"NaN");
         end
     end
-    %    catch
-    %        disp("Impossible to know KF");
-    %        set(handles.L_Check_KF_Text,'String',"NaN");
-    %    end
 end
 
 if (bt.Status=="closed") 
@@ -1131,15 +982,13 @@ new_KF = str2double(get(handles.L_Send_KF_Edit,'String'));         %Gets the Val
 
 global GUI_Variables
 state=GUI_Variables.state;
-% disp(state);
 
 bt = GUI_Variables.BT; 
 
 if (bt.Status=="open")
     try
-        fwrite(bt,char(95)); %send the character "_"
+        fwrite(bt,char(95)); % send the character "_"
         fwrite(bt,new_KF,'double');
-        % str=["Send new Right KF ", num2str(new_KF)];
         disp("Send new Left KF ");
         disp(new_KF);
 
@@ -1237,7 +1086,6 @@ if state==1
     end
 end
 
-% GUI_Variables.TRIG(count_trig)=writeDigitalPin(GUI_Variables.UNO, 'D0', 5);
 try
     tic
     writeDigitalPin(GUI_Variables.UNO, 'D5', 1);
@@ -1247,13 +1095,11 @@ end
 GUI_Variables.COUNT=[GUI_Variables.COUNT;count_trig];
 GUI_Variables.counter=GUI_Variables.counter+1;
 cane=GUI_Variables.counter;
-% disp(cane)
 set(handles.TRIG_NUM_TEXT,'String',num2str(cane));
 try
     writeDigitalPin(GUI_Variables.UNO, 'D5', 0);
 catch
 end
-% toc
 
 % --- Executes on button press in Check_Bluetooth.
 function valBT=Check_Bluetooth_Callback(hObject, eventdata, handles)
@@ -1297,8 +1143,6 @@ try
                 else
                     set(handles.EXP_Params_axes,'Color',[0 0 1])
                 end
-                %         set(handles.axes10,'Color',[0 0 1])
-                %         set(handles.EXP_Params_axes,'Color',[0 0 1])
                 valBT=1;
                 
             else
@@ -1349,15 +1193,13 @@ pause(.01);
 
 
 try
-    fopen(bt);                                                           %Attempts to Make a connection to Bluetooth Object
+    fopen(bt); % Attempts to Make a connection to Bluetooth Object
 catch ME_right_open
     set(handles.flag_bluetooth,'Color',[1 0 0]);
     set(handles.axes8,'Color',[0 0 0])
     set(handles.axes10,'Color',[0 0 0])
     set(handles.EXP_Params_axes,'Color',[0 0 0])
-    %     ME_right_open
-    %If fopen Fails do Nothing
-end                                                            %Makes a connection to Bluetooth Object
+end % Makes a connection to Bluetooth Object
 
 if(bt.status == "open")
     set(handles.flag_bluetooth,'Color',[0 1 0]);
@@ -1650,9 +1492,6 @@ if(bt.Status=="open")
             lkd = str2double(message((indexes(2)+1):(indexes(3)-1)));
             lki = str2double(message((indexes(3)+1):(indexes(4)-1)));
         end
-        %lkp = str2double(fgets(bt));
-        %lkd = str2double(fgets(bt));
-        %lki = str2double(fgets(bt));
         set(handles.L_Kp_text,'String',lkp);
         set(handles.L_Kd_text,'String',lkd);
         set(handles.L_Ki_text,'String',lki);
@@ -1668,9 +1507,8 @@ function L_Set_PID_Callback(hObject, eventdata, handles)
 global GUI_Variables
 bt = GUI_Variables.BT;
 if(bt.Status=="open")
-    % fwrite(bt,char(77));
     fwrite(bt,'M');
-    kp = str2double(get(handles.L_Kp_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+    kp = str2double(get(handles.L_Kp_Edit,'String')); % Gets the Value entered into the edit Box in the G
     kd = str2double(get(handles.L_Kd_Edit,'String'));
     ki = str2double(get(handles.L_Ki_Edit,'String'));
 
@@ -1707,7 +1545,7 @@ if(bt.Status=="open")
     disp(ki)
 
 
-    fwrite(bt,kp,'double');                                   %Sends the new Torque Value to Arduino
+    fwrite(bt,kp,'double'); % Sends the new Torque Value to Arduino
     fwrite(bt,kd,'double');
     fwrite(bt,ki,'double');
 end
@@ -1771,10 +1609,9 @@ if(bt.Status=="open")
     fwrite(bt,char(102));
 end
 
-%set(handles.plotBut,'Enable','off');
-NewSetpoint = str2double(get(handles.R_Setpoint_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+NewSetpoint = str2double(get(handles.R_Setpoint_Edit,'String')); % Gets the Value entered into the edit Box in the G
 fwrite(bt,NewSetpoint,'double'); 
-NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit, 'String')); % Gets the Value entered into the edit Box in the G
 fwrite(bt,NewSetpoint_Dorsi,'double'); 
 
 function R_Setpoint_Edit_Callback(hObject, eventdata, handles)
@@ -1829,18 +1666,18 @@ function L_Get_Setpoint_Callback(hObject, eventdata, handles)
 global GUI_Variables
 bt = GUI_Variables.BT;
 
-fwrite(bt,'D');                                                  %Sends the character corresponding to ASCII value 68 to Arduino
-                                                                 %Which the Arduino understands to send parameters back
-                                                                 %Setpoint_LL = fgets(bt);                                              %Gets the Current Arduino Torque Setpoint
-if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-    message = fgetl(bt);
-    if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'D'
-        indexes = find(message==44);
-        Setpoint_LL = str2double(message((indexes(1)+1):(indexes(2)-1)));
-        Setpoint_Dorsi_LL = str2double(message((indexes(2)+1):(indexes(3)-1)));
-        set(handles.L_Setpoint_Text,'String',Setpoint_LL);
-        set(handles.L_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_LL);
-        disp("Left New Setpoint")
+fwrite(bt,'D'); % Sends the character corresponding to ASCII value
+                % 68 to Arduino Which the Arduino understands to
+                % send parameters back Setpoint_LL = fgets(bt);
+                % Gets the Current Arduino Torque Setpoint if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
+message = fgetl(bt);
+if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'D'
+    indexes = find(message==44);
+    Setpoint_LL = str2double(message((indexes(1)+1):(indexes(2)-1)));
+    Setpoint_Dorsi_LL = str2double(message((indexes(2)+1):(indexes(3)-1)));
+    set(handles.L_Setpoint_Text,'String',Setpoint_LL);
+    set(handles.L_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_LL);
+    disp("Left New Setpoint")
         disp(Setpoint_LL)
     end
     
@@ -1884,8 +1721,7 @@ if(bt.Status=="open")
     fwrite(bt,char(70));
 end
 
-%set(handles.plotBut,'Enable','off');
-NewSetpoint = str2double(get(handles.L_Setpoint_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+NewSetpoint = str2double(get(handles.L_Setpoint_Edit,'String')); % Gets the Value entered into the edit Box in the G
 fwrite(bt,NewSetpoint,'double'); 
 NewSetpoint_Dorsi = str2double(get(handles.L_Setpoint_Dorsi_Edit,'String'));
 fwrite(bt,NewSetpoint_Dorsi,'double'); 
@@ -1949,14 +1785,14 @@ bt = GUI_Variables.BT;
 if (bt.Status=="open")
     try
         fwrite(bt,')');
-        N1 = str2double(get(handles.N1_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+        N1 = str2double(get(handles.N1_Edit,'String')); % Gets the Value entered into the edit Box in the G
         N2 = str2double(get(handles.N2_Edit,'String'));
         N3 = str2double(get(handles.N3_Edit,'String'));
         disp('Smoothing');
         disp(N1)
         disp(N2)
         disp(N3)
-        fwrite(bt,N1,'double');                                   %Sends the new Torque Value to Arduino
+        fwrite(bt,N1,'double'); % Sends the new Torque Value to Arduino
         fwrite(bt,N2,'double');
         fwrite(bt,N3,'double');
     catch
@@ -2058,7 +1894,7 @@ bt = GUI_Variables.BT;
 count_speed=0;
 if (bt.Status=="open")
     try
-        fwrite(bt,'o'); %char(111)
+        fwrite(bt,'o'); % char(111)
         count_speed=GUI_Variables.RLCount;
         GUI_Variables.R_COUNT_SPEED=[GUI_Variables.R_COUNT_SPEED;[count_speed,2]];
     catch
@@ -2075,7 +1911,7 @@ bt = GUI_Variables.BT;
 count_speed=0;
 if (bt.Status=="open")
     try
-        fwrite(bt,'O'); %char(79)
+        fwrite(bt,'O'); % char(79)
         count_speed=GUI_Variables.RLCount;
         GUI_Variables.L_COUNT_SPEED=[GUI_Variables.L_COUNT_SPEED;[count_speed,2]];
     catch
@@ -2092,7 +1928,7 @@ bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
     try
-        fwrite(bt,'P'); %char(80)
+        fwrite(bt,'P'); % char(80)
     catch
     end
 end
@@ -2125,7 +1961,7 @@ function R_Send_KF_Callback(hObject, eventdata, handles)
 % hObject    handle to R_Send_KF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-new_KF = str2double(get(handles.R_Send_KF_Edit,'String'));         %Gets the Value entered into the edit Box in the G
+new_KF = str2double(get(handles.R_Send_KF_Edit,'String')); % Gets the Value entered into the edit Box in the G
 
 global GUI_Variables
 state=GUI_Variables.state;
@@ -2135,9 +1971,8 @@ bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
     try
-        fwrite(bt,'-'); %send the character "-"
+        fwrite(bt,'-'); % send the character "-"
         fwrite(bt,new_KF,'double');
-        % str=["Send new Right KF ", num2str(new_KF)];
         disp("Send new Right KF ");
         disp(new_KF);
 
@@ -2154,7 +1989,7 @@ rkf=0;
 if (bt.Status=="open")
     try
 
-        fwrite(bt,'~'); %send the character "~"
+        fwrite(bt,'~'); % send the character "~"
         message = fgetl(bt);
         if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
             if message(1) == 83 && message(length(message)-1) == 90 && message(2) == '~'
@@ -2165,8 +2000,6 @@ if (bt.Status=="open")
                 disp(KF_RL);
                 rkf=KF_RL;
             end
-            %Curr_KF = str2double(fgets(bt));                                              %Gets the Current Arduino Torque Setpoint
-
         end
     catch
         disp("Impossible to know KF");
@@ -2185,7 +2018,7 @@ global GUI_Variables;
 bt = GUI_Variables.BT; 
 lfsr=0;
 if (bt.Status=="open")
-    fwrite(bt,char('Q')); %send the character "Q"
+    fwrite(bt,char('Q')); % send the character "Q"
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
         message = fgetl(bt);
         if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'Q'
@@ -2239,9 +2072,9 @@ bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
     try
-        fwrite(bt,'R'); %char 35 -> #, 36 -> $, 74-> J
-        LFSRTH = str2double(get(handles.L_Send_FSR_Edit,'String'));               %Gets the Value entered into the edit Box in the G
-        fwrite(bt,LFSRTH,'double');                                   %Sends the new Torque Value to Arduino
+        fwrite(bt,'R'); % char 35 -> #, 36 -> $, 74-> J
+        LFSRTH = str2double(get(handles.L_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
+        fwrite(bt,LFSRTH,'double'); %Sends the new Torque Value to Arduino
     catch
         disp("Impossible to set FSR th parameters for Left");
     end
@@ -2254,7 +2087,7 @@ bt = GUI_Variables.BT;
 rfsr=0;
 if (bt.Status=="open")
     try
-        fwrite(bt,char('q')); %send the character "Q"
+        fwrite(bt,char('q')); % send the character "Q"
         message = fgetl(bt);
         if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'q'
             indexes = find(message==44);
@@ -2264,9 +2097,6 @@ if (bt.Status=="open")
             disp(Curr_TH_R);
             rfsr=Curr_TH_R;
         end
-        
-
-        %rfsr=str2double(Curr_TH_R);
     catch
         disp("Impossible to know R FSR TH");
         set(handles.R_Check_FSR_Text,'String',"NaN");
@@ -2317,9 +2147,9 @@ bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
     try
-        fwrite(bt,'r'); %char 35 -> #, 36 -> $, 74-> J
-        RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String'));               %Gets the Value entered into the edit Box in the G
-        fwrite(bt,RFSRTH,'double');                                   %Sends the new Torque Value to Arduino
+        fwrite(bt,'r'); % char 35 -> #, 36 -> $, 74-> J
+        RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
+        fwrite(bt,RFSRTH,'double'); % Sends the new Torque Value to Arduino
     catch
         disp("Impossible to set FSR th parameters for Right");
     end
@@ -2332,8 +2162,6 @@ function Enable_Arduino_Trig_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of Enable_Arduino_Trig
-
-
 
 function L_Ki_Edit_Callback(hObject, eventdata, handles)
 % hObject    handle to L_Ki_Edit (see GCBO)
@@ -2368,8 +2196,8 @@ bt = GUI_Variables.BT;
 if (bt.Status=="open")
     try
         fwrite(bt,'S');
-        L_PERC = str2double(get(handles.L_Set_Perc_Edit,'String'));               %Gets the Value entered into the edit Box in the G
-        fwrite(bt,L_PERC,'double');                                   %Sends the new Torque Value to Arduino
+        L_PERC = str2double(get(handles.L_Set_Perc_Edit,'String')); % Gets the Value entered into the edit Box in the G
+        fwrite(bt,L_PERC,'double'); % Sends the new Torque Value to Arduino
     catch
         disp("Impossible to set Left Perc parameter for Left");
     end
@@ -2410,8 +2238,8 @@ bt = GUI_Variables.BT;
 if (bt.Status=="open")
     try
         fwrite(bt,'s');
-        R_PERC = str2double(get(handles.R_Set_Perc_Edit,'String'));               %Gets the Value entered into the edit Box in the G
-        fwrite(bt,R_PERC,'double');                                   %Sends the new Torque Value to Arduino
+        R_PERC = str2double(get(handles.R_Set_Perc_Edit,'String')); % Gets the Value entered into the edit Box in the G
+        fwrite(bt,R_PERC,'double'); % Sends the new Torque Value to Arduino
     catch
         disp("Impossible to set Left Perc parameter for Right");
     end
@@ -2749,8 +2577,7 @@ if(bt.Status=="open")
 end
 
 try
-    %set(handles.plotBut,'Enable','off');
-    R_New_Gain = str2double(get(handles.R_Set_Gain_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+    R_New_Gain = str2double(get(handles.R_Set_Gain_Edit,'String')); % Gets the Value entered into the edit Box in the G
     fwrite(bt,R_New_Gain,'double');
     disp('Send to arduino Right Prop Gain');
     disp(R_New_Gain);
@@ -2823,8 +2650,7 @@ try
         fwrite(bt,'{');
     end
 
-    %set(handles.plotBut,'Enable','off');
-    L_New_Gain = str2double(get(handles.L_Set_Gain_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+    L_New_Gain = str2double(get(handles.L_Set_Gain_Edit,'String')); % Gets the Value entered into the edit Box in the G
     fwrite(bt,L_New_Gain,'double');
 catch
 end
@@ -2878,12 +2704,9 @@ function Activate_Balance_Callback(hObject, eventdata, handles)
 global GUI_Variables
 bt = GUI_Variables.BT;
 
-% disp('r');
 if (bt.Status=="open")
-    %     disp('r');
 
     PC=get(hObject,'Value');
-    % disp(PC);
     try
 
         if PC
@@ -2944,12 +2767,9 @@ function L_Auto_KF_Callback(hObject, eventdata, handles)
 global GUI_Variables
 bt = GUI_Variables.BT;
 
-% disp('r');
 if (bt.Status=="open")
-    %     disp('r');
 
     LKF=get(hObject,'Value');
-    % disp(PC);
     try
 
         if LKF
@@ -2965,38 +2785,6 @@ if (bt.Status=="open")
     end
 end
 
-% % --- Executes on button press in R_Auto_KF.
-% function R_Auto_KF_Callback(hObject, eventdata, handles)
-% % hObject    handle to R_Auto_KF (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-% % Hint: get(hObject,'Value') returns toggle state of R_Auto_KF
-% global GUI_Variables
-% bt = GUI_Variables.BT;
-% 
-% % disp('r');
-% if (bt.Status=="open")
-% %     disp('r');
-% 
-% RKF=get(hObject,'Value');
-% % disp(PC);
-% try
-%     
-% if RKF
-%     %activate prop control
-%     fwrite(bt,'+'); 
-%     disp('Activate Right Auto KF');
-% else
-%     %deactivate prop control
-%     fwrite(bt,'='); 
-%     disp('Deactivate Right Auto KF');
-% end
-%     catch
-%     end
-% end
-
-
 % --- Executes on button press in Activate_Prop_Pivot.
 function Activate_Prop_Pivot_Callback(hObject, eventdata, handles)
 % hObject    handle to Activate_Prop_Pivot (see GCBO)
@@ -3008,12 +2796,9 @@ function Activate_Prop_Pivot_Callback(hObject, eventdata, handles)
 global GUI_Variables
 bt = GUI_Variables.BT;
 
-% disp('r');
 if (bt.Status=="open")
-    %     disp('r');
 
     PP=get(hObject,'Value');
-    % disp(PC);
     try
 
         if PP
@@ -3034,21 +2819,6 @@ if (bt.Status=="open")
     catch
     end
 end
-
-
-% % --- Executes on button press in Slow_0_Trq.
-% function Slow_0_Trq_Callback(hObject, eventdata, handles)
-% % hObject    handle to Slow_0_Trq (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-% 
-% % --- Executes on button press in Fast_0_Trq.
-% function Fast_0_Trq_Callback(hObject, eventdata, handles)
-% % hObject    handle to Fast_0_Trq (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
 
 % --- Executes on button press in Fast_0_Trq.
 function Fast_0_Trq_Callback(hObject, eventdata, handles)
@@ -3140,7 +2910,6 @@ try
     end
 
     disp('Check Baseline');
-    %   if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
     message = fgetl(bt);
     if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'B'
         indexes = find(message==44);
@@ -3149,8 +2918,6 @@ try
         disp(GUI_Variables.basel);
         disp(GUI_Variables.baser);
     end
-
-    %   end
 
 catch
 end
@@ -3238,7 +3005,7 @@ try
         fwrite(bt,'W');
     end
 
-    L_Zero_Modif = str2double(get(handles.L_Zero_Modif_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+    L_Zero_Modif = str2double(get(handles.L_Zero_Modif_Edit,'String')); % Gets the Value entered into the edit Box in the G
     fwrite(bt,L_Zero_Modif,'double');
     disp(L_Zero_Modif);
 catch
