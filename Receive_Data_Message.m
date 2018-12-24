@@ -4,7 +4,7 @@ global GUI_Variables
 
 if message(1) == 83 && message(length(message)-1) == 90
     indexes = find(message==44);
-    if(indexes(1) == 2) % It means it is data message to plot and update signals
+    if(message(2) == 63) % It means it is data message to plot and update signals
         Data=zeros(1,length(indexes)-1);
         for index_iterator = 1:(length(indexes)-1)
             Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));
