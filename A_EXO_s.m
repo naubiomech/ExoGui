@@ -54,9 +54,11 @@ function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
 
 handles.output = hObject;
 
-BT_NAME={'Exo_Bluetooth_3','Capstone_Bluetooth_1','Exo_Bluetooth_2','Exo_High_Power'};
-bt = Bluetooth(BT_NAME{1},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
-disp('')
+BT_INDEX = 3;
+BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1','Exo_Bluetooth_2','Exo_High_Power'};
+BT_NAME = BT_NAMES{BT_INDEX};
+fprintf("Connecting to %s", BT_NAME);
+bt = Bluetooth(BT_NAME,1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
 str_uno=input('Would you use the arduino trigger? [y/n] ','s');
 
 if (strcmp(str_uno,'y'))
