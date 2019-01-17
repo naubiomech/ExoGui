@@ -57,7 +57,7 @@ handles.output = hObject;
 BT_INDEX = 3;
 BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1','Exo_Bluetooth_2','Exo_High_Power'};
 BT_NAME = BT_NAMES{BT_INDEX};
-fprintf("Connecting to %s", BT_NAME);
+fprintf("Connecting to %s\n", BT_NAME);
 bt = Bluetooth(BT_NAME,1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
 str_uno=input('Would you use the arduino trigger? [y/n] ','s');
 
@@ -1680,9 +1680,7 @@ if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'D'
     set(handles.L_Setpoint_Text,'String',Setpoint_LL);
     set(handles.L_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_LL);
     disp("Left New Setpoint")
-        disp(Setpoint_LL)
-    end
-    
+    disp(Setpoint_LL)
 end
 
 
