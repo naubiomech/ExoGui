@@ -1,10 +1,10 @@
-function [] = command(message,indexes,hObject, eventdata, handles)
+function [] = command(msg, indexes, handles)
 global GUI_Variables;
 %This function Figures out what non-data
 %message the bluetooth sent
 
 % i.e. it is used when matlab receive from arduino a message non-data
-switch(message(2))
+switch(msg)
   case '`'
     KF_LL = str2double(message((indexes(1)+1):(indexes(2)-1)));                                          %Gets the Current Arduino Torque Setpoint
     set(handles.L_Check_KF_Text,'String',KF_LL);

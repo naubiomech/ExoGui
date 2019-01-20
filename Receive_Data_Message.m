@@ -1,14 +1,6 @@
-function [RLCount,LLCount] = Receive_Data_Message(message,RLCount,LLCount,hObject, eventdata, handles)
-
-global GUI_Variables
-
-if message(1) == 83 && message(length(message)-1) == 90
-    indexes = find(message==44);
-    if(message(2) == 63) % It means it is data message to plot and update signals
-        Data=zeros(1,length(indexes)-1);
-        for index_iterator = 1:(length(indexes)-1)
-            Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));
-        end
+function [RLCount,LLCount] = Receive_Data_Message(RLCount,LLCount,hObject, eventdata, handles)
+    msg, Data = get_message();
+    if(msg == 63) % It means it is data message to plot and update signals
         GUI_Variables.RLTorque(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
         GUI_Variables.RLFSR(RLCount) = Data(2);
         GUI_Variables.RLSET(RLCount) = Data(3); %New to save also the set point
@@ -39,7 +31,18 @@ if message(1) == 83 && message(length(message)-1) == 90
         end
 
     else % it is a non data message
-        command(message,indexes,hObject, eventdata, handles)
+        command(message, indexes, handles);
     end
 
-end
+function [msg, data] = get_message()
+
+    global GUI_Variables
+    bt = GUI_Variables.BT;
+    message = fgetl(bt);
+    msg = message(2);
+    if message(1) == 83 && message(length(message)-1) == 90
+        indexes = find(message==',');
+        data=zeros(1,length(indexes)-1);
+        for index_iterator = 1:(length(indexes)-1)
+            data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));
+        end

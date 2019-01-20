@@ -243,8 +243,7 @@ if state == 1 % both connected
         pause(.000000001); 
         if ((bt.bytesAvailable > 0))
             tic
-            message = fgetl(bt);
-            [RLCount,LLCount] = Receive_Data_Message(message,RLCount,LLCount,hObject, eventdata, handles);
+            [RLCount,LLCount] = Receive_Data_Message(RLCount,LLCount,hObject, eventdata, handles);
             if(mod(RLCount,100) == 0)
                 axes(handles.Bottom_Axes);
                 whichPlotLeft = get(handles.Bottom_Graph,'Value');
@@ -525,35 +524,30 @@ if bt.Status=="open"
                                       %I can pause after it think its finished looping (emptied the buffer), and then check if it should have finished looping (emptied the buffer) and if it is not finished, have it loop again
             while((bt.bytesAvailable > 0)) % While there are still torque values in the bluetooth buffer
                 if(bt.bytesAvailable > 0)
-                    message = fgetl(bt);
-                    if message(1) == 83 && message(length(message)-1) == 90
-                        indexes = find(message==44);
-                        if(indexes(1) == 2)
-                            for index_iterator = 1:(length(indexes)-1)
-                                Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));
-                            end
-                            RLTorque(RLCount) = Data(1); % Gets the new Torque Value and Stores it
-                            RLFSR(RLCount) = Data(2);
-                            RLSET(RLCount) = Data(3); % New to save also the set point
-                            RLVOLT(RLCount) = Data(4);
-                            RLVOLT_H(RLCount) = Data(5);
-                            SIG1(RLCount) = Data(11);
-                            SIG3(RLCount) = Data(13);
-                            SIG4(RLCount) = Data(14);
-                            BASER(RLCount)=GUI_Variables.baser;
-                            RLCount = RLCount + 1; % Increments kneeCount Checks if Ankle Arduino Sent a new Torque Value
-                            RLCount = RLCount;
-                            LLTorque(LLCount) = Data(6); % Gets the new Torque Value and stores it
-                            LLFSR(LLCount) = Data(7);
-                            LLSET(LLCount) = Data(8); % New to save also the set point
-                            LLVOLT(LLCount) = Data(9);
-                            LLVOLT_H(LLCount) = Data(10);
-                            SIG2(LLCount) = Data(12);
-                            BASEL(LLCount)=GUI_Variables.basel;
+                    msg, Data = get_message();
+                    if(msg == '?')
+                        RLTorque(RLCount)
+                        = Data(1); % Gets the new Torque Value and Stores it
+                        RLFSR(RLCount) = Data(2);
+                        RLSET(RLCount) = Data(3); % New to save also the set point
+                        RLVOLT(RLCount) = Data(4);
+                        RLVOLT_H(RLCount) = Data(5);
+                        SIG1(RLCount) = Data(11);
+                        SIG3(RLCount) = Data(13);
+                        SIG4(RLCount) = Data(14);
+                        BASER(RLCount)=GUI_Variables.baser;
+                        RLCount = RLCount + 1; % Increments kneeCount Checks if Ankle Arduino Sent a new Torque Value
+                        RLCount = RLCount;
+                        LLTorque(LLCount) = Data(6); % Gets the new Torque Value and stores it
+                        LLFSR(LLCount) = Data(7);
+                        LLSET(LLCount) = Data(8); % New to save also the set point
+                        LLVOLT(LLCount) = Data(9);
+                        LLVOLT_H(LLCount) = Data(10);
+                        SIG2(LLCount) = Data(12);
+                        BASEL(LLCount)=GUI_Variables.basel;
 
-                        else
-                            command(message,indexes,hObject, eventdata, handles)
-                        end
+                    else
+                        command(msg, data, handles)
                     end
                 end                                                                  %Pause Long enough for any data in transit
             end
@@ -882,15 +876,15 @@ mem=GUI_Variables.MEM;
 if(bt.Status == "open")
     fwrite(bt,char(60));
     try
-        message = fgetl(bt);
-        indexes = find(message==44);
+        message, data = get_message();
     catch MER1
         MER1
     end
-    if message(1) == 83 && message(length(message)-1) == 90 && message(2) == '<'
-        check_torque = str2double(message((indexes(1)+1):(indexes(2)-1)));
-        check_FSR = str2double(message((indexes(2)+1):(indexes(3)-1)));
-        check_EXP = str2double(message((indexes(3)+1):(indexes(4)-1)));
+    if message == '<'
+
+        check_torque = data(1);
+        check_FSR = data(2);
+        check_EXP = data(3);
         
         if(check_torque == 1)
             set(handles.axes10,'Color',[0 1 0])
@@ -953,10 +947,9 @@ lkf=0;
 if (bt.Status=="open")
     fwrite(bt,'`'); % send the character "`"
     if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message = fgetl(bt)
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == '`'
-            indexes = find(message==44);
-            KF_LL = str2double(message((indexes(1)+1):(indexes(2)-1)));
+        message, data = get_message();
+        if mssage(2) == '`'
+            KF_LL = data(1);
 
             set(handles.L_Check_KF_Text,'String',KF_LL);
             disp("Left Current KF ");
@@ -1114,12 +1107,11 @@ mem=GUI_Variables.MEM;
 try
     fwrite(bt,char(78))
     try
-        message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'N'              
-            indexes = find(message==44);
-            check1 = str2double(message((indexes(1)+1):(indexes(2)-1)));
-            check2 = str2double(message((indexes(2)+1):(indexes(3)-1)));
-            check3 = str2double(message((indexes(3)+1):(indexes(4)-1)));
+        message, data = get_message();
+        if message == 'N'
+            check1 = data(1);
+            check2 = data(2);
+            check3 = data(3);
             if(check1 == 0 && check2 == 1 && check3 == 2)
                 set(handles.statusText,'String',"Working as Expected!");
                 set(handles.flag_bluetooth,'Color',[0 1 0]);
@@ -1461,12 +1453,11 @@ rki=0;
 if(bt.Status=="open")
     fwrite(bt,char(107));
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-        message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'k'
-            indexes = find(message==44);
-            rkp = str2double(message((indexes(1)+1):(indexes(2)-1)));
-            rkd = str2double(message((indexes(2)+1):(indexes(3)-1)));
-            rki = str2double(message((indexes(3)+1):(indexes(4)-1))); 
+        message, data = get_message();
+        if message == 'k'
+            rkp = data(1);
+            rkd = data(2);
+            rki = data(3);
             set(handles.R_Kp_text,'String',rkp);
             set(handles.R_Kd_Text,'String',rkd);
             set(handles.R_Ki_Text,'String',rki);
@@ -1487,12 +1478,11 @@ lki=0;
 if(bt.Status=="open")
     fwrite(bt,char(75));
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'K'
-            indexes = find(message==44);
-            lkp = str2double(message((indexes(1)+1):(indexes(2)-1)));
-            lkd = str2double(message((indexes(2)+1):(indexes(3)-1)));
-            lki = str2double(message((indexes(3)+1):(indexes(4)-1)));
+        message, data = get_message();
+        if message == 'K'
+            lkp = data(1);
+            lkd = data(2);
+            lki = data(3);
         end
         set(handles.L_Kp_text,'String',lkp);
         set(handles.L_Kd_text,'String',lkd);
@@ -1649,11 +1639,10 @@ if(bt.Status=="open")
 end
 
 if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-    message = fgetl(bt);
-    if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'd'
-        indexes = find(message==44);
-        Setpoint_RL = str2double(message((indexes(1)+1):(indexes(2)-1)));
-        Setpoint_Dorsi_RL = str2double(message((indexes(2)+1):(indexes(3)-1)));
+    message, data = get_message();
+    if message == 'd'
+        Setpoint_RL = data(1);
+        Setpoint_Dorsi_RL = data(2);
         disp("Right New Setpoint")
         disp(Setpoint_RL)
         disp(Setpoint_Dorsi_RL)
@@ -1670,13 +1659,12 @@ bt = GUI_Variables.BT;
 
 fwrite(bt,'D'); % Sends the character corresponding to ASCII value
                 % 68 to Arduino Which the Arduino understands to
-                % send parameters back Setpoint_LL = fgets(bt);
+                % send parameters back
                 % Gets the Current Arduino Torque Setpoint if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-message = fgetl(bt);
-if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'D'
-    indexes = find(message==44);
-    Setpoint_LL = str2double(message((indexes(1)+1):(indexes(2)-1)));
-    Setpoint_Dorsi_LL = str2double(message((indexes(2)+1):(indexes(3)-1)));
+message, data = get_message();
+if message == 'D'
+    Setpoint_LL = data(1);
+    Setpoint_Dorsi_LL = data(2);
     set(handles.L_Setpoint_Text,'String',Setpoint_LL);
     set(handles.L_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_LL);
     disp("Left New Setpoint")
@@ -1748,12 +1736,11 @@ if (bt.Status=="open")
     try
         fwrite(bt,'(');
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-            message = fgetl(bt)
-            if message(1) == 83 && message(length(message)-1) == 90 && message(2) == '('
-                indexes = find(message==44);
-                N1 = str2double(message((indexes(1)+1):(indexes(2)-1)));
-                N2 = str2double(message((indexes(2)+1):(indexes(3)-1)));
-                N3 = str2double(message((indexes(3)+1):(indexes(4)-1)));
+            message, data = get_message();
+            if message == '('
+                N1 = data(1);
+                N2 = data(2);
+                N3 = data(3);
                 n1=N1;
                 n2=N2;
                 n3=N3;
@@ -1990,11 +1977,10 @@ if (bt.Status=="open")
     try
 
         fwrite(bt,'~'); % send the character "~"
-        message = fgetl(bt);
+        message, data = get_message();
         if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-            if message(1) == 83 && message(length(message)-1) == 90 && message(2) == '~'
-                indexes = find(message==44);
-                KF_RL = str2double(message((indexes(1)+1):(indexes(2)-1)));
+            if message == '~'
+                KF_RL = data(1);
                 set(handles.R_Check_KF_Text,'String',KF_RL);
                 disp("Right Current KF ");
                 disp(KF_RL);
@@ -2020,10 +2006,9 @@ lfsr=0;
 if (bt.Status=="open")
     fwrite(bt,char('Q')); % send the character "Q"
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-        message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'Q'
-            indexes = find(message==44);
-            FSR_thresh_LL = str2double(message((indexes(1)+1):(indexes(2)-1)));
+        message,data = get_message();
+        if message == 'Q'
+            FSR_thresh_LL = data(1);
             set(handles.L_Check_FSR_Text,'String',FSR_thresh_LL);
             disp("Left Current FSR th ");
             disp(FSR_thresh_LL);
@@ -2088,10 +2073,9 @@ rfsr=0;
 if (bt.Status=="open")
     try
         fwrite(bt,char('q')); % send the character "Q"
-        message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'q'
-            indexes = find(message==44);
-            Curr_TH_R = str2double(message((indexes(1)+1):(indexes(2)-1)));
+        message,data = get_message();
+        if message == 'q'
+            Curr_TH_R = data(1);
             set(handles.R_Check_FSR_Text,'String',Curr_TH_R);
             disp("Right Current FSR th ");
             disp(Curr_TH_R);
@@ -2553,10 +2537,9 @@ if(bt.Status=="open")
 end
 
 if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-    message = fgetl(bt);
-    if message(1) == 83 && message(length(message)-1) == 90 && message(2) == ']'
-        indexes = find(message==44);
-        R_Gain= str2double(message((indexes(1)+1):(indexes(2)-1)));
+    message,data = get_message();
+    if message == ']'
+        R_Gain= data(1);
         disp("Right New Gain Setpoint")
         disp(R_Gain)
         set(handles.R_Check_Gain_Text,'String',R_Gain);
@@ -2623,10 +2606,9 @@ try
     end
 
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == '}'
-            indexes = find(message==44);
-            L_Gain= str2double(message((indexes(1)+1):(indexes(2)-1)));
+        message,data = get_message();
+        if message(2) == '}'
+            L_Gain= data(1);
             disp("Left New Gain Setpoint")
             disp(L_Gain)
             set(handles.L_Check_Gain_Text,'String',L_Gain);
@@ -2910,11 +2892,10 @@ try
     end
 
     disp('Check Baseline');
-    message = fgetl(bt);
-    if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'B'
-        indexes = find(message==44);
-        GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
-        GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
+    message, data = get_message();
+    if message(2) == 'B'
+        GUI_Variables.basel= data(1);
+        GUI_Variables.baser= data(2);
         disp(GUI_Variables.basel);
         disp(GUI_Variables.baser);
     end
