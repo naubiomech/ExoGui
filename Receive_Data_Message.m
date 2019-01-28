@@ -46,3 +46,4 @@ function [msg, data] = get_message()
         for index_iterator = 1:(length(indexes)-1)
             data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));
         end
+        data = data ./ 100;
