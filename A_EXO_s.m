@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
 
 handles.output = hObject;
 
-BT_INDEX = 3;
+BT_INDEX = 1;
 BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1','Exo_Bluetooth_2','Exo_High_Power'};
 BT_NAME = BT_NAMES{BT_INDEX};
 fprintf("Connecting to %s\n", BT_NAME);
@@ -132,6 +132,9 @@ BASEL=NaN(1,allocated);
 BASER=NaN(1,allocated);
 basel=0;
 baser=0;
+GUI_Variables.basel= basel;
+GUI_Variables.baser= baser;
+
 
 RLCount = 1; %Initializes the starting space for the Vector holding the Torque Values
 LLCount = 1;
@@ -524,10 +527,9 @@ if bt.Status=="open"
                                       %I can pause after it think its finished looping (emptied the buffer), and then check if it should have finished looping (emptied the buffer) and if it is not finished, have it loop again
             while((bt.bytesAvailable > 0)) % While there are still torque values in the bluetooth buffer
                 if(bt.bytesAvailable > 0)
-                    msg, Data = get_message();
+                    [msg, Data] = get_message();
                     if(msg == '?')
-                        RLTorque(RLCount)
-                        = Data(1); % Gets the new Torque Value and Stores it
+                        RLTorque(RLCount) = Data(1); % Gets the new Torque Value and Stores it
                         RLFSR(RLCount) = Data(2);
                         RLSET(RLCount) = Data(3); % New to save also the set point
                         RLVOLT(RLCount) = Data(4);
@@ -876,7 +878,7 @@ mem=GUI_Variables.MEM;
 if(bt.Status == "open")
     fwrite(bt,char(60));
     try
-        message, data = get_message();
+        [message, data] = get_message();
     catch MER1
         MER1
     end
@@ -947,7 +949,7 @@ lkf=0;
 if (bt.Status=="open")
     fwrite(bt,'`'); % send the character "`"
     if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message, data = get_message();
+        [message, data] = get_message();
         if mssage(2) == '`'
             KF_LL = data(1);
 
@@ -1107,7 +1109,7 @@ mem=GUI_Variables.MEM;
 try
     fwrite(bt,char(78))
     try
-        message, data = get_message();
+        [message, data] = get_message();
         if message == 'N'
             check1 = data(1);
             check2 = data(2);
@@ -1453,7 +1455,7 @@ rki=0;
 if(bt.Status=="open")
     fwrite(bt,char(107));
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-        message, data = get_message();
+        [message, data] = get_message();
         if message == 'k'
             rkp = data(1);
             rkd = data(2);
@@ -1478,7 +1480,7 @@ lki=0;
 if(bt.Status=="open")
     fwrite(bt,char(75));
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message, data = get_message();
+        [message, data] = get_message();
         if message == 'K'
             lkp = data(1);
             lkd = data(2);
@@ -1639,7 +1641,7 @@ if(bt.Status=="open")
 end
 
 if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-    message, data = get_message();
+    [message, data] = get_message();
     if message == 'd'
         Setpoint_RL = data(1);
         Setpoint_Dorsi_RL = data(2);
@@ -1661,7 +1663,7 @@ fwrite(bt,'D'); % Sends the character corresponding to ASCII value
                 % 68 to Arduino Which the Arduino understands to
                 % send parameters back
                 % Gets the Current Arduino Torque Setpoint if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-message, data = get_message();
+[message, data] = get_message();
 if message == 'D'
     Setpoint_LL = data(1);
     Setpoint_Dorsi_LL = data(2);
@@ -1736,7 +1738,7 @@ if (bt.Status=="open")
     try
         fwrite(bt,'(');
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-            message, data = get_message();
+            [message, data] = get_message();
             if message == '('
                 N1 = data(1);
                 N2 = data(2);
@@ -1977,7 +1979,7 @@ if (bt.Status=="open")
     try
 
         fwrite(bt,'~'); % send the character "~"
-        message, data = get_message();
+        [message, data] = get_message();
         if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
             if message == '~'
                 KF_RL = data(1);
@@ -2892,7 +2894,7 @@ try
     end
 
     disp('Check Baseline');
-    message, data = get_message();
+    [message, data] = get_message();
     if message(2) == 'B'
         GUI_Variables.basel= data(1);
         GUI_Variables.baser= data(2);
