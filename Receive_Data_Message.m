@@ -32,5 +32,5 @@ function [RLCount,LLCount] = Receive_Data_Message(RLCount,LLCount,hObject, event
         end
 
     else % it is a non data message
-        command(message, indexes, handles);
+        command(msg, Data, handles);
     end
