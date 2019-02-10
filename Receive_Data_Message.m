@@ -1,4 +1,5 @@
 function [RLCount,LLCount] = Receive_Data_Message(RLCount,LLCount,hObject, eventdata, handles)
+    global GUI_Variables;
     [msg, Data] = get_message();
     if(msg == 63) % It means it is data message to plot and update signals
         GUI_Variables.RLTorque(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
