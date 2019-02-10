@@ -702,6 +702,20 @@ if bt.Status=="open"
         [lkp,lkd,lki]=L_Get_PID_Callback(hObject, eventdata, handles);
         [rkp,rkd,rki]=R_Get_PID_Callback(hObject, eventdata, handles);
     catch
+        
+        n1 = -1;
+        n2 = -1;
+        n3 = -1;
+        lfsr = -1;
+        rfsr = -1;
+        lkf = -1;
+        rkf = -1;
+        lkp = -1;
+        lkd = -1;
+        lki = -1;
+        rkp = -1;
+        rkd = -1;
+        rki = -1;
     end
 
     Filename = sprintf('%s_%d','Parameters_Trial_Number_',bt.UserData); % Creates a new filename called "Torque_#" Where # is the trial number
