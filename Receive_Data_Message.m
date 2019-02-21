@@ -9,7 +9,6 @@ if message(1) == 83 && message(length(message)-1) == 90
                     for index_iterator = 1:(length(indexes)-1)
                         Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));             
                     end
-                    
                     GUI_Variables.RLTRQ(RLCount) = Data(1)/100;                 %Gets the new Torque Value and Stores it
                     GUI_Variables.RLFSR(RLCount) = Data(2); %state
                     GUI_Variables.RLSET(RLCount) = Data(3)/100; %save the torque set point

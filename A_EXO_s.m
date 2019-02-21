@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 05-Dec-2018 10:28:28
+% Last Modified by GUIDE v2.5 21-Jan-2019 17:23:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -97,7 +97,8 @@ GUI_Variables = struct('BT',bt,'IP','0.0.0.0','t',0,'Timer',NaN,'state',0,'RLTRQ
     'L_Bal_dyn_Toe',20,'L_Bal_dyn_Heel',30,'L_Bal_steady_Toe',40,'L_Bal_steady_Heel',50,...
     'R_Bal_dyn_Toe',20,'R_Bal_dyn_Heel',30,'R_Bal_steady_Toe',40,'R_Bal_steady_Heel',50,...
         'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
-    'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000));
+    'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
+    'PropOn',0);
 
 
 
@@ -351,7 +352,87 @@ if state == 1 % both connected
         end
         pause(.000000001); 
         
+%---------------------Optimization-----------------------------------------
 
+        try %Flush input buffer if approaching overflow
+            if GUI_Variables.BT.BytesAvailable>0.9*GUI_Variables.BT.InputBufferSize
+                flushinput(GUI_Variables.BT);
+                fprintf('BT input buffer flushed to avoid overflow \n')
+            end
+        catch
+        end
+        
+        %------------Bang-Bang-------------------------
+        if ~GUI_Variables.PropOn
+            try
+                if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
+                    if GUI_Variables.t.BytesAvailable>0
+                        Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
+                        if char(Setpoints') == "done"
+                            fwrite(GUI_Variables.BT,',');           %Optimization done
+                            set(handles.statusText,'String',"Optimization generation complete.")
+                        else
+                            if ~contains(char(Setpoints'),'_') %One parameter bang-bang optimization (sigmoid)
+                                if GUI_Variables.BT.Status == "open"
+                                    Trq_Setpoint = str2double(char(Setpoints'));    %Torque setpoint
+                                    fwrite(GUI_Variables.BT,'F');                   %Left leg setpoints
+                                    fwrite(GUI_Variables.BT,Trq_Setpoint,'double'); %Plantarflexion
+                                    fwrite(GUI_Variables.BT,0,'double');            %Dorsiflexion
+                                    fwrite(GUI_Variables.BT,'f');                   %Right leg setpoints
+                                    fwrite(GUI_Variables.BT,Trq_Setpoint,'double'); %Plantarflexion
+                                    fwrite(GUI_Variables.BT,0,'double');            %Dorsiflexion
+                                    disp(['Sent Data: ',num2str(Trq_Setpoint)]);
+                                end
+                            else %Two parameter bang-bang optimization (zero-jerk spline)
+                                if GUI_Variables.BT.Status == "open"
+                                    Char_Setpoints = strsplit(char(Setpoints'),'_');
+                                    Trq_Setpoint = str2double(Char_Setpoints{1});    %Torque Setpoint
+                                    RT_Setpoint = str2double(Char_Setpoints{2})/100; %Rise time %
+                                    fwrite(GUI_Variables.BT,'$');       %Two optimization values incoming
+                                    fwrite(GUI_Variables.BT,Trq_Setpoint,'double');  %Torque setpoint
+                                    fwrite(GUI_Variables.BT,RT_Setpoint,'double');   %Rise time %   
+                                    disp(['Sent Data: ',num2str(Trq_Setpoint),' , ', num2str(RT_Setpoint)]);
+                                end
+                            end
+                        end
+                    end
+                end
+            catch error
+                disp(error)
+                fprintf('Unable to apply optimization setpoints \n')
+            end
+        
+        %------------Proportional----------------------
+        elseif GUI_Variables.PropOn
+            try
+                if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
+                    if GUI_Variables.t.BytesAvailable>0
+                        Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
+                        if char(Setpoints') == "done"
+                            fwrite(GUI_Variables.BT,',');   
+                            set(handles.statusText,'String',"Optimization generation complete.")
+                        else
+                            if ~contains(char(Setpoints'),'_')
+                                Trq_Setpoint = str2double(char(Setpoints'));  %Torque Setpoint
+                                if GUI_Variables.BT.Status == "open"
+                                    fwrite(GUI_Variables.BT,'"');   %Need new symbol for prop optimization
+                                    fwrite(GUI_Variables.BT,Trq_Setpoint,'double');
+                                    disp(['Sent Data: ',num2str(Trq_Setpoint)]);
+                                end
+                            else
+                                warning('Two parameter optimization for proportional control is not possible.');
+                            end
+                        end
+                    end
+                end
+            catch error
+                disp(error)
+                fprintf('Unable to apply optimization setpoint \n')
+            end
+            
+        end
+
+        
 %---------------------AUTORECONNECT--------------------
 
 if strcmp(get(handles.BT_Text,'String'),'On')
@@ -1800,7 +1881,7 @@ if selectMode == 1
     set(handles.L_PID,'Visible','off');
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','off');
-    set(handles.HLO_panel,'Visible','off');
+    set(handles.Optimization_Panel,'Visible','off');
     set(handles.Balance_panel,'Visible','off');
 end
 if selectMode == 2
@@ -1808,7 +1889,7 @@ if selectMode == 2
     set(handles.L_PID,'Visible','on');
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','off');
-    set(handles.HLO_panel,'Visible','off');
+    set(handles.Optimization_Panel,'Visible','off');
     set(handles.Balance_panel,'Visible','off');
 end
 if selectMode == 3
@@ -1816,7 +1897,7 @@ if selectMode == 3
     set(handles.L_PID,'Visible','off');
     set(handles.L_Adj,'Visible','on');
     set(handles.L_Proportional_Ctrl,'Visible','off');
-    set(handles.HLO_panel,'Visible','off');
+    set(handles.Optimization_Panel,'Visible','off');
     set(handles.Balance_panel,'Visible','off');
 end
 if selectMode == 4
@@ -1824,7 +1905,7 @@ if selectMode == 4
     set(handles.L_PID,'Visible','off');
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','on');
-    set(handles.HLO_panel,'Visible','off');
+    set(handles.Optimization_Panel,'Visible','off');
     set(handles.Balance_panel,'Visible','off');
 end
 if selectMode == 5
@@ -1832,7 +1913,7 @@ if selectMode == 5
     set(handles.L_PID,'Visible','off');
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','off');
-    set(handles.HLO_panel,'Visible','on');
+    set(handles.Optimization_Panel,'Visible','on');
     set(handles.Balance_panel,'Visible','off');
 end
 if selectMode == 6
@@ -1840,7 +1921,7 @@ if selectMode == 6
     set(handles.L_PID,'Visible','off');
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','off');
-    set(handles.HLO_panel,'Visible','off');
+    set(handles.Optimization_Panel,'Visible','off');
     set(handles.Balance_panel,'Visible','on');
 end
 
@@ -3466,11 +3547,12 @@ if (bt.Status=="open")
 %     disp('r');
 
 PP=get(hObject,'Value');
-% disp(PC);
+ disp(PP);
 try
     
 if PP
     %activate prop control
+    GUI_Variables.PropOn = 1;
     fwrite(bt,'#'); 
     disp('Activate Prop Pivot Ctrl');
     axes(handles.PROP_FUNCTION_axes);
@@ -3478,6 +3560,7 @@ x=0.4:0.01:1.2;
 plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
 else
     %deactivate prop control
+    GUI_Variables.PropOn = 0;
     fwrite(bt,'^'); 
     disp('Deactivate Prop Pivot Ctrl');
     axes(handles.PROP_FUNCTION_axes);
@@ -4158,8 +4241,8 @@ fwrite(bt,bias,'double');
 disp(['BioFeedback Bias ',num2str(bias)]);
 end
 
-catch
-end
+    catch
+    end
     
 end
 
@@ -4231,10 +4314,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% FROM OPTIMIZATION GREG
-
-
 % --- Executes on selection change in IP_list.
 function IP_list_Callback(hObject, eventdata, handles)
 % hObject    handle to IP_list (see GCBO)
@@ -4246,7 +4325,7 @@ if selectMode == 1
     GUI_Variables.IP = '134.114.52.219';
 %     GUI_Variables.IP = '134.114.101.52';
 elseif selectMode == 2
-    GUI_Variables.IP = '10.18.48.52';
+    GUI_Variables.IP = '10.18.48.27';
 elseif selectMode == 3
     GUI_Variables.IP = '10.18.48.166';
 elseif selectMode == 4
@@ -4255,7 +4334,7 @@ end
 
 
 % --- Executes on button press in Start_TCP.
-function Start_TCP_Callback(hObject, eventdata, handles)
+function Open_TCP_Callback(hObject, eventdata, handles)
 % hObject    handle to Start_TCP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -4343,7 +4422,7 @@ end
 if exist('t','var')
     if t.Status == "open" && bt.Status == "open"
         fwrite(t,"start")
-%         fwrite(bt,' ') to change from @
+        fwrite(bt,'%')
         set(handles.statusText,'String',"Initializing optimization...")
     elseif (t.Status == "closed")
         set(handles.statusText,'String',"TCP port is not open! Re-open connection.")
@@ -4374,7 +4453,7 @@ end
 if exist('t','var')
     if t.Status == "open" && bt.Status == "open"
         fwrite(t,"end")
-%         fwrite(bt,' ') to change from %
+        fwrite(bt,',')
         set(handles.statusText,'String',"Stopping optimization...")
     elseif (t.Status == "closed")
         set(handles.statusText,'String',"TCP port is not open! Re-open connection.")
@@ -4415,7 +4494,88 @@ fwrite(bt,':');
 disp(['BioFeedback Baseline for 4 steps (Default)']);
 
 
-catch
-end
+    catch
+    end
 end
 
+% --- Executes during object creation, after setting all properties.
+function TCP_Status_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to TCP_Status (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate TCP_Status
+
+
+% --- Executes during object creation, after setting all properties.
+function Open_TCP_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Open_TCP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes during object creation, after setting all properties.
+function Close_TCP_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Close_TCP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes during object creation, after setting all properties.
+function Start_Optimization_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Start_Optimization (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes during object creation, after setting all properties.
+function Stop_Optimization_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Stop_Optimization (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+
+
+function FSR_Distance_In_Callback(hObject, eventdata, handles)
+% hObject    handle to FSR_Distance_In (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of FSR_Distance_In as text
+%        str2double(get(hObject,'String')) returns contents of FSR_Distance_In as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function FSR_Distance_In_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to FSR_Distance_In (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function Ankle2FSR_Distance_In_Callback(hObject, eventdata, handles)
+% hObject    handle to Ankle2FSR_Distance_In (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Ankle2FSR_Distance_In as text
+%        str2double(get(hObject,'String')) returns contents of Ankle2FSR_Distance_In as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Ankle2FSR_Distance_In_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Ankle2FSR_Distance_In (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
