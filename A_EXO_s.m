@@ -248,230 +248,59 @@ if state == 1 % both connected
             tic
             [RLCount,LLCount] = Receive_Data_Message(RLCount,LLCount,hObject, eventdata, handles);
             if(mod(RLCount,100) == 0)
+                plots = {{GUI_Variables.RLTorque,GUI_Variables.RLSET},
+                    {GUI_Variables.RLFSR},
+                    {GUI_Variables.LLTorque},
+                    {GUI_Variables.LLFSR},
+                    {GUI_Variables.LLFSR},
+                    {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,GUI_Variables.BASEL},
+                    {GUI_Variables.RLVOLT,GUI_Variables.RLVOLT_H,GUI_Variables.BASER},
+                    {GUI_Variables.SIG1},
+                    {GUI_Variables.SIG2},
+                    {GUI_Variables.SIG3},
+                    {GUI_Variables.SIG4}};
+                
+                titles = {"RL Torque","RL State","LL Torque","LL State","LL Force Toe and Heel",
+                     "RL Force Toe and Heel","SIG1","SIG2","SIG3","SIG4"};
+                 
                 axes(handles.Bottom_Axes);
                 whichPlotLeft = get(handles.Bottom_Graph,'Value');
-                if whichPlotLeft == 1
-                    plotThisLeft = GUI_Variables.RLTorque;
-                    if RLCount <= 1000
-                        plot(1:length(plotThisLeft), [plotThisLeft;GUI_Variables.RLSET]);
-                        title("RL Torque");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,[GUI_Variables.RLTorque((RLCount-1000):RLCount-1);GUI_Variables.RLSET((RLCount-1000):RLCount-1)]);
-                        title("RL Torque");
-                    end
-                end
-                if whichPlotLeft == 2
-                    plotThisLeft = GUI_Variables.RLFSR;
-                    if RLCount <= 1000
-                        plot(1:length(plotThisLeft), plotThisLeft);
-                        title("RL State");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.RLFSR((RLCount-1000):RLCount-1));
-                        title("RL State");
-                    end
-                end
-                if whichPlotLeft == 3
-                    plotThisLeft = GUI_Variables.LLTorque;
-                    if LLCount <= 1000
-                        plot(1:length(plotThisLeft), [plotThisLeft;GUI_Variables.LLSET]);
-                        title("LL Torque");
-                    end
-                    if LLCount > 1005
-                        plot((LLCount-1000):LLCount-1,[GUI_Variables.LLTorque((LLCount-1000):LLCount-1);GUI_Variables.LLSET((LLCount-1000):LLCount-1)]);
-                        title("LL Torque");
-                    end
-                end
-                if whichPlotLeft == 4
-                    plotThisLeft = GUI_Variables.LLFSR;
-                    if LLCount <= 1000
-                        plot(1:length(plotThisLeft), plotThisLeft);
-                        title("LL State");
-                    end
-                    if LLCount > 1005
-                        plot((LLCount-1000):LLCount-1,GUI_Variables.LLFSR((LLCount-1000):LLCount-1));
-                        title("LL State");
-                    end
-                end
-                if whichPlotLeft == 5
-
-                    if LLCount <= 1000
-                        plot(1:length(GUI_Variables.LLVOLT), [GUI_Variables.LLVOLT;GUI_Variables.LLVOLT_H;GUI_Variables.BASEL] );
-                        title("LL Force Toe and Heel");
-                    end
-                    if LLCount > 1005
-                        plot((LLCount-1000):LLCount-1,[GUI_Variables.LLVOLT((LLCount-1000):LLCount-1);GUI_Variables.LLVOLT_H((LLCount-1000):LLCount-1);GUI_Variables.BASEL((RLCount-1000):RLCount-1)]);
-                        title("LL Force Toe and Heel");
-                    end
-                end
-                if whichPlotLeft == 6
-                    if RLCount <= 1000
-                        plot(1:length(GUI_Variables.RLVOLT), [GUI_Variables.RLVOLT;GUI_Variables.RLVOLT_H; GUI_Variables.BASER]);
-                        title("RL Force Toe and Heel");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,[GUI_Variables.RLVOLT((RLCount-1000):RLCount-1); GUI_Variables.RLVOLT_H((RLCount-1000):RLCount-1); GUI_Variables.BASER((RLCount-1000):RLCount-1)]);
-                        title("RL Force Toe and Heel");
-                    end
-                end   
+               
+                plotData = plots{whichPlotLeft};
+                plotTitle = titles{whichPlotLeft};
                 
-                if whichPlotLeft == 7
-                    if RLCount <= 1000
-                        plot(1:length(GUI_Variables.SIG1), GUI_Variables.SIG1);
-                        title("SIG1");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.SIG1((RLCount-1000):RLCount-1));
-                        title("SIG1");
+                if RLCount <= 1000
+                	dataLength = 1:RLCount;
+                else
+                    dataLength = (RLCount-1000):RLCount-1;
+                end
+                data = plotData{1}(dataLength);
+                if length(plotData) > 1
+                    for i=2:length(plotData)
+                        data = [data; plotData{i}(dataLength)];
                     end
                 end
-                
-                if whichPlotLeft == 8
-                    if RLCount <= 1000
-                        plot(1:length(GUI_Variables.SIG2), GUI_Variables.SIG2);
-                        title("SIG2");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.SIG2((RLCount-1000):RLCount-1));
-                        title("SIG2");
-                    end
-                end
-                
-                if whichPlotLeft == 9
-                    if RLCount <= 1000
-                        plot(1:length(GUI_Variables.SIG3), GUI_Variables.SIG3);
-                        title("SIG3");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.SIG3((RLCount-1000):RLCount-1));
-                        title("SIG3");
-                    end
-                end
-                
-                if whichPlotLeft == 10
-                    if RLCount <= 1000
-                        plot(1:length(GUI_Variables.SIG4), GUI_Variables.SIG4);
-                        title("SIG4");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.SIG4((RLCount-1000):RLCount-1));
-                        title("SIG4");
-                    end
-                end
-                
+                plot(dataLength, data);
+                title(plotTitle);
                 
                 whichPlotRight = get(handles.Top_Graph,'Value');
                 axes(handles.Top_Axes);
-                if whichPlotRight == 1
-                    plotThisRight = GUI_Variables.RLTorque;
-                    if RLCount <= 1000
-                        plot(1:length(plotThisRight), [plotThisRight;GUI_Variables.RLSET]);
-                        title("RL Torque");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,[GUI_Variables.RLTorque((RLCount-1000):RLCount-1);GUI_Variables.RLSET((RLCount-1000):RLCount-1)]);
-                        title("RL Torque");
-                    end
-                end
-                if whichPlotRight == 2
-                    plotThisRight = GUI_Variables.RLFSR;
-                    if RLCount <= 1000
-                        plot(1:length(plotThisRight), plotThisRight);
-                        title("RL State");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.RLFSR((RLCount-1000):RLCount-1));
-                        title("RL State");
-                    end
-                end
-                if whichPlotRight == 3
-                    plotThisRight = GUI_Variables.LLTorque;
-                    if LLCount <= 1000
-                        plot(1:length(plotThisRight), [plotThisRight;GUI_Variables.LLSET]);
-                        title("LL Torque");
-                    end
-                    if LLCount > 1005
-                        plot((LLCount-1000):LLCount-1,[GUI_Variables.LLTorque((LLCount-1000):LLCount-1);GUI_Variables.LLSET((RLCount-1000):RLCount-1)]);
-                        title("LL Torque");
-                    end
-                end
-                if whichPlotRight == 4
-                    plotThisRight = GUI_Variables.LLFSR;
-                    if LLCount <= 1000
-                        plot(1:length(plotThisRight), plotThisRight);
-                        title("LL State");
-                    end
-                    if LLCount > 1005
-                        plot((LLCount-1000):LLCount-1,GUI_Variables.LLFSR((LLCount-1000):LLCount-1));
-                        title("LL State");
-                    end
-                end
-                if whichPlotRight == 5
-                    if LLCount <= 1000
-                        plot(1:length(GUI_Variables.LLVOLT), [GUI_Variables.LLVOLT;GUI_Variables.LLVOLT_H;GUI_Variables.BASEL]);
-                        title("LL Force Toe and Heel");
-                    end
-                    if LLCount > 1005
-                        plot((LLCount-1000):LLCount-1,[GUI_Variables.LLVOLT((LLCount-1000):LLCount-1);GUI_Variables.LLVOLT_H((LLCount-1000):LLCount-1);GUI_Variables.BASEL((LLCount-1000):LLCount-1)]);
-                        title("LL Force Toe and Heel");
-                    end
-                end
-                if whichPlotRight == 6
-                    plotThisRight = GUI_Variables.RLVOLT;
-                    if RLCount <= 1000
-                        plot(1:length(plotThisRight), [GUI_Variables.RLVOLT;GUI_Variables.RLVOLT_H;GUI_Variables.BASER]);
-                        title("RL Force Toe and Heel");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,[GUI_Variables.RLVOLT((RLCount-1000):RLCount-1);GUI_Variables.RLVOLT_H((RLCount-1000):RLCount-1);GUI_Variables.BASER((LLCount-1000):LLCount-1)]);
-                        title("RL Force Toe and Heel");
-                    end
-                end
+                plotData = plots{whichPlotRight};
+                plotTitle = titles{whichPlotRight};
                 
-                if whichPlotRight == 7
-                    if RLCount <= 1000
-                        plot(1:length(GUI_Variables.SIG1), GUI_Variables.SIG1);
-                        title("SIG1");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.SIG1((RLCount-1000):RLCount-1));
-                        title("SIG1");
+                if RLCount <= 1000
+                	dataLength = 1:RLCount;
+                else
+                    dataLength = (RLCount-1000):RLCount-1;
+                end
+                data = plotData{1}(dataLength);
+                if length(plotData) > 1
+                    for i=2:length(plotData)
+                        data = [data; plotData{i}(dataLength)];
                     end
                 end
-                
-                if whichPlotRight == 8
-                    if RLCount <= 1000
-                        plot(1:length(GUI_Variables.SIG2), GUI_Variables.SIG2);
-                        title("SIG2");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.SIG2((RLCount-1000):RLCount-1));
-                        title("SIG2");
-                    end
-                end
-                
-                if whichPlotRight == 9
-                    if RLCount <= 1000
-                        plot(1:length(GUI_Variables.SIG3), GUI_Variables.SIG3);
-                        title("SIG3");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.SIG3((RLCount-1000):RLCount-1));
-                        title("SIG3");
-                    end
-                end
-
-                if whichPlotRight == 10
-                    if RLCount <= 1000
-                        plot(1:length(GUI_Variables.SIG4), GUI_Variables.SIG4);
-                        title("SIG4");
-                    end
-                    if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,GUI_Variables.SIG4((RLCount-1000):RLCount-1));
-                        title("SIG4");
-                    end
-                end
+                plot(dataLength, data);
+                title(plotTitle);
             end
         end
     end
