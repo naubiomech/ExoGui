@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 13-Sep-2018 09:40:16
+% Last Modified by GUIDE v2.5 19-Nov-2018 16:34:10
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -61,7 +61,7 @@ handles.output = hObject;
 % bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
-BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_2'};
+BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_3'};
 bt = Bluetooth(BT_NAME{3},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
 bt.Timeout=2;
 disp('')%Exo_Bluetooth_2
@@ -3018,7 +3018,9 @@ if (bt.Status=="open")
 %     disp('r');
 
 PC=get(hObject,'Value');
-% disp(PC);
+disp("Balance status")
+disp(PC);
+disp("remember that arduino state machine has to be set on toe&heel");
 try
     
 if PC
@@ -3438,3 +3440,61 @@ end
 disp('Balance Baseline');
 catch
 end
+
+
+
+
+
+% --- Executes on button press in BT_auto_reconnect_radiobutton.
+function BT_auto_reconnect_radiobutton_Callback(hObject, eventdata, handles)
+% hObject    handle to BT_auto_reconnect_radiobutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of BT_auto_reconnect_radiobutton
+
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+% BT_auto_reconnect_radiobutton
+
+% disp('r');
+if (bt.Status=="open")
+%     disp('r');
+BT_auto=get(hObject,'Value');
+% disp(PC);
+    try
+            if BT_auto
+            %activate prop control
+            fwrite(bt,'|'); 
+            disp('Activate BT auto reconnect');
+             else
+            %deactivate prop control
+            fwrite(bt,'@'); 
+            disp('Deactivate BT auto reconnect');
+            end
+    catch
+    end
+end
+
+
+
+% --- Executes on button press in Steady_Balance_Base.
+function Steady_Balance_Base_Callback(hObject, eventdata, handles)
+% hObject    handle to Steady_Balance_Base (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+try
+if(bt.Status=="open")
+fwrite(bt,'J');
+end
+
+disp('Steady Balance Baseline');
+catch
+end
+
