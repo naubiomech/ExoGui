@@ -54,8 +54,8 @@ function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
 
 handles.output = hObject;
 
-BT_INDEX = 1;
-BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1','Exo_Bluetooth_2','Exo_High_Power'};
+BT_INDEX = 5;
+BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1','Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth'};
 BT_NAME = BT_NAMES{BT_INDEX};
 fprintf("Connecting to %s\n", BT_NAME);
 bt = Bluetooth(BT_NAME,1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
