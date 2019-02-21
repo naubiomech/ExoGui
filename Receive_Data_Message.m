@@ -16,7 +16,7 @@ if message(1) == 83 && message(length(message)-1) == 90
                     GUI_Variables.RLVOLT_H(RLCount) = Data(5)/100;
                     GUI_Variables.SIG1(RLCount) = Data(11)/100;
                     GUI_Variables.SIG3(RLCount) = Data(13)/100;
-                    GUI_Variables.SIG4(RLCount) = Data(14)/100;
+                    GUI_Variables.SIG4(RLCount) = 0;%Data(14)/100;
                     GUI_Variables.BASER(RLCount)=GUI_Variables.baser;
                                         
                     GUI_Variables.R_BAL_DYN_HEEL(RLCount)=GUI_Variables.R_Bal_dyn_Heel;

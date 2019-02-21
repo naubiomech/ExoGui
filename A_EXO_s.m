@@ -62,7 +62,7 @@ handles.output = hObject;
 % bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
 BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_3','Jasons_Bluetooth','Exo_Bluetooth_2'};
-bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
+bt = Bluetooth('Exo_Bluetooth_3',1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
 bt.Timeout=2;
 disp('')%Exo_Bluetooth_2
 % Capstone_Bluetooth_1
@@ -4336,7 +4336,7 @@ if selectMode == 1
     GUI_Variables.IP = '134.114.52.219';
 %     GUI_Variables.IP = '134.114.101.52';
 elseif selectMode == 2
-    GUI_Variables.IP = '10.18.48.27';
+    GUI_Variables.IP = '10.18.48.128';
 elseif selectMode == 3
     GUI_Variables.IP = '10.18.48.166';
 elseif selectMode == 4
