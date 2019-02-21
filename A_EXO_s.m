@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 29-Nov-2018 14:07:13
+% Last Modified by GUIDE v2.5 05-Dec-2018 10:28:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -61,8 +61,8 @@ handles.output = hObject;
 % bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
-BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_3','Jasons_Bluetooth'};
-bt = Bluetooth(BT_NAME{4},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
+BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_3','Jasons_Bluetooth','Exo_Bluetooth_2'};
+bt = Bluetooth(BT_NAME{5},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
 bt.Timeout=2;
 disp('')%Exo_Bluetooth_2
 % Capstone_Bluetooth_1
@@ -85,14 +85,14 @@ else
 end
 
 global GUI_Variables
-GUI_Variables = struct('BT',bt,'Timer',NaN,'state',0,'RLTorque',NaN(1,60000), ...
-    'LLTorque',NaN(1,60000),'LLFSR',NaN(1,60000),'RLFSR',NaN(1,60000),...
+GUI_Variables = struct('BT',bt,'IP','0.0.0.0','t',0,'Timer',NaN,'state',0,'RLTRQ',NaN(1,60000), ...
+    'LLTRQ',NaN(1,60000),'LLFSR',NaN(1,60000),'RLFSR',NaN(1,60000),...
     'LLVOLT',NaN(1,60000),'RLVOLT',NaN(1,60000),'LLVOLT_H',NaN(1,60000),'RLVOLT_H',NaN(1,60000),'RLCount',1,'LLCount',1,...
     'COUNT',0,'UNO',Uno,'flag_calib',0,'flag_start',0,'first_calib',0,...
     'L_COUNT_SPEED',[],'R_COUNT_SPEED',[],...
     'RLSET',NaN(1,60000),'LLSET',NaN(1,60000),'MEM',ones(1,3)*2,...
     'SIG1',NaN(1,60000),'SIG2',NaN(1,60000),'SIG3',NaN(1,60000),'SIG4',NaN(1,60000),...
-    'BASEL',NaN(1,60000),'BASER',NaN(1,60000),'basel',0,'baser',0,'counter',0,...
+    'BASEL',NaN(1,60000),'BASER',NaN(1,60000),'BASEL_BIOFB',NaN(1,60000),'basel',0,'baser',0,'basel_biofb',0,'counter',0,...
     'flag_end_trial',0,'count_connection',0,'BT_connection',NaN(1,100),...
     'L_Bal_dyn_Toe',20,'L_Bal_dyn_Heel',30,'L_Bal_steady_Toe',40,'L_Bal_steady_Heel',50,...
     'R_Bal_dyn_Toe',20,'R_Bal_dyn_Heel',30,'R_Bal_steady_Toe',40,'R_Bal_steady_Heel',50,...
@@ -146,8 +146,8 @@ end
 flushinput(bt);
 flushoutput(bt);
 allocated = 100000;
-RLTorque = NaN(1,allocated);
-LLTorque = NaN(1,allocated);
+RLTRQ = NaN(1,allocated);
+LLTRQ = NaN(1,allocated);
 RLFSR = NaN(1,allocated);
 LLFSR = NaN(1,allocated);
 
@@ -157,15 +157,17 @@ SIG3 = NaN(1,allocated);
 SIG4 = NaN(1,allocated);
 BASEL=NaN(1,allocated);
 BASER=NaN(1,allocated);
+BASEL_BIOFB=NaN(1,allocated);
 basel=0;
 baser=0;
+basel_biofb=0;
 
 RLCount = 1;                                                             %Initializes the starting space for the Vector holding the Torque Values
 LLCount = 1;
 GUI_Variables.LLFSR = LLFSR;
 GUI_Variables.RLFSR = RLFSR;
-GUI_Variables.RLTorque = RLTorque;
-GUI_Variables.LLTorque = LLTorque;
+GUI_Variables.RLTRQ = RLTRQ;
+GUI_Variables.LLTRQ = LLTRQ;
 
 LLSET = NaN(1,allocated);
 RLSET = NaN(1,allocated);
@@ -225,6 +227,9 @@ GUI_Variables.SIG4=SIG4;
 
 GUI_Variables.BASEL=BASEL;
 GUI_Variables.BASER=BASER;
+
+GUI_Variables.BASEL_BIOFB=BASEL_BIOFB;
+
 
 BT_Was_Disconnected=0;
 GUI_Variables.counter=0;
@@ -363,25 +368,39 @@ if strcmp(get(handles.BT_Text,'String'),'On')
 %                     GUI_Variables.BT_disconnection(GUI_Variables.count_disconnection)=RLCount;
 %                     RLCount = RLCount + 1;
                     
-            try
+%             try
+
+
+
+
+disp('Close BT')
+try
                 fclose(bt);
+catch
+end
+while(bt.status=="closed")
                 pause(.5); 
+                disp('Try Open BT')
+                try
                 fopen(bt);
+                catch
+                end
+end
                 disp('Wait half second more')
                 pause(0.5); 
                 disp('New Status')
                 disp(bt.status);
                 if(bt.status=="open")
                     fwrite(bt,char(69));
-%                     GUI_Variables.count_connection=GUI_Variables.count_connection+1;
-%                     GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
+                    GUI_Variables.count_connection=GUI_Variables.count_connection+1;
+                    GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
                 end
                 toc
                 RLCount=RLCount+round(toc*100);
                 LLCount=RLCount;
                 tic
-            catch
-            end
+%             catch
+%             end
             tic
             end
         end
@@ -409,13 +428,13 @@ end
                 axes(handles.Bottom_Axes);
                 whichPlotLeft = get(handles.Bottom_Graph,'Value');
                 if whichPlotLeft == 1
-                    plotThisLeft = GUI_Variables.RLTorque;
+                    plotThisLeft = GUI_Variables.RLTRQ;
                     if RLCount <= 1000
                         plot(1:length(plotThisLeft), [plotThisLeft;GUI_Variables.RLSET]);
                         title("RL Torque");
                     end
                     if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,[GUI_Variables.RLTorque((RLCount-1000):RLCount-1);GUI_Variables.RLSET((RLCount-1000):RLCount-1)]);
+                        plot((RLCount-1000):RLCount-1,[GUI_Variables.RLTRQ((RLCount-1000):RLCount-1);GUI_Variables.RLSET((RLCount-1000):RLCount-1)]);
                         title("RL Torque");
                     end
                 end
@@ -431,13 +450,13 @@ end
                     end
                 end
                 if whichPlotLeft == 3
-                    plotThisLeft = GUI_Variables.LLTorque;
+                    plotThisLeft = GUI_Variables.LLTRQ;
                     if LLCount <= 1000
                         plot(1:length(plotThisLeft), [plotThisLeft;GUI_Variables.LLSET]);
                         title("LL Torque");
                     end
                     if LLCount > 1005
-                        plot((LLCount-1000):LLCount-1,[GUI_Variables.LLTorque((LLCount-1000):LLCount-1);GUI_Variables.LLSET((LLCount-1000):LLCount-1)]);
+                        plot((LLCount-1000):LLCount-1,[GUI_Variables.LLTRQ((LLCount-1000):LLCount-1);GUI_Variables.LLSET((LLCount-1000):LLCount-1)]);
                         title("LL Torque");
                     end
                 end
@@ -477,14 +496,35 @@ end
                 end   
                 
                 if whichPlotLeft == 7
+                    
+                        val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
+                        
+             if(val_biofb==0)                
                     if RLCount <= 1000
+                                                                  
                         plot(1:length(GUI_Variables.SIG1), GUI_Variables.SIG1);
-                        title("SIG1");
+                        title("SIG1");                        
                     end
                     if RLCount > 1005
                         plot((RLCount-1000):RLCount-1,GUI_Variables.SIG1((RLCount-1000):RLCount-1));
                         title("SIG1");
+                    end 
+             else
+                 if RLCount <= 1000
+                                                                  
+                        plot(1:length(GUI_Variables.SIG1), [GUI_Variables.SIG1;GUI_Variables.BASEL_BIOFB]);
+                        title("SIG1");                        
                     end
+                    if RLCount > 1005
+                        plot((RLCount-1000):RLCount-1,[GUI_Variables.SIG1((RLCount-1000):RLCount-1);GUI_Variables.BASEL_BIOFB((RLCount-1000):RLCount-1)]);
+                        title("SIG1");
+                        disp(GUI_Variables.BASEL_BIOFB(RLCount))
+                        disp(GUI_Variables.basel_biofb)
+                    end
+             end
+                    
+                    
+                    
                 end
                 
                  if whichPlotLeft == 8
@@ -613,13 +653,13 @@ end
                 whichPlotRight = get(handles.Top_Graph,'Value');
                 axes(handles.Top_Axes);
                 if whichPlotRight == 1
-                    plotThisRight = GUI_Variables.RLTorque;
+                    plotThisRight = GUI_Variables.RLTRQ;
                     if RLCount <= 1000
                         plot(1:length(plotThisRight), [plotThisRight;GUI_Variables.RLSET]);
                         title("RL Torque");
                     end
                     if RLCount > 1005
-                        plot((RLCount-1000):RLCount-1,[GUI_Variables.RLTorque((RLCount-1000):RLCount-1);GUI_Variables.RLSET((RLCount-1000):RLCount-1)]);
+                        plot((RLCount-1000):RLCount-1,[GUI_Variables.RLTRQ((RLCount-1000):RLCount-1);GUI_Variables.RLSET((RLCount-1000):RLCount-1)]);
                         title("RL Torque");
                     end
                 end
@@ -635,13 +675,13 @@ end
                     end
                 end
                 if whichPlotRight == 3
-                    plotThisRight = GUI_Variables.LLTorque;
+                    plotThisRight = GUI_Variables.LLTRQ;
                     if LLCount <= 1000
                         plot(1:length(plotThisRight), [plotThisRight;GUI_Variables.LLSET]);
                         title("LL Torque");
                     end
                     if LLCount > 1005
-                        plot((LLCount-1000):LLCount-1,[GUI_Variables.LLTorque((LLCount-1000):LLCount-1);GUI_Variables.LLSET((RLCount-1000):RLCount-1)]);
+                        plot((LLCount-1000):LLCount-1,[GUI_Variables.LLTRQ((LLCount-1000):LLCount-1);GUI_Variables.LLSET((RLCount-1000):RLCount-1)]);
                         title("LL Torque");
                     end
                 end
@@ -680,14 +720,30 @@ end
                 end
                 
                 if whichPlotRight == 7
+                    
+                       val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
+                        
+             if(val_biofb==0)                
                     if RLCount <= 1000
+                                                                  
                         plot(1:length(GUI_Variables.SIG1), GUI_Variables.SIG1);
-                        title("SIG1");
+                        title("SIG1");                        
                     end
                     if RLCount > 1005
                         plot((RLCount-1000):RLCount-1,GUI_Variables.SIG1((RLCount-1000):RLCount-1));
                         title("SIG1");
+                    end 
+             else
+                 if RLCount <= 1000
+                                                                  
+                        plot(1:length(GUI_Variables.SIG1), [GUI_Variables.SIG1;GUI_Variables.BASEL_BIOFB]);
+                        title("SIG1");                        
                     end
+                    if RLCount > 1005
+                        plot((RLCount-1000):RLCount-1,[GUI_Variables.SIG1((RLCount-1000):RLCount-1);GUI_Variables.BASEL_BIOFB((RLCount-1000):RLCount-1)]);
+                        title("SIG1");
+                    end
+             end
                 end
                 
                  if whichPlotRight == 8
@@ -830,9 +886,9 @@ global GUI_Variables
 bt = GUI_Variables.BT;
 
 if bt.Status=="open"
-LLTorque = GUI_Variables.LLTorque;
+LLTRQ = GUI_Variables.LLTRQ;
 LLFSR = GUI_Variables.LLFSR;
-RLTorque = GUI_Variables.RLTorque;
+RLTRQ = GUI_Variables.RLTRQ;
 RLFSR = GUI_Variables.RLFSR;
 RLSET = GUI_Variables.RLSET;
 LLSET = GUI_Variables.LLSET;
@@ -849,6 +905,8 @@ SIG3 = GUI_Variables.SIG3;
 SIG4 = GUI_Variables.SIG4;
 BASEL=GUI_Variables.BASEL;
 BASER=GUI_Variables.BASER;
+
+BASEL_BIOFB=GUI_Variables.BASEL_BIOFB;
 
 
 L_BAL_DYN_HEEL=GUI_Variables.L_BAL_DYN_HEEL;
@@ -890,7 +948,7 @@ while((bt.bytesAvailable > 0))%I use the double while loop so I can incorporate 
                     for index_iterator = 1:(length(indexes)-1)
                         Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));             
                     end
-%                     RLTorque(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
+%                     RLTRQ(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
 %                     RLFSR(RLCount) = Data(2);
 %                     RLSET(RLCount) = Data(3); %New to save also the set point
 %                     RLVOLT(RLCount) = Data(4);
@@ -898,7 +956,7 @@ while((bt.bytesAvailable > 0))%I use the double while loop so I can incorporate 
 %                     SIG1(RLCount) = Data(11);
 %                     RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value 
 %                     RLCount = RLCount;
-%                     LLTorque(LLCount) = Data(5);              %Gets the new Torque Value and stores it
+%                     LLTRQ(LLCount) = Data(5);              %Gets the new Torque Value and stores it
 %                     LLFSR(LLCount) = Data(6);
 %                     LLSET(LLCount) = Data(7); %New to save also the set point
 %                     LLVOLT(LLCount) = Data(8);
@@ -906,7 +964,7 @@ while((bt.bytesAvailable > 0))%I use the double while loop so I can incorporate 
 %                     
 %                     LLCount = LLCount + 1;  
 %                     LLCount = LLCount;
-                    RLTorque(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
+                    RLTRQ(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
                     RLFSR(RLCount) = Data(2);
                     RLSET(RLCount) = Data(3); %New to save also the set point
                     RLVOLT(RLCount) = Data(4);
@@ -920,18 +978,19 @@ while((bt.bytesAvailable > 0))%I use the double while loop so I can incorporate 
                     R_BAL_STEADY_HEEL(RLCount)=GUI_Variables.R_BAL_STEADY_HEEL;
                     R_BAL_DYN_TOE(RLCount)=GUI_Variables.R_Bal_dyn_Toe;
                     R_BAL_STEADY_TOE(RLCount)=GUI_Variables.R_Bal_steady_Toe;
-                    
+                    BASEL_BIOFB(RLCount)=GUI_Variables.basel_biofb;
                     
                     
                     RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value 
                     RLCount = RLCount;
-                    LLTorque(LLCount) = Data(6);              %Gets the new Torque Value and stores it
+                    LLTRQ(LLCount) = Data(6);              %Gets the new Torque Value and stores it
                     LLFSR(LLCount) = Data(7);
                     LLSET(LLCount) = Data(8); %New to save also the set point
                     LLVOLT(LLCount) = Data(9);
                     LLVOLT_H(LLCount) = Data(10);
                     SIG2(LLCount) = Data(12);                   
                     BASEL(LLCount)=GUI_Variables.basel;
+                    BASEL_BIOFB(LLCount)=GUI_Variables.basel_biofb;
                     
                     
                     L_BAL_DYN_HEEL(LLCount)=GUI_Variables.L_Bal_dyn_Heel;
@@ -955,8 +1014,8 @@ catch
 end
 
 
-LLTorque = LLTorque(1:(LLCount-1));
-RLTorque = RLTorque(1:(RLCount-1));
+LLTRQ = LLTRQ(1:(LLCount-1));
+RLTRQ = RLTRQ(1:(RLCount-1));
 RLFSR = RLFSR(1:(RLCount-1));
 LLFSR = LLFSR(1:(LLCount-1));
 
@@ -976,7 +1035,7 @@ SIG4 = SIG4(1:(RLCount-1));
 BASEL=BASEL(1:(RLCount-1));
 BASER=BASER(1:(RLCount-1));
 
-
+BASEL_BIOFB=BASEL_BIOFB(1:(RLCount-1));
 
 L_BAL_DYN_HEEL=L_BAL_DYN_HEEL(1:(RLCount-1));
 L_BAL_STEADY_HEEL=L_BAL_STEADY_HEEL(1:(RLCount-1));
@@ -991,14 +1050,14 @@ R_BAL_STEADY_TOE=R_BAL_STEADY_TOE(1:(RLCount-1));
 
 
 if(state ==1)  %If both are on
-   lengthDif = length(RLTorque) - length(LLTorque);                   %When both are on there is a possibility that one arduino sent more datapoints than the other
+   lengthDif = length(RLTRQ) - length(LLTRQ);                   %When both are on there is a possibility that one arduino sent more datapoints than the other
    disp(" ");
    disp(" Length DIF in state 1 : ");
    disp(lengthDif);                                                   %This would be caused by them not starting or stopping at the exact same time (to the nearest 10 ms)
    disp(" ");
    if lengthDif > 0                                                   %It looks for the difference in legnth of datapoints to determine which has more datapoints
       addOn = NaN(1,lengthDif);                                      %If the Left Or Right has more datapoints, it prepends the NaNs to start of the list with less datapoints
-      LLTorque = [addOn, LLTorque];                                  %There is room for some error here, but the NaNs usually do not exceed 4, meaning that its at maximum,
+      LLTRQ = [addOn, LLTRQ];                                  %There is room for some error here, but the NaNs usually do not exceed 4, meaning that its at maximum,
       LLFSR = [addOn, LLFSR];                                        %40 ms out of sync
        LLSET = [addOn,LLSET];
        LLVOLT = [addOn,LLVOLT];
@@ -1010,7 +1069,7 @@ if(state ==1)  %If both are on
    if lengthDif < 0
        lengthDif = -lengthDif;
        addOn = NaN(1,lengthDif);
-       RLTorque = [addOn,RLTorque];
+       RLTRQ = [addOn,RLTRQ];
        RLFSR = [addOn,RLFSR];
         RLSET = [addOn,RLSET];
         RLVOLT = [addOn,RLVOLT];
@@ -1020,23 +1079,24 @@ if(state ==1)  %If both are on
         SIG4=[addOn,SIG4];
         BASEL=[BASEL;addOn];
         BASER=[BASER;addOn];
+        BASEL_BIOFB=[BASEL_BIOFB;addOn];
    end
    if lengthDif == 0                                                  %If they are the same length, everything is dandy
    end
 end
 
 if (RLCount>=LLCount)
-TRIG=zeros(size(RLTorque));
-L_SPEED=zeros(size(RLTorque));
-R_SPEED=zeros(size(RLTorque));
+TRIG=zeros(size(RLTRQ));
+L_SPEED=zeros(size(RLTRQ));
+R_SPEED=zeros(size(RLTRQ));
 else
-   TRIG=zeros(size(LLTorque));
-   L_SPEED=zeros(size(LLTorque));
-R_SPEED=zeros(size(LLTorque));
+   TRIG=zeros(size(LLTRQ));
+   L_SPEED=zeros(size(LLTRQ));
+R_SPEED=zeros(size(LLTRQ));
 end
     
 dt = .01;                                                              %Since the Arduino is set to send values every 10 ms, dt is .01 S
-t = 1:length(RLTorque);                                                %Creates a time Vector equal in length to the number of Torque Values Recieved
+t = 1:length(RLTRQ);                                                %Creates a time Vector equal in length to the number of Torque Values Recieved
 t = t .* dt;                                                         %Scales the time Vector, knowing how often Arduino sends values,
     
 if isempty(GUI_Variables.COUNT) || (length(GUI_Variables.COUNT)==1) %beacuse the first is zero
@@ -1087,20 +1147,51 @@ BT_CONNECTION=zeros(size(LLSET));
 
 % end
 
-% TRIG
-% size(TRIG)
-% size(LLSET)
-A = [t; RLTorque; RLFSR; RLSET; RLVOLT; RLVOLT_H; LLTorque; LLFSR; LLSET; LLVOLT; LLVOLT_H; TRIG; BASEL; BASER ;L_SPEED; R_SPEED; SIG1; SIG2; SIG3; SIG4];                                 %Creates a vector that holds the time and data
-% A = [t; RLTorque; RLSET; LLTorque; LLSET] 
-A2=[L_BAL_DYN_HEEL;L_BAL_STEADY_HEEL;L_BAL_DYN_TOE;L_BAL_STEADY_TOE;R_BAL_DYN_HEEL;R_BAL_STEADY_HEEL;R_BAL_DYN_TOE;R_BAL_STEADY_TOE];
+A = {'t'; 'RLTRQ'; 'RLFSR'; 'RLSET'; 'RLVOLT'; 'RLVOLT_H'; 'LLTRQ';...
+    'LLFSR'; 'LLSET'; 'LLVOLT'; 'LLVOLT_H'; ...
+    'TRIG'; 'BASEL'; 'BASER' ; 'SIG1'; 'SIG2'; 'SIG3'; 'SIG4'; 'BSL_BIO'};
+A2={'L_BAL_DYN_HEEL';'L_BAL_STEADY_HEEL';'L_BAL_DYN_TOE';'L_BAL_STEADY_TOE';...
+    'R_BAL_DYN_HEEL';'R_BAL_STEADY_HEEL';'R_BAL_DYN_TOE';'R_BAL_STEADY_TOE'};
+A_mat = [t; RLTRQ; RLFSR; RLSET; RLVOLT; RLVOLT_H; LLTRQ;...
+    LLFSR; LLSET; LLVOLT; LLVOLT_H; ...
+    TRIG; BASEL; BASER ; SIG1; SIG2; SIG3; SIG4; BASEL_BIOFB];                                 %Creates a vector that holds the time and data
+% A = [t; RLTRQ; RLSET; LLTRQ; LLSET] 
+A_mat2=[L_BAL_DYN_HEEL;L_BAL_STEADY_HEEL;L_BAL_DYN_TOE;L_BAL_STEADY_TOE;...
+    R_BAL_DYN_HEEL;R_BAL_STEADY_HEEL;R_BAL_DYN_TOE;R_BAL_STEADY_TOE];
 
 A=[A;A2];
+A_mat=[A_mat;A_mat2];
 Filename = sprintf('%s_%d','Trial_Number_',bt.UserData);               %Creates a new filename called "Torque_#"
                                                                            %Where # is the trial number                                                                           
 fileID = fopen(Filename,'w');                                      %Actually creates that file
 pause(.01);
-fprintf(fileID,'\tTime\t\t RLTRQ\t\t RLFSR\t\t RLSET\t\t RLVOLT\t\t RLVOLT_H\t\t LLTRQ\t\t LLFSR\t\t LLSET\t\t LLVOLT\t\t LLVOLT_H\t\t TRIG\t\t BASEL\t\t BASER\t\t L_SPEED\t\t R_SPEED\t\t SIG1\t\t SIG2\t\t SIG3\t\t SIG4\t\t\n');
-fprintf(fileID,'%6.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\n',A);     %Puts the Time and Torque values in the txt columns
+% A_mat=[];
+str_fileID='';
+str_fileID_title='\t';
+for jk=1:size(A,1)
+    
+    if jk==1
+        str_fileID=[str_fileID,'\t','%0.2f\t\t '];
+    elseif jk==size(A,1)
+        str_fileID=[str_fileID,'%0.2f\n '];
+    else
+        str_fileID=[str_fileID,'%0.2f\t\t '];
+    end
+    
+    if length(A{jk})>6
+        str_fileID_title=[str_fileID_title,A{jk},'\t\t'];
+    else
+    str_fileID_title=[str_fileID_title,A{jk},'\t\t\t'];
+    end
+    
+end
+    
+% fprintf(fileID,'\tTime\t\t RLTRQ\t\t RLFSR\t\t RLSET\t\t RLVOLT\t\t RLVOLT_H\t\t LLTRQ\t\t LLFSR\t\t LLSET\t\t LLVOLT\t\t LLVOLT_H\t\t TRIG\t\t BASEL\t\t BASER\t\t L_SPEED\t\t R_SPEED\t\t SIG1\t\t SIG2\t\t SIG3\t\t SIG4\t\t BASEL_BIOFB\t\t\n');
+% fprintf(fileID,'%6.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\n',A);     %Puts the Time and Torque values in the txt columns
+fprintf(fileID,[str_fileID_title,'\n']);  
+fprintf(fileID,str_fileID,A_mat);  
+
+
 fclose(fileID);
 
 if(bt.Status == "open")
@@ -1178,9 +1269,9 @@ Filename = fprintf(fileID,['KI_R = ',num2str(rki),'\n']);
 fclose(fileID);
 %Closes the txt file
 set(handles.statusText,'String','Data has finished being Saved');
-RLTorque = [];
+RLTRQ = [];
 RLFSR = [];
-LLTorque =[];
+LLTRQ =[];
 LLFSR =[];
 
 LLSET =[];
@@ -1198,6 +1289,7 @@ SIG4=[];
 
 BASEL=[];
 BASER=[];
+BASEL_BIOFB=[];
 
 LLCount = 1;
 RLCount = 1;
@@ -1220,12 +1312,12 @@ set(handles.R_Check_FSR_Th,'Enable','on');
 set(handles.Start_Trial,'Enable','on');
 set(handles.End_Trial,'Enable','off');                                      %Disables the button to stop the trial
 set(handles.Start_Trial,'Enable','on');
-
+set(handles.Activate_BioFeedback_Text,'String','Off');
 GUI_Variables.counter=0;
 set(handles.TRIG_NUM_TEXT,'String',0);
 
-GUI_Variables.RLTorque = RLTorque;
-GUI_Variables.LLTorque = LLTorque;
+GUI_Variables.RLTRQ = RLTRQ;
+GUI_Variables.LLTRQ = LLTRQ;
 GUI_Variables.RLFSR = RLFSR;
 GUI_Variables.LLFSR = LLFSR;
 GUI_Variables.RLCount = RLCount;
@@ -1255,6 +1347,8 @@ GUI_Variables.SIG4=SIG4;
 GUI_Variables.BASEL=BASEL;
 GUI_Variables.BASER=BASER;
 
+GUI_Variables.BASEL_BIOFB=BASEL_BIOFB;
+
 GUI_Variables.flag_end_trial=1;
 
 else
@@ -1274,7 +1368,8 @@ set(handles.R_Check_FSR_Th,'Enable','on');
 set(handles.Start_Trial,'Enable','on');
 set(handles.End_Trial,'Enable','off');                                      %Disables the button to stop the trial
 set(handles.Start_Trial,'Enable','on');
-    disp("System not connected");
+set(handles.Activate_BioFeedback_Text,'String','Off');    
+disp("System not connected");
     set(handles.statusText,'String','System not connected');
 end
 
@@ -2384,70 +2479,70 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in R_Bs_Frq.
-function R_Bs_Frq_Callback(hObject, eventdata, handles)
-% hObject    handle to R_Bs_Frq (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global GUI_Variables;
-bt = GUI_Variables.BT; 
-
-disp('Right torque adaption')
-if (bt.Status=="open")
-     try         
-        fwrite(bt,'p'); %char(112)
-     catch
-     end
-end
-
-% --- Executes on button press in R_N3_Adj.
-function R_N3_Adj_Callback(hObject, eventdata, handles)
-% hObject    handle to R_N3_Adj (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global GUI_Variables;
-bt = GUI_Variables.BT; 
-count_speed=0;
-if (bt.Status=="open")
-     try         
-        fwrite(bt,'o'); %char(111)
-        count_speed=GUI_Variables.RLCount;
-        GUI_Variables.R_COUNT_SPEED=[GUI_Variables.R_COUNT_SPEED;[count_speed,2]];
-     catch
-     end
-end
-
-% --- Executes on button press in L_N3_Adj.
-function L_N3_Adj_Callback(hObject, eventdata, handles)
-% hObject    handle to L_N3_Adj (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global GUI_Variables;
-bt = GUI_Variables.BT; 
-count_speed=0;
-if (bt.Status=="open")
-     try         
-        fwrite(bt,'O'); %char(79)
-        count_speed=GUI_Variables.RLCount;
-        GUI_Variables.L_COUNT_SPEED=[GUI_Variables.L_COUNT_SPEED;[count_speed,2]];
-     catch
-     end
-end
-
-% --- Executes on button press in L_Bs_Frq.
-function L_Bs_Frq_Callback(hObject, eventdata, handles)
-% hObject    handle to L_Bs_Frq (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global GUI_Variables;
-bt = GUI_Variables.BT; 
-
-if (bt.Status=="open")
-     try         
-        fwrite(bt,'P'); %char(80)
-     catch
-     end
-end
+% % --- Executes on button press in R_Bs_Frq.
+% function R_Bs_Frq_Callback(hObject, eventdata, handles)
+% % hObject    handle to R_Bs_Frq (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% global GUI_Variables;
+% bt = GUI_Variables.BT; 
+% 
+% disp('Right torque adaption')
+% if (bt.Status=="open")
+%      try         
+%         fwrite(bt,'p'); %char(112)
+%      catch
+%      end
+% end
+% 
+% % --- Executes on button press in R_N3_Adj.
+% function R_N3_Adj_Callback(hObject, eventdata, handles)
+% % hObject    handle to R_N3_Adj (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% global GUI_Variables;
+% bt = GUI_Variables.BT; 
+% count_speed=0;
+% if (bt.Status=="open")
+%      try         
+%         fwrite(bt,'o'); %char(111)
+%         count_speed=GUI_Variables.RLCount;
+%         GUI_Variables.R_COUNT_SPEED=[GUI_Variables.R_COUNT_SPEED;[count_speed,2]];
+%      catch
+%      end
+% end
+% 
+% % --- Executes on button press in L_N3_Adj.
+% function L_N3_Adj_Callback(hObject, eventdata, handles)
+% % hObject    handle to L_N3_Adj (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% global GUI_Variables;
+% bt = GUI_Variables.BT; 
+% count_speed=0;
+% if (bt.Status=="open")
+%      try         
+%         fwrite(bt,'O'); %char(79)
+%         count_speed=GUI_Variables.RLCount;
+%         GUI_Variables.L_COUNT_SPEED=[GUI_Variables.L_COUNT_SPEED;[count_speed,2]];
+%      catch
+%      end
+% end
+% 
+% % --- Executes on button press in L_Bs_Frq.
+% function L_Bs_Frq_Callback(hObject, eventdata, handles)
+% % hObject    handle to L_Bs_Frq (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% global GUI_Variables;
+% bt = GUI_Variables.BT; 
+% 
+% if (bt.Status=="open")
+%      try         
+%         fwrite(bt,'P'); %char(80)
+%      catch
+%      end
+% end
 
 
 function R_Send_KF_Edit_Callback(hObject, eventdata, handles)
@@ -2709,23 +2804,23 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in L_Set_Perc.
-function L_Set_Perc_Callback(hObject, eventdata, handles)
-% hObject    handle to L_Set_Perc (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global GUI_Variables
-bt = GUI_Variables.BT;
-
-if (bt.Status=="open")
-    try
-fwrite(bt,'S'); 
-L_PERC = str2double(get(handles.L_Set_Perc_Edit,'String'));               %Gets the Value entered into the edit Box in the G
-fwrite(bt,L_PERC,'double');                                   %Sends the new Torque Value to Arduino
-    catch
-        disp("Impossible to set Left Perc parameter for Left");
-    end
-end
+% % --- Executes on button press in L_Set_Perc.
+% function L_Set_Perc_Callback(hObject, eventdata, handles)
+% % hObject    handle to L_Set_Perc (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% global GUI_Variables
+% bt = GUI_Variables.BT;
+% 
+% if (bt.Status=="open")
+%     try
+% fwrite(bt,'S'); 
+% L_PERC = str2double(get(handles.L_Set_Perc_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+% fwrite(bt,L_PERC,'double');                                   %Sends the new Torque Value to Arduino
+%     catch
+%         disp("Impossible to set Left Perc parameter for Left");
+%     end
+% end
 
 
 
@@ -2751,23 +2846,23 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in R_Set_Perc.
-function R_Set_Perc_Callback(hObject, eventdata, handles)
-% hObject    handle to R_Set_Perc (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global GUI_Variables
-bt = GUI_Variables.BT;
-
-if (bt.Status=="open")
-    try
-fwrite(bt,'s'); 
-R_PERC = str2double(get(handles.R_Set_Perc_Edit,'String'));               %Gets the Value entered into the edit Box in the G
-fwrite(bt,R_PERC,'double');                                   %Sends the new Torque Value to Arduino
-    catch
-        disp("Impossible to set Left Perc parameter for Right");
-    end
-end
+% % --- Executes on button press in R_Set_Perc.
+% function R_Set_Perc_Callback(hObject, eventdata, handles)
+% % hObject    handle to R_Set_Perc (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% global GUI_Variables
+% bt = GUI_Variables.BT;
+% 
+% if (bt.Status=="open")
+%     try
+% fwrite(bt,'s'); 
+% R_PERC = str2double(get(handles.R_Set_Perc_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+% fwrite(bt,R_PERC,'double');                                   %Sends the new Torque Value to Arduino
+%     catch
+%         disp("Impossible to set Left Perc parameter for Right");
+%     end
+% end
 
 
 function R_Set_Perc_Edit_Callback(hObject, eventdata, handles)
@@ -3498,7 +3593,8 @@ fwrite(bt,'B');
   end  
 
       val=get(handles.Activate_Balance,'Value');
-    
+    val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
+
 %         if(val==0)
 %         GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
 %         GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
@@ -3525,13 +3621,31 @@ fwrite(bt,'B');
     if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'B'
         indexes = find(message==44);
         
-         if(val==0)
-        
-        GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
-        GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
-        disp(GUI_Variables.basel);
-        disp(GUI_Variables.baser);
-                else
+%          if(val==0)
+%         
+%         GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
+%         GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
+%         disp(GUI_Variables.basel);
+%         disp(GUI_Variables.baser);
+%                 else
+%         GUI_Variables.L_Bal_steady_Toe= str2double(message((indexes(1)+1):(indexes(2)-1)));
+%         GUI_Variables.L_Bal_steady_Heel= str2double(message((indexes(2)+1):(indexes(3)-1)));
+%         GUI_Variables.R_Bal_steady_Toe= str2double(message((indexes(3)+1):(indexes(4)-1)));
+%         GUI_Variables.R_Bal_steady_Heel= str2double(message((indexes(4)+1):(indexes(5)-1)));
+%         
+%         GUI_Variables.L_Bal_dyn_Toe= str2double(message((indexes(5)+1):(indexes(6)-1)));
+%         GUI_Variables.L_Bal_dyn_Heel= str2double(message((indexes(6)+1):(indexes(7)-1)));
+%         GUI_Variables.R_Bal_dyn_Toe= str2double(message((indexes(7)+1):(indexes(8)-1)));
+%         GUI_Variables.R_Bal_dyn_Heel= str2double(message((indexes(8)+1):(indexes(9)-1)));
+%          end
+%         
+%          if(val_biofeedback)
+%              GUI_Variables.basel_biofb= str2double(message((indexes(1)+1):(indexes(2)-1)));
+%          end
+ if (val_biofb==1)
+                GUI_Variables.basel_biofb=str2double(message((indexes(1)+1):(indexes(2)-1)));
+                disp(GUI_Variables.basel_biofb)
+elseif (val==1)
         GUI_Variables.L_Bal_steady_Toe= str2double(message((indexes(1)+1):(indexes(2)-1)));
         GUI_Variables.L_Bal_steady_Heel= str2double(message((indexes(2)+1):(indexes(3)-1)));
         GUI_Variables.R_Bal_steady_Toe= str2double(message((indexes(3)+1):(indexes(4)-1)));
@@ -3541,7 +3655,14 @@ fwrite(bt,'B');
         GUI_Variables.L_Bal_dyn_Heel= str2double(message((indexes(6)+1):(indexes(7)-1)));
         GUI_Variables.R_Bal_dyn_Toe= str2double(message((indexes(7)+1):(indexes(8)-1)));
         GUI_Variables.R_Bal_dyn_Heel= str2double(message((indexes(8)+1):(indexes(9)-1)));
-        end
+elseif(val==0)
+        GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
+        GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
+        disp('command');
+        disp(GUI_Variables.basel);
+        disp(GUI_Variables.baser);
+
+        end        
     end
 
 %   end
@@ -3923,29 +4044,33 @@ global GUI_Variables
 bt = GUI_Variables.BT;
 
 % BT_auto_reconnect_radiobutton
-
+BT_auto=get(handles.BT_Text,'String')
 % disp('r');
-if (bt.Status=="open")
+
 %     disp('r');
-BT_auto=get(handles.BT_Text,'String');
+
 % disp(PC);
 
             if strcmp(BT_auto,'On')
             %deactivate prop control
+            if (bt.Status=="open")
             fwrite(bt,'@'); 
             disp('Deactivate BT auto reconnect');
+            end
             set(handles.BT_Text,'String','Off')
 %             pause(0.5);
             else
             %activate prop control
+            if (bt.Status=="open")
             fwrite(bt,'|'); 
             disp('Activate BT auto reconnect');
+            end
             set(handles.BT_Text,'String','On')
 %             pause(0.5);
             end
 
     
-end
+
 
 
 
@@ -3956,3 +4081,316 @@ function radiobutton23_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of radiobutton23
+
+
+% --- Executes on button press in Activate_BioFeedback.
+function Activate_BioFeedback_Callback(hObject, eventdata, handles)
+% hObject    handle to Activate_BioFeedback (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+% BT_auto_reconnect_radiobutton
+
+% disp('r');
+if (bt.Status=="open")
+%     disp('r');
+BIO=get(handles.Activate_BioFeedback_Text,'String');
+% disp(PC);
+
+            if strcmp(BIO,'On')
+            %deactivate 
+            fwrite(bt,'y'); 
+            disp('Deactivate Audio Bio Feedback');
+            set(handles.Activate_BioFeedback_Text,'String','Off')
+%             pause(0.5);
+            else
+            %activate 
+            fwrite(bt,'/'); 
+            disp('Activate Audio Bio Feedback');
+            set(handles.Activate_BioFeedback_Text,'String','On')
+%             pause(0.5);
+            end
+
+    
+end
+
+% --- Executes on button press in Set_Bias.
+function Set_Bias_Callback(hObject, eventdata, handles)
+% hObject    handle to Set_Bias (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+if (bt.Status=="open")
+    try
+bias=str2num(get(handles.Set_Bias_Edit,'String'));
+if not(isempty(bias))
+fwrite(bt,'*');
+fwrite(bt,bias,'double');
+disp(['BioFeedback Bias ',num2str(bias)]);
+end
+
+catch
+end
+    
+end
+
+
+% --- Executes on button press in Set_Target.
+function Set_Target_Callback(hObject, eventdata, handles)
+% hObject    handle to Set_Target (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+if (bt.Status=="open")
+    try
+target=str2num(get(handles.Set_Target_Edit,'String'));
+fwrite(bt,'u');
+if not(isempty(target))
+
+fwrite(bt,target,'double');
+disp(['BioFeedback Target ',num2str(target)]);
+end
+
+catch
+end
+end
+
+
+function Set_Bias_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to Set_Bias_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Set_Bias_Edit as text
+%        str2double(get(hObject,'String')) returns contents of Set_Bias_Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Set_Bias_Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Set_Bias_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function Set_Target_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to Set_Target_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Set_Target_Edit as text
+%        str2double(get(hObject,'String')) returns contents of Set_Target_Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Set_Target_Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Set_Target_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% FROM OPTIMIZATION GREG
+
+
+% --- Executes on selection change in IP_list.
+function IP_list_Callback(hObject, eventdata, handles)
+% hObject    handle to IP_list (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+selectMode = get(handles.IP_list,'Value');
+if selectMode == 1
+    GUI_Variables.IP = '134.114.52.219';
+%     GUI_Variables.IP = '134.114.101.52';
+elseif selectMode == 2
+    GUI_Variables.IP = '10.18.48.52';
+elseif selectMode == 3
+    GUI_Variables.IP = '10.18.48.166';
+elseif selectMode == 4
+    GUI_Variables.IP = '10.18.48.160';
+end
+
+
+% --- Executes on button press in Start_TCP.
+function Start_TCP_Callback(hObject, eventdata, handles)
+% hObject    handle to Start_TCP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global GUI_Variables
+
+if strcmp(GUI_Variables.IP,'0.0.0.0')
+    set(handles.statusText,'String',"Select host IP address from drop-down");
+else
+    try
+        fprintf('Attempting to make a TCP/IP connection to the host');
+        fprintf('\n');
+        set(handles.statusText,'String',"Attempting to make a TCP/IP connection!");
+        pause(.01);
+        t = tcpip(GUI_Variables.IP,3000,'NetworkRole','client');   %Creates TCP/IP connection client object
+        GUI_Variables.t = t;
+        fopen(t);       %Open TCP communication port
+    catch
+        set(handles.TCP_Status,'Color',[1 0 0]);
+        set(handles.statusText,'String',"TCP/IP connection failed. Check host IP and try again.");
+    end
+end
+
+if exist('t','var')
+    if(t.Status == "open")
+        set(handles.TCP_Status,'Color',[0 1 0]);
+        fprintf('Made a TCP connection to the host!');
+        fprintf('\n');
+        set(handles.statusText,'String',"Made a TCP connection to the host!");
+    elseif(t.Status == "closed")
+        set(handles.TCP_Status,'Color',[1 0 0]);
+        set(handles.statusText,'String',"Could not establish TCP connection to host within time limit. Check host IP and try again.");
+    end
+end
+
+
+% --- Executes on button press in Close_TCP.
+function Close_TCP_Callback(hObject, eventdata, handles)
+% hObject    handle to Close_TCP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global GUI_Variables
+try 
+    t = GUI_Variables.t;
+catch
+end
+    
+if exist('t','var')
+    if (t.Status == "open")
+        fclose(t);      %Close TCP connection
+        set(handles.TCP_Status,'Color',[1 1 1]);
+        fprintf('Closing TCP connection with the host!');
+        fprintf('\n');
+        set(handles.statusText,'String',"Closed TCP connection."); 
+    elseif (t.Status == "closed")
+        fprintf('No TCP connection to close. \n');
+        set(handles.statusText,'String',"No TCP connection to close.");
+    end
+end
+
+% --- Executes on button press in Start_Optimization.
+function Start_Optimization_Callback(hObject, eventdata, handles)
+% hObject    handle to Start_Optimization (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global GUI_Variables
+try
+    t = GUI_Variables.t;
+catch
+    fprintf('No TCP connection established, cannot start optimization');
+    fprintf('\n');
+    set(handles.statusText,'String',"No TCP connection established, cannot start optimization.")
+end
+
+try
+    bt = GUI_Variables.BT;
+catch
+    fprintf('No BT connection established, cannot send start byte');
+    fprintf('\n')
+    set(handles.statusText,'String',"No BT connection established, cannot start optimization.")
+end
+
+if exist('t','var')
+    if t.Status == "open" && bt.Status == "open"
+        fwrite(t,"start")
+%         fwrite(bt,' ') to change from @
+        set(handles.statusText,'String',"Initializing optimization...")
+    elseif (t.Status == "closed")
+        set(handles.statusText,'String',"TCP port is not open! Re-open connection.")
+    elseif bt.Status == "closed"
+        set(handles.statusText,'String',"No BT connection established, no optimization values to be sent to exo.")
+        pause(0.1)
+        fwrite(t,"start")
+        set(handles.statusText,'String',"Initializing optimization (no BT)...")       
+    end
+end
+
+
+% --- Executes on button press in Stop_Optimization.
+function Stop_Optimization_Callback(hObject, eventdata, handles)
+% hObject    handle to Stop_Optimization (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+try
+    t = GUI_Variables.t;
+    bt = GUI_Variables.BT;
+catch
+    fprintf('No TCP connection established, cannot start optimization.');
+    fprintf('\n');
+    set(handles.statusText,'String',"No TCP connection established, cannot start optimization.")
+end
+
+if exist('t','var')
+    if t.Status == "open" && bt.Status == "open"
+        fwrite(t,"end")
+%         fwrite(bt,' ') to change from %
+        set(handles.statusText,'String',"Stopping optimization...")
+    elseif (t.Status == "closed")
+        set(handles.statusText,'String',"TCP port is not open! Re-open connection.")
+    elseif bt.Status == "closed"
+        fwrite(t,"end")
+        set(handles.statusText,'String',"Stopping optimization...")
+    end
+end
+
+
+
+% --- Executes during object creation, after setting all properties.
+function IP_list_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to IP_list (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in BioFeedback_Baseline.
+function BioFeedback_Baseline_Callback(hObject, eventdata, handles)
+% hObject    handle to BioFeedback_Baseline (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+if (bt.Status=="open")
+    try
+
+fwrite(bt,':');
+
+disp(['BioFeedback Baseline for 4 steps (Default)']);
+
+
+catch
+end
+end
+

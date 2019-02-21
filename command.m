@@ -67,14 +67,15 @@ switch(message(2))
        set(handles.R_Check_Gain_Text,'String',R_Gain);
     case 'B'
         val=strcmp(get(handles.Balance_Text,'String'),'On');
+        get(handles.Activate_BioFeedback_Text,'String')
+        val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')
     
-        if(val==0)
-        GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
-        GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
-        disp('command');
-        disp(GUI_Variables.basel);
-        disp(GUI_Variables.baser);
-        else
+if (val_biofb==1)
+    disp('biofeedback baseline');
+                GUI_Variables.basel_biofb=str2double(message((indexes(1)+1):(indexes(2)-1)));
+                disp(GUI_Variables.basel_biofb)
+elseif (val==1)
+    disp('balance baseline');
         GUI_Variables.L_Bal_steady_Toe= str2double(message((indexes(1)+1):(indexes(2)-1)));
         GUI_Variables.L_Bal_steady_Heel= str2double(message((indexes(2)+1):(indexes(3)-1)));
         GUI_Variables.R_Bal_steady_Toe= str2double(message((indexes(3)+1):(indexes(4)-1)));
@@ -84,6 +85,13 @@ switch(message(2))
         GUI_Variables.L_Bal_dyn_Heel= str2double(message((indexes(6)+1):(indexes(7)-1)));
         GUI_Variables.R_Bal_dyn_Toe= str2double(message((indexes(7)+1):(indexes(8)-1)));
         GUI_Variables.R_Bal_dyn_Heel= str2double(message((indexes(8)+1):(indexes(9)-1)));
+elseif(val==0)
+        GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
+        GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
+        disp('command');
+        disp(GUI_Variables.basel);
+        disp(GUI_Variables.baser);
+
         end
     case 'V'
         steady_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
