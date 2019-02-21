@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 13-Sep-2018 09:40:16
+% Last Modified by GUIDE v2.5 21-Feb-2019 03:24:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -100,6 +100,20 @@ function varargout = A_EXO_s_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+% --- Executes when user attempts to close figure1.
+function figure1_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: delete(hObject) closes the figure
+
+global GUI_Variables
+bt = GUI_Variables.BT;
+try
+    fclose(bt);
+end
+delete(hObject);
 
 % --- Executes on button press in Start_Trial.
 function Start_Trial_Callback(hObject, eventdata, handles)
@@ -2896,3 +2910,6 @@ try
     disp('Balance Baseline');
 catch
 end
+
+
+
