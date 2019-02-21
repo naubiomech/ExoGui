@@ -382,7 +382,6 @@ if bt.Status=="open"
                         SIG4(RLCount) = Data(14);
                         BASER(RLCount)=GUI_Variables.baser;
                         RLCount = RLCount + 1; % Increments kneeCount Checks if Ankle Arduino Sent a new Torque Value
-                        RLCount = RLCount;
                         LLTorque(LLCount) = Data(6); % Gets the new Torque Value and stores it
                         LLFSR(LLCount) = Data(7);
                         LLSET(LLCount) = Data(8); % New to save also the set point
@@ -390,6 +389,7 @@ if bt.Status=="open"
                         LLVOLT_H(LLCount) = Data(10);
                         SIG2(LLCount) = Data(12);
                         BASEL(LLCount)=GUI_Variables.basel;
+                        LLCount = LLCount + 1; % Increments kneeCount Checks if Ankle Arduino Sent a new Torque Value
 
                     else
                         command(msg, data, handles)
