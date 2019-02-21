@@ -55,14 +55,10 @@ function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
 
     handles.output = hObject;
 
-    % bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
-    % bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
-    % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
     BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_3','Jasons_Bluetooth','Exo_Bluetooth_2'};
     bt = Bluetooth('Exo_Bluetooth_3',1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
     bt.Timeout=2;
-    disp('')%Exo_Bluetooth_2
-            % Capstone_Bluetooth_1
+    disp('')
     str_uno=input('Would you use the arduino trigger? [y/n] ','s');
 
     if (strcmp(str_uno,'y'))
@@ -99,12 +95,6 @@ function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
 
 
 
-
-
-    % Update handles structure
-    guidata(hObject, handles);
-
-
 % --- Outputs from this function are returned to the command line.
 function varargout = A_EXO_s_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
@@ -135,12 +125,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables.flag_end_trial=0;
     end
 
-    % if(bt.Status == "open")
-    %     try
-    % fwrite(bt,'C');
-    %     catch
-    %     end
-    % end
     flushinput(bt);
     flushoutput(bt);
     allocated = 100000;
@@ -184,16 +168,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     GUI_Variables.RLVOLT_H = RLVOLT_H;
 
 
-    % L_BAL_DYN_TOE=NaN(1,allocated);
-    % L_BAL_STEADY_TOE=NaN(1,allocated);
-    % R_BAL_DYN_TOE=NaN(1,allocated);
-    % R_BAL_STEADY_TOE=NaN(1,allocated);
-    %
-    % L_BAL_DYN_HEEL=NaN(1,allocated);
-    % L_BAL_STEADY_HEEL=NaN(1,allocated);
-    % R_BAL_DYN_HEEL=NaN(1,allocated);
-    % R_BAL_STEADY_HEEL=NaN(1,allocated);
-
     L_BAL_DYN_TOE=ones(1,allocated)*0;
     L_BAL_STEADY_TOE=ones(1,allocated)*0;
     R_BAL_DYN_TOE=ones(1,allocated)*0;
@@ -214,8 +188,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     GUI_Variables.L_BAL_STEADY_TOE=L_BAL_STEADY_TOE;
     GUI_Variables.R_BAL_DYN_TOE=R_BAL_DYN_TOE;
     GUI_Variables.R_BAL_STEADY_TOE=R_BAL_STEADY_TOE;
-
-
 
 
     GUI_Variables.SIG1=SIG1;
@@ -253,54 +225,14 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     end
 
 
-    %set(handles.L_Get_Setpoint,'Enable','off');
-    %set(handles.R_Get_Setpoint,'Enable','off');
-    %set(handles.Get_Smoothing,'Enable','off');
     set(handles.Calibrate_FSR,'Enable','on');
     set(handles.Calibrate_Torque,'Enable','off');
     set(handles.Check_Memory,'Enable','off');
     set(handles.Clean_Memory,'Enable','off');
-    %set(handles.L_Get_PID,'Enable','off');
-    %set(handles.R_Get_PID,'Enable','off');
-    %set(handles.L_Check_KF,'Enable','off');
-    %set(handles.R_Check_KF,'Enable','off');
-    %set(handles.L_Check_FSR_Th,'Enable','off');
-    %set(handles.R_Check_FSR_Th,'Enable','off');
     set(handles.Start_Trial,'Enable','off');
     set(handles.End_Trial,'Enable','on');
 
     GUI_Variables.flag_start=1;
-
-    % set(handles.getRightPIDParamBut,'Enable','off');
-    %Disables Manual communication with the Arduino
-    % set(handles.calTorqBut,'Enable','off');                                   %Disables Manual communication with the Arduino
-    %Enables Manual "End Trial" with Bluetooth
-    % set(handles.waitRadioBut,'Enable','off');
-    % set(handles.noWaitRadioBut,'Enable','off');
-    % set(handles.getLeftAnkleValsBut,'Enable','off');
-    % set(handles.getRightAnkleValsBut,'Enable','off');
-    %
-    % %FSR calib
-    % set(handles.calFSRBut,'Enable','on');
-    % %clean memory
-    % set(handles.Clean_Memory,'Enable','on');
-    % %check memory
-    % set(handles.Check_Sensor_Bias_Status,'Enable','off');
-    % %check memory
-    % set(handles.Get_Smoothing,'Enable','off');
-    % set(handles.Check_FSR_Th,'Enable','off');
-    % set(handles.L_Check_KF,'Enable','off');
-
-    % if get(handles.waitRadioBut,'Value') == 1
-    %     set(handles.statusText,'String','Waiting for external Switch');
-    %     pause(.001);
-    %
-    %     Uno = arduino;
-    %     while readVoltage(Uno,'A0') < 3.8
-    %         pause(.00001);%Double check if This is necessary
-    %     end
-    %     set(handles.statusText,'String','External switch has been pushed');
-    % end
 
     pause(.01);
     if state == 1
@@ -315,19 +247,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     tic
     if state == 1 % both connected
         disp('both connected')
-        while strcmp(get(handles.Start_Trial,'Enable'), 'off')                         %Will Loop continuously until the "End Trial" button is pressed
-                                                                                       %         if RLCount > 1
-                                                                                       %             if toc > 0.9
-                                                                                       %                 toc
-                                                                                       %                 disp('')
-                                                                                       %                 disp(' It takes too much time to communicate with the bluetooth')
-                                                                                       %                 disp('')
-                                                                                       %                 set(handles.End_Trial,'Enable','off');
-                                                                                       %                 set(handles.statusText,'String','One of the Bluetooths has stopped streaming, all systems have shut down. Remaining Data is being saved.');
-                                                                                       %                 pause(.0001);
-                                                                                       %                 End_Trial_Callback(hObject, eventdata, handles)
-                                                                                       %             end
-                                                                                       %         end
+        while strcmp(get(handles.Start_Trial,'Enable'), 'off')
 
             if GUI_Variables.flag_calib==1
 
@@ -337,7 +257,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                     disp("Start FSR Calib")
                     GUI_Variables.first_calib=1;
                 end
-                %             disp(" Calib")
                 v=clock;
                 if (v(6)-start_count)>5
                     set(handles.statusText,'String','Finished Calibrating the FSRs');
@@ -428,8 +347,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                 end
 
             end
-
-
             %---------------------AUTORECONNECT--------------------
 
             if strcmp(get(handles.BT_Text,'String'),'On')
@@ -442,14 +359,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                         BT_Was_Disconnected=1;
                         disp("NO DATA AVAILABLE!!!");
                         pause(.000000001);
-                        %                     GUI_Variables.count_disconnection=GUI_Variables.count_disconnection+1;
-                        %                     GUI_Variables.BT_disconnection(GUI_Variables.count_disconnection)=RLCount;
-                        %                     RLCount = RLCount + 1;
-
-                        %             try
-
-
-
 
                         disp('Close BT')
                         try
@@ -477,8 +386,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                         RLCount=RLCount+round(toc*100);
                         LLCount=RLCount;
                         tic
-                        %             catch
-                        %             end
                         tic
                     end
                 end
@@ -497,7 +404,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                     BT_was_Disconnected=0;
                 end
 
-                %           disp('saving in global variables');%Checks if Knee Arduino Sent a new Torque Value
                 tic
                 message = fgetl(bt);
 
@@ -550,8 +456,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                         end
                     end
                     if whichPlotLeft == 5
-                        %                     whichPlotLeft = GUI_Variables.LLVOLT;
-
                         if LLCount <= 1000
                             plot(1:length(GUI_Variables.LLVOLT), [GUI_Variables.LLVOLT;GUI_Variables.LLVOLT_H;GUI_Variables.BASEL] );
                             title("LL Force Toe and Heel");
@@ -562,7 +466,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                         end
                     end
                     if whichPlotLeft == 6
-                        %                     whichPlotLeft = GUI_Variables.RLVOLT;
                         if RLCount <= 1000
                             plot(1:length(GUI_Variables.RLVOLT), [GUI_Variables.RLVOLT;GUI_Variables.RLVOLT_H; GUI_Variables.BASER]);
                             title("RL Force Toe and Heel");
@@ -725,9 +628,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                         end
                     end
 
-                    %                 'L_Bal_dyn_Toe',0,'R_Bal_dyn_Toe',0,'L_Bal_steady_Toe',0,'R_Bal_steady_Toe',0
-
-
                     whichPlotRight = get(handles.Top_Graph,'Value');
                     axes(handles.Top_Axes);
                     if whichPlotRight == 1
@@ -775,7 +675,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                         end
                     end
                     if whichPlotRight == 5
-                        %                     plotThisRight = GUI_Variables.LLVOLT;
                         if LLCount <= 1000
                             plot(1:length(GUI_Variables.LLVOLT), [GUI_Variables.LLVOLT;GUI_Variables.LLVOLT_H;GUI_Variables.BASEL]);
                             title("LL Force Toe and Heel");
@@ -945,10 +844,8 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                             title("Right Balance");
                         end
                     end
-
-                    %toc
                 end
-            end % end if bt.bytes available >0
+            end
         end
     end
 
@@ -998,10 +895,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
         R_BAL_STEADY_TOE=GUI_Variables.R_BAL_STEADY_TOE;
 
 
-
-
-        % TRIG=GUI_Variables.TRIG;
-
         disp("");
         disp(" I am going to terminate the system, my current state is: ");
         disp(state);
@@ -1026,22 +919,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
                                 for index_iterator = 1:(length(indexes)-1)
                                     Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));
                                 end
-                                %                     RLTRQ(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
-                                %                     RLFSR(RLCount) = Data(2);
-                                %                     RLSET(RLCount) = Data(3); %New to save also the set point
-                                %                     RLVOLT(RLCount) = Data(4);
-                                %                     SIG3(RLCount) = Data(9);
-                                %                     SIG1(RLCount) = Data(11);
-                                %                     RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value
-                                %                     RLCount = RLCount;
-                                %                     LLTRQ(LLCount) = Data(5);              %Gets the new Torque Value and stores it
-                                %                     LLFSR(LLCount) = Data(6);
-                                %                     LLSET(LLCount) = Data(7); %New to save also the set point
-                                %                     LLVOLT(LLCount) = Data(8);
-                                %                     SIG2(LLCount) = Data(10);
-                                %
-                                %                     LLCount = LLCount + 1;
-                                %                     LLCount = LLCount;
                                 RLTRQ(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
                                 RLFSR(RLCount) = Data(2);
                                 RLSET(RLCount) = Data(3); %New to save also the set point
@@ -1076,9 +953,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
                                 L_BAL_DYN_TOE(LLCount)=GUI_Variables.L_Bal_dyn_Toe;
                                 L_BAL_STEADY_TOE(LLCount)=GUI_Variables.L_Bal_steady_Toe;
 
-
-
-                                %                   pause(.000000001);                                               %Pauses to give time for the user to possibly hit stop button
                             else
                                 command(message,indexes,hObject, eventdata, handles)
                             end
@@ -1179,51 +1053,30 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
         if isempty(GUI_Variables.COUNT) || (length(GUI_Variables.COUNT)==1) %beacuse the first is zero
         else
-            %     disp('ok')
             count_trig_c=GUI_Variables.COUNT(2:end);
 
             for i=1:length(count_trig_c)
-                %     count_trig_c(i)
                 TRIG(count_trig_c(i))=1;
-                % find(TRIG(count_trig_c(i))==1)
             end
 
         end
 
         if isempty(GUI_Variables.L_COUNT_SPEED)  %beacuse the first is zero
         else
-            %     disp('ok')
-
             for i=1:size(GUI_Variables.L_COUNT_SPEED,1)
-                %     count_trig_c(i)
                 L_SPEED(GUI_Variables.L_COUNT_SPEED(i,1))=GUI_Variables.L_COUNT_SPEED(i,2);
-                % find(TRIG(count_trig_c(i))==1)
             end
         end
 
         if isempty(GUI_Variables.R_COUNT_SPEED)  %beacuse the first is zero
         else
-            %     disp('ok')
             for i=1:size(GUI_Variables.R_COUNT_SPEED,1)
-                %     count_trig_c(i)
                 R_SPEED(GUI_Variables.R_COUNT_SPEED(i,1))=GUI_Variables.R_COUNT_SPEED(i,2);
-                % find(TRIG(count_trig_c(i))==1)
             end
         end
 
 
         BT_CONNECTION=zeros(size(LLSET));
-
-        % for i=1:length(LLSET)
-
-        % BT_Vect=find(GUI_Variables.BT_connection(:)>0)
-        %      BT_CONNECTION(BT_Vect)=1;
-
-        %      GUI_Variables.count_connection=GUI_Variables.count_connection+1;
-        %                 GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
-        %                 BT_was_Disconnected=0;
-
-        % end
 
         A = {'t'; 'RLTRQ'; 'RLFSR'; 'RLSET'; 'RLVOLT'; 'RLVOLT_H'; 'LLTRQ';...
              'LLFSR'; 'LLSET'; 'LLVOLT'; 'LLVOLT_H'; ...
@@ -1247,10 +1100,8 @@ function End_Trial_Callback(hObject, eventdata, handles)
                            bt.UserData);               %Creates a new filename called "Torque_#"
 
 
-        %Where # is the trial number
         fileID = fopen(Filename,'w');                                      %Actually creates that file
         pause(.01);
-        % A_mat=[];
         str_fileID='';
         str_fileID_title='\t';
         for jk=1:size(A,1)
@@ -1271,11 +1122,8 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
         end
 
-        % fprintf(fileID,'\tTime\t\t RLTRQ\t\t RLFSR\t\t RLSET\t\t RLVOLT\t\t RLVOLT_H\t\t LLTRQ\t\t LLFSR\t\t LLSET\t\t LLVOLT\t\t LLVOLT_H\t\t TRIG\t\t BASEL\t\t BASER\t\t L_SPEED\t\t R_SPEED\t\t SIG1\t\t SIG2\t\t SIG3\t\t SIG4\t\t BASEL_BIOFB\t\t\n');
-        % fprintf(fileID,'%6.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\n',A);     %Puts the Time and Torque values in the txt columns
         fprintf(fileID,[str_fileID_title,'\n']);
         fprintf(fileID,str_fileID,A_mat);
-
 
         fclose(fileID);
 
@@ -1295,35 +1143,15 @@ function End_Trial_Callback(hObject, eventdata, handles)
         flushoutput(bt);
         pause(.5);
 
-        % lkf=0;
-        % rkf=0;
-        %
-        % lfsr=0;
-        % rfsr=0;
-        %
-        % lkp=0;
-        % lki=0;
-        % lkd=0;
-        %
-        % rkp=0;
-        % rki=0;
-        % rkd=0;
-
         try
             [n1,n2,n3]=Get_Smoothing_Callback(hObject, eventdata, handles);
             pause(0.5);
             lfsr=L_Check_FSR_Th_Callback(hObject, eventdata, handles);
-            % pause(0.5);
             rfsr=R_Check_FSR_Th_Callback(hObject, eventdata, handles);
-            % pause(0.5);
             lkf=L_Check_KF_Callback(hObject, eventdata, handles);
-            % pause(0.5);
             rkf=R_Check_KF_Callback(hObject, eventdata, handles);
-            % pause(0.5);
             [lkp,lkd,lki]=L_Get_PID_Callback(hObject, eventdata, handles);
-            % pause(0.5);
             [rkp,rkd,rki]=R_Get_PID_Callback(hObject, eventdata, handles);
-            % pause(0.5);
         catch
         end
 
@@ -1335,9 +1163,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
                                                        %Where # is the trial number
         fileID = fopen(Filename,'w');                                      %Actually creates that file
         pause(.01);
-        % Smooth_params=['N1 = ',num2str(n1)];
-        % Smooth_params_2=['N2 = ',num2str(n2),'N3 = ',num2str(n3),'\n'];
-        % Filename = fprintf(fileID,Smooth_params);
         Filename = fprintf(fileID,['N1 = ',num2str(n1),'\n']);
         Filename = fprintf(fileID,['N2 = ',num2str(n2),'\n']);
         Filename = fprintf(fileID,['N3 = ',num2str(n3),'\n']);
@@ -1352,11 +1177,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         Filename = fprintf(fileID,['KD_R = ',num2str(rkd),'\n']);
         Filename = fprintf(fileID,['KI_R = ',num2str(rki),'\n']);
 
-        % ,'KD_L = ',num2str(lkd),'KI_L = ',num2str(lki),'\n']);
-        % Filename = fprintf(fileID,['KP_R = ',num2str(rkp),'KD_R = ',num2str(rkd),'KI_R = ',num2str(rki),'\n']);
-
         fclose(fileID);
-        %Closes the txt file
         set(handles.statusText,'String','Data has finished being Saved');
         RLTRQ = [];
         RLFSR = [];
@@ -1479,8 +1300,6 @@ function Calibrate_Torque_Callback(hObject, eventdata, handles)
         catch
         end
     end
-    % pause(2);
-    % set(handles.statusText,'String',"The Torque Sensors have been Calibrated! (>^_^)>");
     pause(2);
     set(handles.statusText,'String',"The Torque Sensors have been Calibrated!");
 
@@ -1597,8 +1416,6 @@ function lkf=L_Check_KF_Callback(hObject, eventdata, handles)
             if message(1) == 83 && message(length(message)-1) == 90 && message(2) == '`'
                 indexes = find(message==44);
                 KF_LL = str2double(message((indexes(1)+1):(indexes(2)-1)));
-
-                %Curr_KF = str2double(fgets(bt));                                              %Gets the Current Arduino Torque Setpoint
                 set(handles.L_Check_KF_Text,'String',KF_LL);
                 disp("Left Current KF ");
                 disp(KF_LL);
@@ -1608,10 +1425,6 @@ function lkf=L_Check_KF_Callback(hObject, eventdata, handles)
                 set(handles.L_Check_KF_Text,'String',"NaN");
             end
         end
-        %    catch
-        %        disp("Impossible to know KF");
-        %        set(handles.L_Check_KF_Text,'String',"NaN");
-        %    end
     end
 
     if (bt.Status=="closed")
@@ -1629,7 +1442,6 @@ function L_Send_KF_Callback(hObject, eventdata, handles)
 
     global GUI_Variables
     state=GUI_Variables.state;
-    % disp(state);
 
     bt = GUI_Variables.BT;
 
@@ -1637,7 +1449,6 @@ function L_Send_KF_Callback(hObject, eventdata, handles)
         try
             fwrite(bt,char(95)); %send the character "_"
             fwrite(bt,new_KF,'double');
-            % str=["Send new Right KF ", num2str(new_KF)];
             disp("Send new Left KF ");
             disp(new_KF);
 
@@ -1735,7 +1546,6 @@ function Send_Trig_Callback(hObject, eventdata, handles)
         end
     end
 
-    % GUI_Variables.TRIG(count_trig)=writeDigitalPin(GUI_Variables.UNO, 'D0', 5);
     try
         tic
         writeDigitalPin(GUI_Variables.UNO, 'D5', 1);
@@ -1745,7 +1555,6 @@ function Send_Trig_Callback(hObject, eventdata, handles)
     GUI_Variables.COUNT=[GUI_Variables.COUNT;count_trig];
     GUI_Variables.counter=GUI_Variables.counter+1;
     cane=GUI_Variables.counter;
-    % disp(cane)
     set(handles.TRIG_NUM_TEXT,'String',num2str(cane));
     try
         writeDigitalPin(GUI_Variables.UNO, 'D5', 0);
@@ -1795,8 +1604,6 @@ function valBT=Check_Bluetooth_Callback(hObject, eventdata, handles)
                     else
                         set(handles.EXP_Params_axes,'Color',[0 0 1])
                     end
-                    %         set(handles.axes10,'Color',[0 0 1])
-                    %         set(handles.EXP_Params_axes,'Color',[0 0 1])
                     valBT=1;
 
                 else
@@ -1853,8 +1660,6 @@ function Connect_BT_Callback(hObject, eventdata, handles)
         set(handles.axes8,'Color',[0 0 0])
         set(handles.axes10,'Color',[0 0 0])
         set(handles.EXP_Params_axes,'Color',[0 0 0])
-        %     ME_right_open
-        %If fopen Fails do Nothing
     end                                                            %Makes a connection to Bluetooth Object
 
     if(bt.status == "open")
@@ -2186,9 +1991,6 @@ function [lkp,lkd,lki]=L_Get_PID_Callback(hObject, eventdata, handles)
                 lkd = str2double(message((indexes(2)+1):(indexes(3)-1)));
                 lki = str2double(message((indexes(3)+1):(indexes(4)-1)));
             end
-            %lkp = str2double(fgets(bt));
-            %lkd = str2double(fgets(bt));
-            %lki = str2double(fgets(bt));
             set(handles.L_Kp_text,'String',lkp);
             set(handles.L_Kd_text,'String',lkd);
             set(handles.L_Ki_text,'String',lki);
@@ -2204,7 +2006,6 @@ function L_Set_PID_Callback(hObject, eventdata, handles)
     global GUI_Variables
     bt = GUI_Variables.BT;
     if(bt.Status=="open")
-        % fwrite(bt,char(77));
         fwrite(bt,'M');
         kp = str2double(get(handles.L_Kp_Edit,'String'));               %Gets the Value entered into the edit Box in the G
         kd = str2double(get(handles.L_Kd_Edit,'String'));
@@ -2307,7 +2108,6 @@ function R_Set_Setpoint_Callback(hObject, eventdata, handles)
         fwrite(bt,char(102));
     end
 
-    %set(handles.plotBut,'Enable','off');
     NewSetpoint = str2double(get(handles.R_Setpoint_Edit,'String'));               %Gets the Value entered into the edit Box in the G
     fwrite(bt,NewSetpoint,'double');
     NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit,'String'));               %Gets the Value entered into the edit Box in the G
@@ -2480,8 +2280,6 @@ function Set_Smoothing_Callback(hObject, eventdata, handles)
     global GUI_Variables
     bt = GUI_Variables.BT;
 
-    % SEND '(' to get the smoothing
-
     if (bt.Status=="open")
         try
             fwrite(bt,')');
@@ -2567,73 +2365,6 @@ function N3_Edit_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
 
-
-% % --- Executes on button press in R_Bs_Frq.
-% function R_Bs_Frq_Callback(hObject, eventdata, handles)
-% % hObject    handle to R_Bs_Frq (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% global GUI_Variables;
-% bt = GUI_Variables.BT; 
-% 
-% disp('Right torque adaption')
-% if (bt.Status=="open")
-%      try
-%         fwrite(bt,'p'); %char(112)
-%      catch
-%      end
-% end
-%
-% % --- Executes on button press in R_N3_Adj.
-% function R_N3_Adj_Callback(hObject, eventdata, handles)
-% % hObject    handle to R_N3_Adj (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% global GUI_Variables;
-% bt = GUI_Variables.BT; 
-% count_speed=0;
-% if (bt.Status=="open")
-%      try
-%         fwrite(bt,'o'); %char(111)
-%         count_speed=GUI_Variables.RLCount;
-%         GUI_Variables.R_COUNT_SPEED=[GUI_Variables.R_COUNT_SPEED;[count_speed,2]];
-%      catch
-%      end
-% end
-% 
-% % --- Executes on button press in L_N3_Adj.
-% function L_N3_Adj_Callback(hObject, eventdata, handles)
-% % hObject    handle to L_N3_Adj (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% global GUI_Variables;
-% bt = GUI_Variables.BT; 
-% count_speed=0;
-% if (bt.Status=="open")
-%      try
-%         fwrite(bt,'O'); %char(79)
-%         count_speed=GUI_Variables.RLCount;
-%         GUI_Variables.L_COUNT_SPEED=[GUI_Variables.L_COUNT_SPEED;[count_speed,2]];
-%      catch
-%      end
-% end
-% 
-% % --- Executes on button press in L_Bs_Frq.
-% function L_Bs_Frq_Callback(hObject, eventdata, handles)
-% % hObject    handle to L_Bs_Frq (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% global GUI_Variables;
-% bt = GUI_Variables.BT; 
-% 
-% if (bt.Status=="open")
-%      try
-%         fwrite(bt,'P'); %char(80)
-%      catch
-%      end
-% end
-
-
 function R_Send_KF_Edit_Callback(hObject, eventdata, handles)
 % hObject    handle to R_Send_KF_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -2673,7 +2404,6 @@ function R_Send_KF_Callback(hObject, eventdata, handles)
         try
             fwrite(bt,'-'); %send the character "-"
             fwrite(bt,new_KF,'double');
-            % str=["Send new Right KF ", num2str(new_KF)];
             disp("Send new Right KF ");
             disp(new_KF);
 
@@ -2701,8 +2431,6 @@ function rkf=R_Check_KF_Callback(hObject, eventdata, handles)
                     disp(KF_RL);
                     rkf=KF_RL;
                 end
-                %Curr_KF = str2double(fgets(bt));                                              %Gets the Current Arduino Torque Setpoint
-
             end
         catch
             disp("Impossible to know KF");
@@ -2800,9 +2528,6 @@ function rfsr=R_Check_FSR_Th_Callback(hObject, eventdata, handles)
                 disp(Curr_TH_R);
                 rfsr=Curr_TH_R;
             end
-
-
-            %rfsr=str2double(Curr_TH_R);
         catch
             disp("Impossible to know R FSR TH");
             set(handles.R_Check_FSR_Text,'String',"NaN");
@@ -2933,26 +2658,6 @@ function L_Set_Perc_Edit_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
-
-
-% % --- Executes on button press in R_Set_Perc.
-% function R_Set_Perc_Callback(hObject, eventdata, handles)
-% % hObject    handle to R_Set_Perc (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% global GUI_Variables
-% bt = GUI_Variables.BT;
-% 
-% if (bt.Status=="open")
-%     try
-% fwrite(bt,'s');
-% R_PERC = str2double(get(handles.R_Set_Perc_Edit,'String'));               %Gets the Value entered into the edit Box in the G
-% fwrite(bt,R_PERC,'double');                                   %Sends the new Torque Value to Arduino
-%     catch
-%         disp("Impossible to set Left Perc parameter for Right");
-%     end
-% end
-
 
 function R_Set_Perc_Edit_Callback(hObject, eventdata, handles)
 % hObject    handle to R_Set_Perc_Edit (see GCBO)
@@ -3285,7 +2990,6 @@ function R_Set_Gain_Callback(hObject, eventdata, handles)
     end
 
     try
-        %set(handles.plotBut,'Enable','off');
         R_New_Gain = str2double(get(handles.R_Set_Gain_Edit,'String'));               %Gets the Value entered into the edit Box in the G
         fwrite(bt,R_New_Gain,'double');
         disp('Send to arduino Right Prop Gain');
@@ -3358,8 +3062,6 @@ function L_Set_Gain_Callback(hObject, eventdata, handles)
         if(bt.Status=="open")
             fwrite(bt,'{');
         end
-
-        %set(handles.plotBut,'Enable','off');
         L_New_Gain = str2double(get(handles.L_Set_Gain_Edit,'String'));               %Gets the Value entered into the edit Box in the G
         fwrite(bt,L_New_Gain,'double');
     catch
@@ -3414,26 +3116,20 @@ function Activate_Balance_Callback(hObject, eventdata, handles)
     bt = GUI_Variables.BT;
 
     % BT_auto_reconnect_radiobutton
-
-    % disp('r');
     if (bt.Status=="open")
-        %     disp('r');
         Balance=get(handles.Balance_Text,'String');
-        % disp(PC);
 
         if strcmp(Balance,'On')
             %deactivate prop control
             fwrite(bt,'=');
             disp('Deactivate Balance Ctrl');
             set(handles.Balance_Text,'String','Off')
-            %             pause(0.5);
         else
             %activate prop control
 
             fwrite(bt,'+');
             disp('Activate Balance Ctrl');
             set(handles.Balance_Text,'String','On')
-            %             pause(0.5);
         end
 
 
@@ -3486,12 +3182,9 @@ function L_Auto_KF_Callback(hObject, eventdata, handles)
     global GUI_Variables
     bt = GUI_Variables.BT;
 
-    % disp('r');
     if (bt.Status=="open")
-        %     disp('r');
 
         LKF=get(hObject,'Value');
-        % disp(PC);
         try
 
             if LKF
@@ -3507,37 +3200,6 @@ function L_Auto_KF_Callback(hObject, eventdata, handles)
         end
     end
 
-% % --- Executes on button press in R_Auto_KF.
-% function R_Auto_KF_Callback(hObject, eventdata, handles)
-% % hObject    handle to R_Auto_KF (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-%
-% % Hint: get(hObject,'Value') returns toggle state of R_Auto_KF
-% global GUI_Variables
-% bt = GUI_Variables.BT;
-% 
-% % disp('r');
-% if (bt.Status=="open")
-% %     disp('r');
-% 
-% RKF=get(hObject,'Value');
-% % disp(PC);
-% try
-%     
-% if RKF
-%     %activate prop control
-%     fwrite(bt,'+'); 
-%     disp('Activate Right Auto KF');
-% else
-%     %deactivate prop control
-%     fwrite(bt,'=');
-%     disp('Deactivate Right Auto KF');
-% end
-%     catch
-%     end
-% end
-
 
 % --- Executes on button press in Activate_Prop_Pivot.
 function Activate_Prop_Pivot_Callback(hObject, eventdata, handles)
@@ -3550,9 +3212,7 @@ function Activate_Prop_Pivot_Callback(hObject, eventdata, handles)
     global GUI_Variables
     bt = GUI_Variables.BT;
 
-    % disp('r');
     if (bt.Status=="open")
-        %     disp('r');
 
         PP=get(hObject,'Value');
         disp(PP);
@@ -3578,21 +3238,6 @@ function Activate_Prop_Pivot_Callback(hObject, eventdata, handles)
         catch
         end
     end
-
-
-% % --- Executes on button press in Slow_0_Trq.
-% function Slow_0_Trq_Callback(hObject, eventdata, handles)
-% % hObject    handle to Slow_0_Trq (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-%
-%
-% % --- Executes on button press in Fast_0_Trq.
-% function Fast_0_Trq_Callback(hObject, eventdata, handles)
-% % hObject    handle to Fast_0_Trq (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-%
 
 % --- Executes on button press in Fast_0_Trq.
 function Fast_0_Trq_Callback(hObject, eventdata, handles)
@@ -3686,53 +3331,12 @@ function Check_Baseline_Callback(hObject, eventdata, handles)
         val=get(handles.Activate_Balance,'Value');
         val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
 
-        %         if(val==0)
-        %         GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
-        %         GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
-        %         disp('command');
-        %         disp(GUI_Variables.basel);
-        %         disp(GUI_Variables.baser);
-        %         else
-        %         GUI_Variables.L_Bal_steady_Toe= str2double(message((indexes(1)+1):(indexes(2)-1)));
-        %         GUI_Variables.L_Bal_steady_Heel= str2double(message((indexes(2)+1):(indexes(3)-1)));
-        %         GUI_Variables.R_Bal_steady_Toe= str2double(message((indexes(3)+1):(indexes(4)-1)));
-        %         GUI_Variables.R_Bal_steady_Heel= str2double(message((indexes(4)+1):(indexes(5)-1)));
-        %
-        %         GUI_Variables.L_Bal_dyn_Toe= str2double(message((indexes(5)+1):(indexes(6)-1)));
-        %         GUI_Variables.L_Bal_dyn_Heel= str2double(message((indexes(6)+1):(indexes(7)-1)));
-        %         GUI_Variables.R_Bal_dyn_Toe= str2double(message((indexes(7)+1):(indexes(8)-1)));
-        %         GUI_Variables.R_Bal_dyn_Heel= str2double(message((indexes(8)+1):(indexes(9)-1)));
-        %         end
-
-
 
         disp('Check Baseline');
-        %   if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
         message = fgetl(bt);
         if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'B'
             indexes = find(message==44);
 
-            %          if(val==0)
-            %
-            %         GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
-            %         GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
-            %         disp(GUI_Variables.basel);
-            %         disp(GUI_Variables.baser);
-            %                 else
-            %         GUI_Variables.L_Bal_steady_Toe= str2double(message((indexes(1)+1):(indexes(2)-1)));
-            %         GUI_Variables.L_Bal_steady_Heel= str2double(message((indexes(2)+1):(indexes(3)-1)));
-            %         GUI_Variables.R_Bal_steady_Toe= str2double(message((indexes(3)+1):(indexes(4)-1)));
-            %         GUI_Variables.R_Bal_steady_Heel= str2double(message((indexes(4)+1):(indexes(5)-1)));
-            %
-            %         GUI_Variables.L_Bal_dyn_Toe= str2double(message((indexes(5)+1):(indexes(6)-1)));
-            %         GUI_Variables.L_Bal_dyn_Heel= str2double(message((indexes(6)+1):(indexes(7)-1)));
-            %         GUI_Variables.R_Bal_dyn_Toe= str2double(message((indexes(7)+1):(indexes(8)-1)));
-            %         GUI_Variables.R_Bal_dyn_Heel= str2double(message((indexes(8)+1):(indexes(9)-1)));
-            %          end
-            %
-            %          if(val_biofeedback)
-            %              GUI_Variables.basel_biofb= str2double(message((indexes(1)+1):(indexes(2)-1)));
-            %          end
             if (val_biofb==1)
                 GUI_Variables.basel_biofb=str2double(message((indexes(1)+1):(indexes(2)-1)));
                 disp(GUI_Variables.basel_biofb)
@@ -3755,8 +3359,6 @@ function Check_Baseline_Callback(hObject, eventdata, handles)
 
             end
         end
-
-        %   end
 
     catch
     end
@@ -3898,21 +3500,6 @@ function Balance_Baseline_Callback(hObject, eventdata, handles)
 % hObject    handle to Balance_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% global GUI_Variables
-% bt = GUI_Variables.BT;
-% 
-% try
-% if(bt.Status=="open")
-% fwrite(bt,'&');
-% end
-% 
-% disp('Balance Baseline');
-% catch
-% end
-
-
-
-
 
 % --- Executes on button press in BT_auto_reconnect_radiobutton.
 function BT_auto_reconnect_radiobutton_Callback(hObject, eventdata, handles)
@@ -3925,13 +3512,8 @@ function BT_auto_reconnect_radiobutton_Callback(hObject, eventdata, handles)
     global GUI_Variables
     bt = GUI_Variables.BT;
 
-    % BT_auto_reconnect_radiobutton
-
-    % disp('r');
     if (bt.Status=="open")
-        %     disp('r');
         BT_auto=get(hObject,'Value');
-        % disp(PC);
         try
             if BT_auto
                 %activate prop control
@@ -4026,7 +3608,6 @@ function Check_Steady_Val_Callback(hObject, eventdata, handles)
                     steady_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
                     set(handles.Steady_Text,'String',steady_val);
                     disp(['Check Steady Val ',num2str(steady_val)]);
-                    %         disp(steady_val);
                 end
             end
         catch
@@ -4071,7 +3652,6 @@ function Check_Dyn_Val_Callback(hObject, eventdata, handles)
                     dyn_val = str2double(message((indexes(1)+1):(indexes(2)-1)))
                     set(handles.Dyn_Text,'String',dyn_val);
                     disp(['Check Steady Val ',num2str(dyn_val)]);
-                    %         disp(steady_val);
                 end
             end
 
@@ -4124,11 +3704,6 @@ function Dyn_Edit_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % --- Executes on button press Flush Bluetooth.
 function Flush_Biobluetooth_Callback(hObject, eventdata, handles)
 % hObject    handle to Flush_Bluetooth (see GCBO)
@@ -4152,13 +3727,7 @@ function BT_Auto_Reconnection_Callback(hObject, eventdata, handles)
     global GUI_Variables
     bt = GUI_Variables.BT;
 
-    % BT_auto_reconnect_radiobutton
     BT_auto=get(handles.BT_Text,'String')
-	% disp('r');
-
-    %     disp('r');
-
-    % disp(PC);
 
     if strcmp(BT_auto,'On')
         %deactivate prop control
@@ -4167,7 +3736,6 @@ function BT_Auto_Reconnection_Callback(hObject, eventdata, handles)
             disp('Deactivate BT auto reconnect');
         end
         set(handles.BT_Text,'String','Off')
-        %             pause(0.5);
     else
         %activate prop control
         if (bt.Status=="open")
@@ -4175,7 +3743,6 @@ function BT_Auto_Reconnection_Callback(hObject, eventdata, handles)
             disp('Activate BT auto reconnect');
         end
         set(handles.BT_Text,'String','On')
-        %             pause(0.5);
     end
 
 
@@ -4208,25 +3775,19 @@ function Activate_BioFeedback_Callback(hObject, eventdata, handles)
     bt = GUI_Variables.BT;
 
     % BT_auto_reconnect_radiobutton
-
-    % disp('r');
     if (bt.Status=="open")
-        %     disp('r');
         BIO=get(handles.Activate_BioFeedback_Text,'String');
-        % disp(PC);
 
         if strcmp(BIO,'On')
             %deactivate
             fwrite(bt,'y');
             disp('Deactivate Audio Bio Feedback');
             set(handles.Activate_BioFeedback_Text,'String','Off')
-            %             pause(0.5);
         else
             %activate
             fwrite(bt,'/');
             disp('Activate Audio Bio Feedback');
             set(handles.Activate_BioFeedback_Text,'String','On')
-            %             pause(0.5);
         end
 
 
@@ -4331,7 +3892,6 @@ function IP_list_Callback(hObject, eventdata, handles)
     selectMode = get(handles.IP_list,'Value');
     if selectMode == 1
         GUI_Variables.IP = '134.114.52.219';
-        %     GUI_Variables.IP = '134.114.101.52';
     elseif selectMode == 2
         GUI_Variables.IP = '10.18.48.128';
     elseif selectMode == 3

@@ -23,8 +23,6 @@ switch(message(2))
     set(handles.L_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_LL);
   case 'd'
     Setpoint_RL = str2double(message((indexes(1)+1):(indexes(2)-1)));
-    %         disp("Right New Setpoint")
-    %         disp(Setpoint_RL)
     set(handles.R_Setpoint_Text,'String',Setpoint_RL);
     Setpoint_Dorsi_RL = str2double(message((indexes(2)+1):(indexes(3)-1)));
     set(handles.R_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_RL);

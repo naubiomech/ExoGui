@@ -45,7 +45,6 @@ if message(1) == 83 && message(length(message)-1) == 90
 
         LLCount = LLCount + 1;
         GUI_Variables.LLCount = LLCount;
-        %                   pause(.000000001);                                               %Pauses to give time for the user to possibly hit stop button
         if(Data(2)==9)||(Data(7)==9)
             disp("Torque value problem    Trq > 25Nm");
             set(handles.statusText,'String','Problem Trq Ctrl, Trq > 25 Nm');
