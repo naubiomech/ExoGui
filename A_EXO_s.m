@@ -1,3 +1,6 @@
+function varargout = A_EXO_s(varargin)
+% A_EXO_S MATLAB code for A_EXO_s.fig
+%      A_EXO_S, by itself, creates a new A_EXO_S or raises the existing
 %      singleton*.
 %
 %      H = A_EXO_S returns the handle to a new A_EXO_S or the handle to
