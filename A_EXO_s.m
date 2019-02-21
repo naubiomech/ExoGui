@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 19-Nov-2018 16:34:10
+% Last Modified by GUIDE v2.5 20-Nov-2018 14:58:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -93,7 +93,11 @@ GUI_Variables = struct('BT',bt,'Timer',NaN,'state',0,'RLTorque',NaN(1,60000), ..
     'RLSET',NaN(1,60000),'LLSET',NaN(1,60000),'MEM',ones(1,3)*2,...
     'SIG1',NaN(1,60000),'SIG2',NaN(1,60000),'SIG3',NaN(1,60000),'SIG4',NaN(1,60000),...
     'BASEL',NaN(1,60000),'BASER',NaN(1,60000),'basel',0,'baser',0,'counter',0,...
-    'flag_end_trial',0,'count_connection',0,'BT_connection',NaN(1,100)); 
+    'flag_end_trial',0,'count_connection',0,'BT_connection',NaN(1,100),...
+    'L_Bal_dyn_Toe',20,'L_Bal_dyn_Heel',30,'L_Bal_steady_Toe',40,'L_Bal_steady_Heel',50,...
+    'R_Bal_dyn_Toe',20,'R_Bal_dyn_Heel',30,'R_Bal_steady_Toe',40,'R_Bal_steady_Heel',50,...
+        'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
+    'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000));
 
 
 
@@ -178,6 +182,41 @@ LLVOLT_H = NaN(1,allocated);
 RLVOLT_H = NaN(1,allocated);
 GUI_Variables.LLVOLT_H = LLVOLT_H;
 GUI_Variables.RLVOLT_H = RLVOLT_H;
+
+
+% L_BAL_DYN_TOE=NaN(1,allocated);
+% L_BAL_STEADY_TOE=NaN(1,allocated);
+% R_BAL_DYN_TOE=NaN(1,allocated);
+% R_BAL_STEADY_TOE=NaN(1,allocated);
+% 
+% L_BAL_DYN_HEEL=NaN(1,allocated);
+% L_BAL_STEADY_HEEL=NaN(1,allocated);
+% R_BAL_DYN_HEEL=NaN(1,allocated);
+% R_BAL_STEADY_HEEL=NaN(1,allocated);
+
+L_BAL_DYN_TOE=ones(1,allocated)*0;
+L_BAL_STEADY_TOE=ones(1,allocated)*0;
+R_BAL_DYN_TOE=ones(1,allocated)*0;
+R_BAL_STEADY_TOE=ones(1,allocated)*0;
+
+L_BAL_DYN_HEEL=ones(1,allocated)*0;
+L_BAL_STEADY_HEEL=ones(1,allocated)*0;
+R_BAL_DYN_HEEL=ones(1,allocated)*0;
+R_BAL_STEADY_HEEL=ones(1,allocated)*0;
+
+
+GUI_Variables.L_BAL_DYN_HEEL=L_BAL_DYN_HEEL;
+GUI_Variables.L_BAL_STEADY_HEEL=L_BAL_STEADY_HEEL;
+GUI_Variables.R_BAL_DYN_HEEL=R_BAL_DYN_HEEL;
+GUI_Variables.R_BAL_STEADY_HEEL=R_BAL_STEADY_HEEL;
+
+GUI_Variables.L_BAL_DYN_TOE=L_BAL_DYN_TOE;
+GUI_Variables.L_BAL_STEADY_TOE=L_BAL_STEADY_TOE;
+GUI_Variables.R_BAL_DYN_TOE=R_BAL_DYN_TOE;
+GUI_Variables.R_BAL_STEADY_TOE=R_BAL_STEADY_TOE;
+
+
+
 
 GUI_Variables.SIG1=SIG1;
 GUI_Variables.SIG2=SIG2;
@@ -308,39 +347,10 @@ if state == 1 % both connected
         end
         pause(.000000001); 
         
-        
-%         if(bt.bytesAvailable==0 && bt.status=="open" && GUI_Variables.flag_end_trial==0)
-%             bt_wait_time=toc;
-%             
-%             if (bt_wait_time>1)
-%             disp("NO DATA AVAILABLE!!!");
-%             pause(.000000001);
-%                     GUI_Variables.count_disconnection=GUI_Variables.count_disconnection+1;
-%                     GUI_Variables.BT_disconnection(GUI_Variables.count_disconnection)=RLCount;
-%                     RLCount = RLCount + 1;
-%                     
-%             try
-%                 fclose(bt);
-%                 pause(.5); 
-%                 fopen(bt);
-%                 disp('Wait half second more')
-%                 pause(0.5); 
-%                 disp('New Status')
-%                 disp(bt.status);
-%                 if(bt.status=="open")
-%                     fwrite(bt,char(69));
-%                     GUI_Variables.count_connection=GUI_Variables.count_connection+1;
-%                     GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
-%                 end
-%                 toc
-%                 tic
-%             catch
-%             end
-%             tic
-%             end
-%         end
 
+%---------------------AUTORECONNECT--------------------
 
+if(get(handles.BT_auto_reconnect_radiobutton,'Value'))
 
 
         if(bt.bytesAvailable==0 && bt.status=="open" && GUI_Variables.flag_end_trial==0)
@@ -376,7 +386,9 @@ if state == 1 % both connected
             tic
             end
         end
-
+        
+end
+%---------------------------------------------------
 
 
 
@@ -554,7 +566,7 @@ if state == 1 % both connected
                     end
                  end
                 
-                                 if whichPlotLeft == 10
+                if whichPlotLeft == 10
                     if RLCount <= 1000
                         plot(1:length(GUI_Variables.SIG4), GUI_Variables.SIG4);
                         title("SIG4");
@@ -564,6 +576,86 @@ if state == 1 % both connected
                         title("SIG4");
                     end
                 end
+                if whichPlotLeft == 11
+                    if LLCount <= 1000
+                        h=plot(1:length(GUI_Variables.LLVOLT), [GUI_Variables.LLVOLT;GUI_Variables.LLVOLT_H;...
+                        GUI_Variables.L_BAL_DYN_TOE;...
+                        GUI_Variables.L_BAL_STEADY_TOE;...
+                        GUI_Variables.LLVOLT_H;...
+                        GUI_Variables.L_BAL_DYN_HEEL;...
+                        GUI_Variables.L_BAL_STEADY_HEEL] );
+                        h(3).LineStyle='-.';
+                        h(4).LineStyle='--';
+                        h(6).LineStyle='-.';
+                        h(7).LineStyle='--';
+                        
+                        h(3).Color=[0 0 1];
+                        h(4).Color=[0 0 1];
+                        h(6).Color=[1 0 0];
+                        h(7).Color=[1 0 0];
+                        title("Left Balance");
+                    end
+                    if RLCount > 1005
+                        h=plot((LLCount-1000):LLCount-1, [GUI_Variables.LLVOLT((LLCount-1000):LLCount-1);GUI_Variables.LLVOLT_H((LLCount-1000):LLCount-1);...
+                        GUI_Variables.L_BAL_DYN_TOE((LLCount-1000):LLCount-1);...
+                        GUI_Variables.L_BAL_STEADY_TOE((LLCount-1000):LLCount-1);...
+                        GUI_Variables.LLVOLT_H((LLCount-1000):LLCount-1);...
+                        GUI_Variables.L_BAL_DYN_HEEL((LLCount-1000):LLCount-1);...
+                        GUI_Variables.L_BAL_STEADY_HEEL((LLCount-1000):LLCount-1)] );
+                        h(3).LineStyle='-.';
+                        h(4).LineStyle='--';
+                        h(6).LineStyle='-.';
+                        h(7).LineStyle='--';
+                        
+                        h(3).Color=[0 0 1];
+                        h(4).Color=[0 0 1];
+                        h(6).Color=[1 0 0];
+                        h(7).Color=[1 0 0];
+                        title("Left Balance");
+                    end
+                end
+                if whichPlotLeft == 12
+                    if LLCount <= 1000
+                        h=plot(1:length(GUI_Variables.RLVOLT), [GUI_Variables.RLVOLT;GUI_Variables.RLVOLT_H;...
+                        GUI_Variables.R_BAL_DYN_TOE;...
+                        GUI_Variables.R_BAL_STEADY_TOE;...
+                        GUI_Variables.RLVOLT_H;...
+                        GUI_Variables.R_BAL_DYN_HEEL;...
+                        GUI_Variables.R_BAL_STEADY_HEEL] );
+                    
+                        h(3).LineStyle='-.';
+                        h(4).LineStyle='--';
+                        h(6).LineStyle='-.';
+                        h(7).LineStyle='--';
+                        
+                        h(3).Color=[0 0 1];
+                        h(4).Color=[0 0 1];
+                        h(6).Color=[1 0 0];
+                        h(7).Color=[1 0 0];
+                        title("Left Balance");
+                    end
+                    if RLCount > 1005
+                        h=plot((RLCount-1000):RLCount-1, [GUI_Variables.RLVOLT((RLCount-1000):RLCount-1);GUI_Variables.RLVOLT_H((RLCount-1000):RLCount-1);...
+                        GUI_Variables.R_BAL_DYN_TOE((RLCount-1000):RLCount-1);...
+                        GUI_Variables.R_BAL_STEADY_TOE((RLCount-1000):RLCount-1);...
+                        GUI_Variables.RLVOLT_H((LLCount-1000):RLCount-1);...
+                        GUI_Variables.R_BAL_DYN_HEEL((LLCount-1000):RLCount-1);...
+                        GUI_Variables.R_BAL_STEADY_HEEL((LLCount-1000):RLCount-1)] );
+                        
+                        h(3).LineStyle='-.';
+                        h(4).LineStyle='--';
+                        h(6).LineStyle='-.';
+                        h(7).LineStyle='--';
+                        
+                        h(3).Color=[0 0 1];
+                        h(4).Color=[0 0 1];
+                        h(6).Color=[1 0 0];
+                        h(7).Color=[1 0 0];
+                        title("Right Balance");
+                    end
+                end
+                
+%                 'L_Bal_dyn_Toe',0,'R_Bal_dyn_Toe',0,'L_Bal_steady_Toe',0,'R_Bal_steady_Toe',0
                 
                 
                 whichPlotRight = get(handles.Top_Graph,'Value');
@@ -677,8 +769,87 @@ if state == 1 % both connected
                         plot((RLCount-1000):RLCount-1,GUI_Variables.SIG4((RLCount-1000):RLCount-1));
                         title("SIG4");
                     end
-                end
+                 end
                 
+                if whichPlotRight == 11
+                    if LLCount <= 1000
+                        h=plot(1:length(GUI_Variables.LLVOLT), [GUI_Variables.LLVOLT;GUI_Variables.LLVOLT_H;...
+                        GUI_Variables.L_BAL_DYN_TOE;...
+                        GUI_Variables.L_BAL_STEADY_TOE;...
+                        GUI_Variables.LLVOLT_H;...
+                        GUI_Variables.L_BAL_DYN_HEEL;...
+                        GUI_Variables.L_BAL_STEADY_HEEL] );
+                        h(3).LineStyle='-.';
+                        h(4).LineStyle='--';
+                        h(6).LineStyle='-.';
+                        h(7).LineStyle='--';
+                        
+                        h(3).Color=[0 0 1];
+                        h(4).Color=[0 0 1];
+                        h(6).Color=[1 0 0];
+                        h(7).Color=[1 0 0];
+                        title("Left Balance");
+                    end
+                    if RLCount > 1005
+                        h=plot((LLCount-1000):LLCount-1, [GUI_Variables.LLVOLT((LLCount-1000):LLCount-1);GUI_Variables.LLVOLT_H((LLCount-1000):LLCount-1);...
+                        GUI_Variables.L_BAL_DYN_TOE((LLCount-1000):LLCount-1);...
+                        GUI_Variables.L_BAL_STEADY_TOE((LLCount-1000):LLCount-1);...
+                        GUI_Variables.LLVOLT_H((LLCount-1000):LLCount-1);...
+                        GUI_Variables.L_BAL_DYN_HEEL((LLCount-1000):LLCount-1);...
+                        GUI_Variables.L_BAL_STEADY_HEEL((LLCount-1000):LLCount-1)] );
+                        h(3).LineStyle='-.';
+                        h(4).LineStyle='--';
+                        h(6).LineStyle='-.';
+                        h(7).LineStyle='--';
+                        
+                        h(3).Color=[0 0 1];
+                        h(4).Color=[0 0 1];
+                        h(6).Color=[1 0 0];
+                        h(7).Color=[1 0 0];
+                        title("Left Balance");
+                    end
+                end
+                if whichPlotRight == 12
+                    if LLCount <= 1000
+                        h=plot(1:length(GUI_Variables.RLVOLT), [GUI_Variables.RLVOLT;GUI_Variables.RLVOLT_H;...
+                        GUI_Variables.R_BAL_DYN_TOE;...
+                        GUI_Variables.R_BAL_STEADY_TOE;...
+                        GUI_Variables.RLVOLT_H;...
+                        GUI_Variables.R_BAL_DYN_HEEL;...
+                        GUI_Variables.R_BAL_STEADY_HEEL] );
+                    
+                        h(3).LineStyle='-.';
+                        h(4).LineStyle='--';
+                        h(6).LineStyle='-.';
+                        h(7).LineStyle='--';
+                        
+                        h(3).Color=[0 0 1];
+                        h(4).Color=[0 0 1];
+                        h(6).Color=[1 0 0];
+                        h(7).Color=[1 0 0];
+                        title("Left Balance");
+                    end
+                    if RLCount > 1005
+                        h=plot((RLCount-1000):RLCount-1, [GUI_Variables.RLVOLT((RLCount-1000):RLCount-1);GUI_Variables.RLVOLT_H((RLCount-1000):RLCount-1);...
+                        GUI_Variables.R_BAL_DYN_TOE((RLCount-1000):RLCount-1);...
+                        GUI_Variables.R_BAL_STEADY_TOE((RLCount-1000):RLCount-1);...
+                        GUI_Variables.RLVOLT_H((LLCount-1000):RLCount-1);...
+                        GUI_Variables.R_BAL_DYN_HEEL((LLCount-1000):RLCount-1);...
+                        GUI_Variables.R_BAL_STEADY_HEEL((LLCount-1000):RLCount-1)] );
+                        
+                        h(3).LineStyle='-.';
+                        h(4).LineStyle='--';
+                        h(6).LineStyle='-.';
+                        h(7).LineStyle='--';
+                        
+                        h(3).Color=[0 0 1];
+                        h(4).Color=[0 0 1];
+                        h(6).Color=[1 0 0];
+                        h(7).Color=[1 0 0];
+                        title("Right Balance");
+                    end
+                end
+                 
                 %toc
             end
         end % end if bt.bytes available >0
@@ -716,6 +887,21 @@ SIG3 = GUI_Variables.SIG3;
 SIG4 = GUI_Variables.SIG4;
 BASEL=GUI_Variables.BASEL;
 BASER=GUI_Variables.BASER;
+
+
+L_BAL_DYN_HEEL=GUI_Variables.L_BAL_DYN_HEEL;
+L_BAL_STEADY_HEEL=GUI_Variables.L_BAL_STEADY_HEEL;
+L_BAL_DYN_TOE=GUI_Variables.L_BAL_DYN_TOE;
+L_BAL_STEADY_TOE=GUI_Variables.L_BAL_STEADY_TOE;
+
+R_BAL_DYN_HEEL=GUI_Variables.R_BAL_DYN_HEEL;
+R_BAL_STEADY_HEEL=GUI_Variables.R_BAL_STEADY_HEEL;
+R_BAL_DYN_TOE=GUI_Variables.R_BAL_DYN_TOE;
+R_BAL_STEADY_TOE=GUI_Variables.R_BAL_STEADY_TOE;
+
+
+
+
 % TRIG=GUI_Variables.TRIG;
 
 disp("");
@@ -767,6 +953,14 @@ while((bt.bytesAvailable > 0))%I use the double while loop so I can incorporate 
                     SIG3(RLCount) = Data(13);
                     SIG4(RLCount) = Data(14);
                     BASER(RLCount)=GUI_Variables.baser;
+                    
+                    R_BAL_DYN_HEEL(RLCount)=GUI_Variables.R_Bal_steady_Heel;
+                    R_BAL_STEADY_HEEL(RLCount)=GUI_Variables.R_BAL_STEADY_HEEL;
+                    R_BAL_DYN_TOE(RLCount)=GUI_Variables.R_Bal_dyn_Toe;
+                    R_BAL_STEADY_TOE(RLCount)=GUI_Variables.R_Bal_steady_Toe;
+                    
+                    
+                    
                     RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value 
                     RLCount = RLCount;
                     LLTorque(LLCount) = Data(6);              %Gets the new Torque Value and stores it
@@ -776,6 +970,14 @@ while((bt.bytesAvailable > 0))%I use the double while loop so I can incorporate 
                     LLVOLT_H(LLCount) = Data(10);
                     SIG2(LLCount) = Data(12);                   
                     BASEL(LLCount)=GUI_Variables.basel;
+                    
+                    
+                    L_BAL_DYN_HEEL(LLCount)=GUI_Variables.L_Bal_dyn_Heel;
+                    L_BAL_STEADY_HEEL(LLCount)=GUI_Variables.L_Bal_steady_Heel;
+                    L_BAL_DYN_TOE(LLCount)=GUI_Variables.L_Bal_dyn_Toe;
+                    L_BAL_STEADY_TOE(LLCount)=GUI_Variables.L_Bal_steady_Toe;
+
+                    
                     
 %                   pause(.000000001);                                               %Pauses to give time for the user to possibly hit stop button
                 else
@@ -811,6 +1013,20 @@ SIG3 = SIG3(1:(RLCount-1));
 SIG4 = SIG4(1:(RLCount-1));
 BASEL=BASEL(1:(RLCount-1));
 BASER=BASER(1:(RLCount-1));
+
+
+
+L_BAL_DYN_HEEL=L_BAL_DYN_HEEL(1:(RLCount-1));
+L_BAL_STEADY_HEEL=L_BAL_STEADY_HEEL(1:(RLCount-1));
+L_BAL_DYN_TOE=L_BAL_DYN_TOE(1:(RLCount-1));
+L_BAL_STEADY_TOE=L_BAL_STEADY_TOE(1:(RLCount-1));
+
+R_BAL_DYN_HEEL=R_BAL_DYN_HEEL(1:(RLCount-1));
+R_BAL_STEADY_HEEL=R_BAL_STEADY_HEEL(1:(RLCount-1));
+R_BAL_DYN_TOE=R_BAL_DYN_TOE(1:(RLCount-1));
+R_BAL_STEADY_TOE=R_BAL_STEADY_TOE(1:(RLCount-1));
+
+
 
 if(state ==1)  %If both are on
    lengthDif = length(RLTorque) - length(LLTorque);                   %When both are on there is a possibility that one arduino sent more datapoints than the other
@@ -914,14 +1130,15 @@ BT_CONNECTION=zeros(size(LLSET));
 % size(LLSET)
 A = [t; RLTorque; RLFSR; RLSET; RLVOLT; RLVOLT_H; LLTorque; LLFSR; LLSET; LLVOLT; LLVOLT_H; TRIG; BASEL; BASER ;L_SPEED; R_SPEED; SIG1; SIG2; SIG3; SIG4];                                 %Creates a vector that holds the time and data
 % A = [t; RLTorque; RLSET; LLTorque; LLSET] 
+A2=[L_BAL_DYN_HEEL;L_BAL_STEADY_HEEL;L_BAL_DYN_TOE;L_BAL_STEADY_TOE;R_BAL_DYN_HEEL;R_BAL_STEADY_HEEL;R_BAL_DYN_TOE;R_BAL_STEADY_TOE];
 
-
+A=[A;A2];
 Filename = sprintf('%s_%d','Trial_Number_',bt.UserData);               %Creates a new filename called "Torque_#"
                                                                            %Where # is the trial number                                                                           
 fileID = fopen(Filename,'w');                                      %Actually creates that file
 pause(.01);
 fprintf(fileID,'\tTime\t\t RLTRQ\t\t RLFSR\t\t RLSET\t\t RLVOLT\t\t RLVOLT_H\t\t LLTRQ\t\t LLFSR\t\t LLSET\t\t LLVOLT\t\t LLVOLT_H\t\t TRIG\t\t BASEL\t\t BASER\t\t L_SPEED\t\t R_SPEED\t\t SIG1\t\t SIG2\t\t SIG3\t\t SIG4\t\t\n');
-fprintf(fileID,'%6.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\n',A);     %Puts the Time and Torque values in the txt columns
+fprintf(fileID,'%6.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\t %12.2f\n',A);     %Puts the Time and Torque values in the txt columns
 fclose(fileID);
 
 if(bt.Status == "open")
@@ -1526,24 +1743,35 @@ if selectMode == 1
     set(handles.L_PID,'Visible','off');
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','off');
+    set(handles.HLO_panel,'Visible','off');
 end
 if selectMode == 2
     set(handles.L_Torque,'Visible','off');
     set(handles.L_PID,'Visible','on');
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','off');
+    set(handles.HLO_panel,'Visible','off');
 end
 if selectMode == 3
     set(handles.L_Torque,'Visible','off');
     set(handles.L_PID,'Visible','off');
     set(handles.L_Adj,'Visible','on');
     set(handles.L_Proportional_Ctrl,'Visible','off');
+    set(handles.HLO_panel,'Visible','off');
 end
 if selectMode == 4
     set(handles.L_Torque,'Visible','off');
     set(handles.L_PID,'Visible','off');
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','on');
+    set(handles.HLO_panel,'Visible','off');
+end
+if selectMode == 5
+    set(handles.L_Torque,'Visible','off');
+    set(handles.L_PID,'Visible','off');
+    set(handles.L_Adj,'Visible','off');
+    set(handles.L_Proportional_Ctrl,'Visible','off');
+    set(handles.HLO_panel,'Visible','on');
 end
 
 
@@ -1575,6 +1803,7 @@ if selectMode == 1
     set(handles.R_Adj,'Visible','off');
     set(handles.R_Smoothing,'Visible','off');
     set(handles.R_Proportional_Ctrl,'Visible','off');
+    set(handles.Bio_Feedback_panel,'Visible','off');
 end
 if selectMode == 2
     set(handles.R_Torque,'Visible','off');
@@ -1582,6 +1811,7 @@ if selectMode == 2
     set(handles.R_Adj,'Visible','off');
     set(handles.R_Smoothing,'Visible','off');
     set(handles.R_Proportional_Ctrl,'Visible','off');
+    set(handles.Bio_Feedback_panel,'Visible','off');
 end
 if selectMode == 3
     set(handles.R_Torque,'Visible','off');
@@ -1589,6 +1819,7 @@ if selectMode == 3
     set(handles.R_Adj,'Visible','on');
     set(handles.R_Smoothing,'Visible','off');
     set(handles.R_Proportional_Ctrl,'Visible','off');
+    set(handles.Bio_Feedback_panel,'Visible','off');
 end
 if selectMode == 4
     set(handles.R_Torque,'Visible','off');
@@ -1596,6 +1827,7 @@ if selectMode == 4
         set(handles.R_Adj,'Visible','off');
     set(handles.R_Smoothing,'Visible','on');
     set(handles.R_Proportional_Ctrl,'Visible','off');
+    set(handles.Bio_Feedback_panel,'Visible','off');
 end
 if selectMode == 5
     set(handles.R_Torque,'Visible','off');
@@ -1603,6 +1835,15 @@ if selectMode == 5
         set(handles.R_Adj,'Visible','off');
     set(handles.R_Smoothing,'Visible','off');
     set(handles.R_Proportional_Ctrl,'Visible','on');
+    set(handles.Bio_Feedback_panel,'Visible','off');
+end
+if selectMode == 6
+    set(handles.R_Torque,'Visible','off');
+        set(handles.R_PID,'Visible','off');
+        set(handles.R_Adj,'Visible','off');
+    set(handles.R_Smoothing,'Visible','off');
+    set(handles.R_Proportional_Ctrl,'Visible','off');
+    set(handles.Bio_Feedback_panel,'Visible','on');
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3276,15 +3517,51 @@ try
 fwrite(bt,'B');
   end  
 
+      val=get(handles.Activate_Balance,'Value');
+    
+%         if(val==0)
+%         GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
+%         GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
+%         disp('command');
+%         disp(GUI_Variables.basel);
+%         disp(GUI_Variables.baser);
+%         else
+%         GUI_Variables.L_Bal_steady_Toe= str2double(message((indexes(1)+1):(indexes(2)-1)));
+%         GUI_Variables.L_Bal_steady_Heel= str2double(message((indexes(2)+1):(indexes(3)-1)));
+%         GUI_Variables.R_Bal_steady_Toe= str2double(message((indexes(3)+1):(indexes(4)-1)));
+%         GUI_Variables.R_Bal_steady_Heel= str2double(message((indexes(4)+1):(indexes(5)-1)));
+%         
+%         GUI_Variables.L_Bal_dyn_Toe= str2double(message((indexes(5)+1):(indexes(6)-1)));
+%         GUI_Variables.L_Bal_dyn_Heel= str2double(message((indexes(6)+1):(indexes(7)-1)));
+%         GUI_Variables.R_Bal_dyn_Toe= str2double(message((indexes(7)+1):(indexes(8)-1)));
+%         GUI_Variables.R_Bal_dyn_Heel= str2double(message((indexes(8)+1):(indexes(9)-1)));
+%         end
+  
+  
+  
   disp('Check Baseline');
 %   if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
     message = fgetl(bt);
     if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'B'
         indexes = find(message==44);
+        
+         if(val==0)
+        
         GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
         GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
         disp(GUI_Variables.basel);
         disp(GUI_Variables.baser);
+                else
+        GUI_Variables.L_Bal_steady_Toe= str2double(message((indexes(1)+1):(indexes(2)-1)));
+        GUI_Variables.L_Bal_steady_Heel= str2double(message((indexes(2)+1):(indexes(3)-1)));
+        GUI_Variables.R_Bal_steady_Toe= str2double(message((indexes(3)+1):(indexes(4)-1)));
+        GUI_Variables.R_Bal_steady_Heel= str2double(message((indexes(4)+1):(indexes(5)-1)));
+        
+        GUI_Variables.L_Bal_dyn_Toe= str2double(message((indexes(5)+1):(indexes(6)-1)));
+        GUI_Variables.L_Bal_dyn_Heel= str2double(message((indexes(6)+1):(indexes(7)-1)));
+        GUI_Variables.R_Bal_dyn_Toe= str2double(message((indexes(7)+1):(indexes(8)-1)));
+        GUI_Variables.R_Bal_dyn_Heel= str2double(message((indexes(8)+1):(indexes(9)-1)));
+        end
     end
 
 %   end

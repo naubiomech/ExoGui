@@ -66,11 +66,25 @@ switch(message(2))
        R_Gain = str2double(message((indexes(1)+1):(indexes(2)-1)));
        set(handles.R_Check_Gain_Text,'String',R_Gain);
     case 'B'
+    val=get(handles.Activate_Balance,'Value')
+    
+        if(val==0)
         GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
         GUI_Variables.baser= str2double(message((indexes(2)+1):(indexes(3)-1)));
         disp('command');
         disp(GUI_Variables.basel);
         disp(GUI_Variables.baser);
+        else
+        GUI_Variables.L_Bal_steady_Toe= str2double(message((indexes(1)+1):(indexes(2)-1)));
+        GUI_Variables.L_Bal_steady_Heel= str2double(message((indexes(2)+1):(indexes(3)-1)));
+        GUI_Variables.R_Bal_steady_Toe= str2double(message((indexes(3)+1):(indexes(4)-1)));
+        GUI_Variables.R_Bal_steady_Heel= str2double(message((indexes(4)+1):(indexes(5)-1)));
+        
+        GUI_Variables.L_Bal_dyn_Toe= str2double(message((indexes(5)+1):(indexes(6)-1)));
+        GUI_Variables.L_Bal_dyn_Heel= str2double(message((indexes(6)+1):(indexes(7)-1)));
+        GUI_Variables.R_Bal_dyn_Toe= str2double(message((indexes(7)+1):(indexes(8)-1)));
+        GUI_Variables.R_Bal_dyn_Heel= str2double(message((indexes(8)+1):(indexes(9)-1)));
+        end
        
     otherwise
         %Do nothing
