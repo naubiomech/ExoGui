@@ -9,14 +9,15 @@ if message(1) == 83 && message(length(message)-1) == 90
                     for index_iterator = 1:(length(indexes)-1)
                         Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));             
                     end
-                    GUI_Variables.RLTRQ(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
+                    
+                    GUI_Variables.RLTRQ(RLCount) = Data(1)/100;                 %Gets the new Torque Value and Stores it
                     GUI_Variables.RLFSR(RLCount) = Data(2); %state
-                    GUI_Variables.RLSET(RLCount) = Data(3); %save the torque set point
-                    GUI_Variables.RLVOLT(RLCount) = Data(4);
-                    GUI_Variables.RLVOLT_H(RLCount) = Data(5);
-                    GUI_Variables.SIG1(RLCount) = Data(11);
-                    GUI_Variables.SIG3(RLCount) = Data(13);
-                    GUI_Variables.SIG4(RLCount) = Data(14);
+                    GUI_Variables.RLSET(RLCount) = Data(3)/100; %save the torque set point
+                    GUI_Variables.RLVOLT(RLCount) = Data(4)/100;
+                    GUI_Variables.RLVOLT_H(RLCount) = Data(5)/100;
+                    GUI_Variables.SIG1(RLCount) = Data(11)/100;
+                    GUI_Variables.SIG3(RLCount) = Data(13)/100;
+                    GUI_Variables.SIG4(RLCount) = Data(14)/100;
                     GUI_Variables.BASER(RLCount)=GUI_Variables.baser;
                                         
                     GUI_Variables.R_BAL_DYN_HEEL(RLCount)=GUI_Variables.R_Bal_dyn_Heel;
@@ -27,12 +28,12 @@ if message(1) == 83 && message(length(message)-1) == 90
                     
                     RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value 
                     GUI_Variables.RLCount = RLCount;
-                    GUI_Variables.LLTRQ(LLCount) = Data(6);              %Gets the new Torque Value and stores it
+                    GUI_Variables.LLTRQ(LLCount) = Data(6)/100;            %Gets the new Torque Value and stores it
                     GUI_Variables.LLFSR(LLCount) = Data(7);
-                    GUI_Variables.LLSET(LLCount) = Data(8); %New to save also the set point
-                    GUI_Variables.LLVOLT(LLCount) = Data(9);
-                    GUI_Variables.LLVOLT_H(LLCount) = Data(10);
-                    GUI_Variables.SIG2(LLCount) = Data(12);
+                    GUI_Variables.LLSET(LLCount) = Data(8)/100; %New to save also the set point
+                    GUI_Variables.LLVOLT(LLCount) = Data(9)/100;
+                    GUI_Variables.LLVOLT_H(LLCount) = Data(10)/100;
+                    GUI_Variables.SIG2(LLCount) = Data(12)/100;
                     
                     GUI_Variables.BASEL(LLCount)=GUI_Variables.basel;
                                         

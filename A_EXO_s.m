@@ -59,7 +59,7 @@ function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 % bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
-bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
+% bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
 BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_3','Jasons_Bluetooth','Exo_Bluetooth_2'};
 bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
@@ -4033,7 +4033,25 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % --- Executes on button press Flush Bluetooth.
+    function Flush_Biobluetooth_Callback(hObject, eventdata, handles)
+    % hObject    handle to Flush_Bluetooth (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    global GUI_Variables
+    bt = GUI_Variables.BT;
+        if (bt.Status=="open")
+        fwrite(bt,'Y'); 
+        disp('Deactivate BT auto reconnect');
+        end
+    
+    
+    
 % --- Executes on button press in BT_Auto_Reconnection.
 function BT_Auto_Reconnection_Callback(hObject, eventdata, handles)
 % hObject    handle to BT_Auto_Reconnection (see GCBO)
@@ -4081,6 +4099,13 @@ function radiobutton23_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of radiobutton23
+
+
+
+
+
+
+
 
 
 % --- Executes on button press in Activate_BioFeedback.
