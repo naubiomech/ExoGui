@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 21-Jan-2019 17:23:03
+% Last Modified by GUIDE v2.5 11-Feb-2019 13:15:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -98,7 +98,7 @@ GUI_Variables = struct('BT',bt,'IP','0.0.0.0','t',0,'Timer',NaN,'state',0,'RLTRQ
     'R_Bal_dyn_Toe',20,'R_Bal_dyn_Heel',30,'R_Bal_steady_Toe',40,'R_Bal_steady_Heel',50,...
         'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
     'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
-    'PropOn',0);
+    'PropOn',0,'SSID','No_ID');
 
 
 
@@ -1242,7 +1242,14 @@ A_mat2=[L_BAL_DYN_HEEL;L_BAL_STEADY_HEEL;L_BAL_DYN_TOE;L_BAL_STEADY_TOE;...
 
 A=[A;A2];
 A_mat=[A_mat;A_mat2];
-Filename = sprintf('%s_%d','Trial_Number_',bt.UserData);               %Creates a new filename called "Torque_#"
+
+currDir = cd;       % Current directory
+saveDir = [currDir,'\',GUI_Variables.SSID,'_',date];    % Save directory specific to subject and date
+mkdir(currDir,[GUI_Variables.SSID,'_',date]);           % Generate a save directory
+Filename = sprintf('%s_%d',fullfile(saveDir,[GUI_Variables.SSID,'_',date,'_','Trial_Number_']),...
+    bt.UserData);               %Creates a new filename called "Torque_#"
+
+
                                                                            %Where # is the trial number                                                                           
 fileID = fopen(Filename,'w');                                      %Actually creates that file
 pause(.01);
@@ -1323,7 +1330,11 @@ rkf=R_Check_KF_Callback(hObject, eventdata, handles);
 catch
 end
 
-Filename = sprintf('%s_%d','Parameters_Trial_Number_',bt.UserData);               %Creates a new filename called "Torque_#"
+currDir = cd;       % Current directory
+saveDir = [currDir,'\',GUI_Variables.SSID,'_',date];    % Save directory specific to subject and date
+mkdir(currDir,[GUI_Variables.SSID,'_',date]);           % Make a save directory
+Filename = sprintf('%s_%d',fullfile(saveDir,[GUI_Variables.SSID,'_',date,'_','Parameters_Trial_Number_']),...
+    bt.UserData);               %Creates a new filename called "Torque_#"
                                                                            %Where # is the trial number                                                                           
 fileID = fopen(Filename,'w');                                      %Actually creates that file
 pause(.01);
@@ -4571,6 +4582,35 @@ function Ankle2FSR_Distance_In_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function Ankle2FSR_Distance_In_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to Ankle2FSR_Distance_In (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function SSID_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to SSID_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global GUI_Variables
+
+GUI_Variables.SSID = get(hObject,'String');
+
+
+
+% Hints: get(hObject,'String') returns contents of SSID_Input as text
+%        str2double(get(hObject,'String')) returns contents of SSID_Input as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function SSID_Input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SSID_Input (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
