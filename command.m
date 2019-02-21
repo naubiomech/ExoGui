@@ -66,7 +66,7 @@ switch(message(2))
        R_Gain = str2double(message((indexes(1)+1):(indexes(2)-1)));
        set(handles.R_Check_Gain_Text,'String',R_Gain);
     case 'B'
-    val=get(handles.Activate_Balance,'Value')
+        val=strcmp(get(handles.Balance_Text,'String'),'On');
     
         if(val==0)
         GUI_Variables.basel= str2double(message((indexes(1)+1):(indexes(2)-1)));
@@ -85,7 +85,14 @@ switch(message(2))
         GUI_Variables.R_Bal_dyn_Toe= str2double(message((indexes(7)+1):(indexes(8)-1)));
         GUI_Variables.R_Bal_dyn_Heel= str2double(message((indexes(8)+1):(indexes(9)-1)));
         end
-       
+    case 'V'
+        steady_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
+        set(handles.Steady_Text,'String',steady_val);
+        disp(["Check Steady Val ",num2str(steady_val)]);
+     case 'A'
+        dyn_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
+        set(handles.Dyn_Text,'String',dyn_val);
+        disp(["Check Dyn Val ",num2str(dyn_val)]);    
     otherwise
         %Do nothing
 end

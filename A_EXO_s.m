@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 20-Nov-2018 14:58:00
+% Last Modified by GUIDE v2.5 29-Nov-2018 14:07:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -61,8 +61,8 @@ handles.output = hObject;
 % bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
-BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_3'};
-bt = Bluetooth(BT_NAME{3},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
+BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_3','Jasons_Bluetooth'};
+bt = Bluetooth(BT_NAME{4},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
 bt.Timeout=2;
 disp('')%Exo_Bluetooth_2
 % Capstone_Bluetooth_1
@@ -327,8 +327,7 @@ if state == 1 % both connected
 %         end
         
         if GUI_Variables.flag_calib==1
-% % %         flushinput(bt);   % Not sure if this was commented? Giamma
-% please check
+
             if GUI_Variables.first_calib==0
             start_count=clock;
             start_count=start_count(6);
@@ -350,8 +349,8 @@ if state == 1 % both connected
 
 %---------------------AUTORECONNECT--------------------
 
-if(get(handles.BT_auto_reconnect_radiobutton,'Value'))
-
+if strcmp(get(handles.BT_Text,'String'),'On')
+% disp('Activating the BT auto reconnection Matlab gui side')
 
         if(bt.bytesAvailable==0 && bt.status=="open" && GUI_Variables.flag_end_trial==0)
             bt_wait_time=toc;
@@ -391,32 +390,6 @@ end
 %---------------------------------------------------
 
 
-
-% % % % %         
-% % % % % %            try
-% % % % %                disp("Check BT");
-% % % % %                disp(bt.status);
-% % % % % % Check_Bluetooth_Callback(hObject, eventdata, handles);
-% % % % % 
-% % % % % if (bt.status=="closed")
-% % % % %     fopen(bt);
-% % % % % %     pause(1);
-% % % % %     tic
-% % % % % end
-% % % % % 
-% % % % % if (bt.status=="open")
-% % % % %    fclose(bt);
-% % % % %        fopen(bt);
-% % % % % %     pause(1);
-% % % % %     tic
-% % % % % end
-% % % % %     disp(bt.status);
-% % % % % %             catch
-% % % % % %             end
-% % % % %             
-% % % % %             end
-% % % % %         end
-        
         
         if ((bt.bytesAvailable > 0))
             
@@ -430,37 +403,7 @@ end
 %           disp('saving in global variables');%Checks if Knee Arduino Sent a new Torque Value
             tic
             message = fgetl(bt);
-%             if message(1) == 83 && message(length(message)-1) == 90% && length(find(A==90)) == 1 && length(find(A==69)) == 1              
-%                 indexes = find(message==44);
-%                 if(indexes(1) == 2) % It means it is data message to plot and update signals
-%                     for index_iterator = 1:(length(indexes)-1)
-%                         Data(index_iterator) = str2double(message((indexes(index_iterator)+1):(indexes(index_iterator+1)-1)));             
-%                     end
-%                     GUI_Variables.RLTorque(RLCount) = Data(1);                 %Gets the new Torque Value and Stores it
-%                     GUI_Variables.RLFSR(RLCount) = Data(2);
-%                     GUI_Variables.RLSET(RLCount) = Data(3); %New to save also the set point
-%                     GUI_Variables.RLVOLT(RLCount) = Data(4);
-%                     GUI_Variables.SIG3(RLCount) = Data(9);
-%                     RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value 
-%                     GUI_Variables.RLCount = RLCount;
-%                     GUI_Variables.LLTorque(LLCount) = Data(5);              %Gets the new Torque Value and stores it
-%                     GUI_Variables.LLFSR(LLCount) = Data(6);
-%                     GUI_Variables.LLSET(LLCount) = Data(7); %New to save also the set point
-%                     GUI_Variables.LLVOLT(LLCount) = Data(8);
-%                     GUI_Variables.SIG2(LLCount) = Data(10);
-%                     GUI_Variables.SIG1(LLCount) = Data(11);
-%                     LLCount = LLCount + 1;  
-%                     GUI_Variables.LLCount = LLCount;
-% %                   pause(.000000001);                                               %Pauses to give time for the user to possibly hit stop button
-%                     if(Data(3)==9)||(Data(7)==9)
-%                        disp("Torque value problem    Trq > 25Nm");
-%                        set(handles.statusText,'String','Problem Trq Ctrl, Trq > 25 Nm');
-%                        
-%                     end
-%                 else % it is a non data message
-%                     command(message,indexes,hObject, eventdata, handles)
-%                 end          
-%             end
+
 [RLCount,LLCount] = Receive_Data_Message(message,RLCount,LLCount,hObject, eventdata, handles);
             if(mod(RLCount,100) == 0)
                 axes(handles.Bottom_Axes);
@@ -589,6 +532,11 @@ end
                         h(6).LineStyle='-.';
                         h(7).LineStyle='--';
                         
+                        
+                        h(1).Color=[0 0 1];
+                        h(2).Color=[1 0 0];
+                        h(5).Color=[1 0 0];
+                        
                         h(3).Color=[0 0 1];
                         h(4).Color=[0 0 1];
                         h(6).Color=[1 0 0];
@@ -606,6 +554,10 @@ end
                         h(4).LineStyle='--';
                         h(6).LineStyle='-.';
                         h(7).LineStyle='--';
+                        
+                        h(1).Color=[0 0 1];
+                        h(2).Color=[1 0 0];
+                        h(5).Color=[1 0 0];
                         
                         h(3).Color=[0 0 1];
                         h(4).Color=[0 0 1];
@@ -784,6 +736,10 @@ end
                         h(6).LineStyle='-.';
                         h(7).LineStyle='--';
                         
+                        h(1).Color=[0 0 1];
+                        h(2).Color=[1 0 0];
+                        h(5).Color=[1 0 0];
+                        
                         h(3).Color=[0 0 1];
                         h(4).Color=[0 0 1];
                         h(6).Color=[1 0 0];
@@ -801,6 +757,12 @@ end
                         h(4).LineStyle='--';
                         h(6).LineStyle='-.';
                         h(7).LineStyle='--';
+                        
+                        
+                        h(1).Color=[0 0 1];
+                        h(2).Color=[1 0 0];
+                        h(5).Color=[1 0 0];
+                        
                         
                         h(3).Color=[0 0 1];
                         h(4).Color=[0 0 1];
@@ -1744,6 +1706,7 @@ if selectMode == 1
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','off');
     set(handles.HLO_panel,'Visible','off');
+    set(handles.Balance_panel,'Visible','off');
 end
 if selectMode == 2
     set(handles.L_Torque,'Visible','off');
@@ -1751,6 +1714,7 @@ if selectMode == 2
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','off');
     set(handles.HLO_panel,'Visible','off');
+    set(handles.Balance_panel,'Visible','off');
 end
 if selectMode == 3
     set(handles.L_Torque,'Visible','off');
@@ -1758,6 +1722,7 @@ if selectMode == 3
     set(handles.L_Adj,'Visible','on');
     set(handles.L_Proportional_Ctrl,'Visible','off');
     set(handles.HLO_panel,'Visible','off');
+    set(handles.Balance_panel,'Visible','off');
 end
 if selectMode == 4
     set(handles.L_Torque,'Visible','off');
@@ -1765,6 +1730,7 @@ if selectMode == 4
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','on');
     set(handles.HLO_panel,'Visible','off');
+    set(handles.Balance_panel,'Visible','off');
 end
 if selectMode == 5
     set(handles.L_Torque,'Visible','off');
@@ -1772,7 +1738,17 @@ if selectMode == 5
     set(handles.L_Adj,'Visible','off');
     set(handles.L_Proportional_Ctrl,'Visible','off');
     set(handles.HLO_panel,'Visible','on');
+    set(handles.Balance_panel,'Visible','off');
 end
+if selectMode == 6
+    set(handles.L_Torque,'Visible','off');
+    set(handles.L_PID,'Visible','off');
+    set(handles.L_Adj,'Visible','off');
+    set(handles.L_Proportional_Ctrl,'Visible','off');
+    set(handles.HLO_panel,'Visible','off');
+    set(handles.Balance_panel,'Visible','on');
+end
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -3250,32 +3226,36 @@ function Activate_Balance_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of Activate_Balance
 global GUI_Variables
 bt = GUI_Variables.BT;
+
+% BT_auto_reconnect_radiobutton
 
 % disp('r');
 if (bt.Status=="open")
 %     disp('r');
+Balance=get(handles.Balance_Text,'String');
+% disp(PC);
 
-PC=get(hObject,'Value');
-disp("Balance status")
-disp(PC);
-disp("remember that arduino state machine has to be set on toe&heel");
-try
-    
-if PC
-    %activate prop control
-    fwrite(bt,'+'); 
-    disp('Activate Balance Ctrl');
-else
-    %deactivate prop control
+            if strcmp(Balance,'On')
+            %deactivate prop control
     fwrite(bt,'='); 
     disp('Deactivate Balance Ctrl');
+            set(handles.Balance_Text,'String','Off')
+%             pause(0.5);
+            else
+            %activate prop control
+
+        fwrite(bt,'+'); 
+    disp('Activate Balance Ctrl');
+            set(handles.Balance_Text,'String','On')
+%             pause(0.5);
+            end
+
+    
 end
-    catch
-    end
-end
+
+
 
 
 % --- Executes on button press in radiobutton12.
@@ -3706,17 +3686,17 @@ function Balance_Baseline_Callback(hObject, eventdata, handles)
 % hObject    handle to Balance_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global GUI_Variables
-bt = GUI_Variables.BT;
-
-try
-if(bt.Status=="open")
-fwrite(bt,'&');
-end
-
-disp('Balance Baseline');
-catch
-end
+% global GUI_Variables
+% bt = GUI_Variables.BT;
+% 
+% try
+% if(bt.Status=="open")
+% fwrite(bt,'&');
+% end
+% 
+% disp('Balance Baseline');
+% catch
+% end
 
 
 
@@ -3775,3 +3755,204 @@ disp('Steady Balance Baseline');
 catch
 end
 
+
+
+% --- Executes on button press in Dynamic_Balance_Base.
+function Dynamic_Balance_Base_Callback(hObject, eventdata, handles)
+% hObject    handle to Dynamic_Balance_Base (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+try
+if(bt.Status=="open")
+fwrite(bt,'&');
+end
+
+disp('Balance Baseline');
+catch
+end
+
+
+
+% --- Executes on button press in Set_Steady_Val.
+function Set_Steady_Val_Callback(hObject, eventdata, handles)
+% hObject    handle to Set_Steady_Val (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+if(bt.Status=="open")
+try
+    fwrite(bt,'v');
+    steady_val = str2double(get(handles.Steady_Edit,'String')); 
+    fwrite(bt,steady_val,'double');
+    disp(['Steady Val ',num2str(steady_val)]);
+catch
+end
+end
+
+
+% --- Executes on button press in Check_Steady_Val.
+function Check_Steady_Val_Callback(hObject, eventdata, handles)
+% hObject    handle to Check_Steady_Val (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt=GUI_Variables.BT;
+if(bt.Status=="open")
+    try
+    fwrite(bt,'V');
+    steady_val=0;
+
+        if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
+                message = fgetl(bt);
+                if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'V'
+                    indexes = find(message==44);
+                    steady_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
+                    set(handles.Steady_Text,'String',steady_val);
+                disp(['Check Steady Val ',num2str(steady_val)]);
+        %         disp(steady_val);
+                end
+        end
+    catch
+    end
+end
+
+% --- Executes on button press in Set_Dyn_Val.
+function Set_Dyn_Val_Callback(hObject, eventdata, handles)
+% hObject    handle to Set_Dyn_Val (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+if(bt.Status=="open")
+    try
+fwrite(bt,'a');
+dyn_val = str2double(get(handles.Dyn_Edit,'String')); 
+fwrite(bt,dyn_val,'double');
+disp(['Dynamic Val ',num2str(dyn_val)]);
+    catch
+    end
+end
+
+% --- Executes on button press in Check_Dyn_Val.
+function Check_Dyn_Val_Callback(hObject, eventdata, handles)
+% hObject    handle to Check_Dyn_Val (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+if(bt.Status=="open")
+    try
+fwrite(bt,'A');
+dyn_val=0;
+
+        if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
+                message = fgetl(bt)
+                if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'A'
+                    indexes = find(message==44);
+                    dyn_val = str2double(message((indexes(1)+1):(indexes(2)-1)))
+                    set(handles.Dyn_Text,'String',dyn_val);
+                disp(['Check Steady Val ',num2str(dyn_val)]);
+        %         disp(steady_val);
+                end
+        end
+
+    catch
+    end
+end
+
+
+function Steady_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to Steady_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Steady_Edit as text
+%        str2double(get(hObject,'String')) returns contents of Steady_Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Steady_Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Steady_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function Dyn_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to Dyn_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Dyn_Edit as text
+%        str2double(get(hObject,'String')) returns contents of Dyn_Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Dyn_Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Dyn_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in BT_Auto_Reconnection.
+function BT_Auto_Reconnection_Callback(hObject, eventdata, handles)
+% hObject    handle to BT_Auto_Reconnection (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global GUI_Variables
+bt = GUI_Variables.BT;
+
+% BT_auto_reconnect_radiobutton
+
+% disp('r');
+if (bt.Status=="open")
+%     disp('r');
+BT_auto=get(handles.BT_Text,'String');
+% disp(PC);
+
+            if strcmp(BT_auto,'On')
+            %deactivate prop control
+            fwrite(bt,'@'); 
+            disp('Deactivate BT auto reconnect');
+            set(handles.BT_Text,'String','Off')
+%             pause(0.5);
+            else
+            %activate prop control
+            fwrite(bt,'|'); 
+            disp('Activate BT auto reconnect');
+            set(handles.BT_Text,'String','On')
+%             pause(0.5);
+            end
+
+    
+end
+
+
+
+% --- Executes on button press in radiobutton23.
+function radiobutton23_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton23 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton23
