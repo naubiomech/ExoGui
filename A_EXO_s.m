@@ -45,7 +45,7 @@ end
 
 
 % --- Executes just before A_EXO_s is made visible.
-function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
+function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -91,7 +91,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = A_EXO_s_OutputFcn(hObject, eventdata, handles) 
+function varargout = A_EXO_s_OutputFcn(~, ~, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -101,7 +101,7 @@ function varargout = A_EXO_s_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 % --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, eventdata, handles)
+function figure1_CloseRequestFcn(hObject, ~, ~)
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -262,19 +262,19 @@ if state == 1 % both connected
             tic
             [RLCount,LLCount] = Receive_Data_Message(RLCount,LLCount,hObject, eventdata, handles);
             if(mod(RLCount,100) == 0)
-                plots = {{GUI_Variables.RLTorque,GUI_Variables.RLSET},
-                    {GUI_Variables.RLFSR},
-                    {GUI_Variables.LLTorque},
-                    {GUI_Variables.LLFSR},
-                    {GUI_Variables.LLFSR},
-                    {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,GUI_Variables.BASEL},
-                    {GUI_Variables.RLVOLT,GUI_Variables.RLVOLT_H,GUI_Variables.BASER},
-                    {GUI_Variables.SIG1},
-                    {GUI_Variables.SIG2},
-                    {GUI_Variables.SIG3},
+                plots = {{GUI_Variables.RLTorque,GUI_Variables.RLSET}, ...
+                    {GUI_Variables.RLFSR}, ...
+                    {GUI_Variables.LLTorque}, ...
+                    {GUI_Variables.LLFSR}, ...
+                    {GUI_Variables.LLFSR}, ...
+                    {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,GUI_Variables.BASEL}, ...
+                    {GUI_Variables.RLVOLT,GUI_Variables.RLVOLT_H,GUI_Variables.BASER}, ...
+                    {GUI_Variables.SIG1}, ...
+                    {GUI_Variables.SIG2}, ...
+                    {GUI_Variables.SIG3}, ...
                     {GUI_Variables.SIG4}};
                 
-                titles = {"RL Torque","RL State","LL Torque","LL State","LL Force Toe and Heel",
+                titles = {"RL Torque","RL State","LL Torque","LL State","LL Force Toe and Heel", ...
                      "RL Force Toe and Heel","SIG1","SIG2","SIG3","SIG4"};
                  
                 axes(handles.Bottom_Axes);
@@ -564,19 +564,19 @@ if bt.Status=="open"
     Filename = sprintf('%s_%d','Parameters_Trial_Number_',bt.UserData); % Creates a new filename called "Torque_#" Where # is the trial number
     fileID = fopen(Filename,'w'); % Actually creates that file
     pause(.01);
-    Filename = fprintf(fileID,['N1 = ',num2str(n1),'\n']);
-    Filename = fprintf(fileID,['N2 = ',num2str(n2),'\n']);
-    Filename = fprintf(fileID,['N3 = ',num2str(n3),'\n']);
-    Filename = fprintf(fileID,['KF_LL = ',num2str(lkf),'\n']);
-    Filename = fprintf(fileID,['KF_RL = ',num2str(rkf),'\n']);
-    Filename = fprintf(fileID,['FSR_TH_LL = ',num2str(lfsr),'\n']);
-    Filename = fprintf(fileID,['FSR_TH_RL = ',num2str(rfsr),'\n']);
-    Filename = fprintf(fileID,['KP_L = ',num2str(lkp),'\n']);
-    Filename = fprintf(fileID,['KD_L = ',num2str(lkd),'\n']);
-    Filename = fprintf(fileID,['KI_L = ',num2str(lki),'\n']);
-    Filename = fprintf(fileID,['KP_R = ',num2str(rkp),'\n']);
-    Filename = fprintf(fileID,['KD_R = ',num2str(rkd),'\n']);
-    Filename = fprintf(fileID,['KI_R = ',num2str(rki),'\n']);
+    fprintf(fileID,['N1 = ',num2str(n1),'\n']);
+    fprintf(fileID,['N2 = ',num2str(n2),'\n']);
+    fprintf(fileID,['N3 = ',num2str(n3),'\n']);
+    fprintf(fileID,['KF_LL = ',num2str(lkf),'\n']);
+    fprintf(fileID,['KF_RL = ',num2str(rkf),'\n']);
+    fprintf(fileID,['FSR_TH_LL = ',num2str(lfsr),'\n']);
+    fprintf(fileID,['FSR_TH_RL = ',num2str(rfsr),'\n']);
+    fprintf(fileID,['KP_L = ',num2str(lkp),'\n']);
+    fprintf(fileID,['KD_L = ',num2str(lkd),'\n']);
+    fprintf(fileID,['KI_L = ',num2str(lki),'\n']);
+    fprintf(fileID,['KP_R = ',num2str(rkp),'\n']);
+    fprintf(fileID,['KD_R = ',num2str(rkd),'\n']);
+    fprintf(fileID,['KI_R = ',num2str(rki),'\n']);
 
     fclose(fileID);
     %Closes the txt file
@@ -588,7 +588,6 @@ if bt.Status=="open"
 
     LLSET =[];
     RLSET =[];
-    TRIG=[];
     LLVOLT=[];
     RLVOLT=[];
     LLVOLT_H=[];
@@ -681,7 +680,7 @@ end
 
 
 % --- Executes on button press in Calibrate_Torque.
-function Calibrate_Torque_Callback(hObject, eventdata, handles)
+function Calibrate_Torque_Callback(~, ~, handles)
 % hObject    handle to Calibrate_Torque (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -699,7 +698,7 @@ pause(2);
 set(handles.statusText,'String',"The Torque Sensors have been Calibrated! (>^_^)>");
 
 % --- Executes on button press in Calibrate_FSR.
-function Calibrate_FSR_Callback(hObject, eventdata, handles)
+function Calibrate_FSR_Callback(~, ~, handles)
 % hObject    handle to Calibrate_FSR (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -724,7 +723,7 @@ end
 
 
 % --- Executes on button press in Check_Memory.
-function Check_Memory_Callback(hObject, eventdata, handles)
+function Check_Memory_Callback(~, ~, handles)
 disp("Checking Memory Status")
 set(handles.statusText,'String','Checking Memory Status');
 pause(0.01);
@@ -778,7 +777,7 @@ GUI_Variables.MEM=mem;
 set(handles.statusText,'String','Memory Status Checked');
 
 % --- Executes on button press in Clean_Memory.
-function Clean_Memory_Callback(hObject, eventdata, handles)
+function Clean_Memory_Callback(~, ~, handles)
 % hObject    handle to Clean_Memory (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -799,7 +798,7 @@ set(handles.statusText,'String','Memory Cleared');
 
 
 % --- Executes on button press in L_Check_KF.
-function lkf=L_Check_KF_Callback(hObject, eventdata, handles)
+function lkf=L_Check_KF_Callback(~, ~, handles)
 global GUI_Variables;
 bt = GUI_Variables.BT; 
 lkf=0;
@@ -827,7 +826,7 @@ if (bt.Status=="closed")
 end
 
 % --- Executes on button press in L_Send_KF.
-function L_Send_KF_Callback(hObject, eventdata, handles)
+function L_Send_KF_Callback(~, ~, handles)
 % hObject    handle to L_Send_KF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -852,7 +851,7 @@ if (bt.Status=="open")
 end
 
 
-function L_Send_KF_Edit_Callback(hObject, eventdata, handles)
+function L_Send_KF_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Send_KF_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -862,7 +861,7 @@ function L_Send_KF_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Send_KF_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Send_KF_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Send_KF_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -875,7 +874,7 @@ end
 
 
 % --- Executes on selection change in Top_Graph.
-function Top_Graph_Callback(hObject, eventdata, handles)
+function Top_Graph_Callback(~, ~, ~)
 % hObject    handle to Top_Graph (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -885,7 +884,7 @@ function Top_Graph_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function Top_Graph_CreateFcn(hObject, eventdata, handles)
+function Top_Graph_CreateFcn(hObject, ~, ~)
 % hObject    handle to Top_Graph (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -898,7 +897,7 @@ end
 
 
 % --- Executes on selection change in Bottom_Graph.
-function Bottom_Graph_Callback(hObject, eventdata, handles)
+function Bottom_Graph_Callback(~, ~, ~)
 % hObject    handle to Bottom_Graph (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -908,7 +907,7 @@ function Bottom_Graph_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function Bottom_Graph_CreateFcn(hObject, eventdata, handles)
+function Bottom_Graph_CreateFcn(hObject, ~, ~)
 % hObject    handle to Bottom_Graph (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -921,7 +920,7 @@ end
 
 
 % --- Executes on button press in Send_Trig.
-function Send_Trig_Callback(hObject, eventdata, handles)
+function Send_Trig_Callback(~, ~, handles)
 % hObject    handle to Send_Trig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -956,7 +955,7 @@ catch
 end
 
 % --- Executes on button press in Check_Bluetooth.
-function valBT=Check_Bluetooth_Callback(hObject, eventdata, handles)
+function valBT=Check_Bluetooth_Callback(~, ~, handles)
 global GUI_Variables
 bt = GUI_Variables.BT;
 pause(.01);
@@ -1034,7 +1033,7 @@ catch
 end
 
 % --- Executes on button press in Connect_BT.
-function Connect_BT_Callback(hObject, eventdata, handles)
+function Connect_BT_Callback(~, ~, handles)
 % hObject    handle to Connect_BT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1073,7 +1072,7 @@ end
 
 
 % --- Executes on selection change in L_List.
-function L_List_Callback(hObject, eventdata, handles)
+function L_List_Callback(~, ~, handles)
 % hObject    handle to L_List (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1108,7 +1107,7 @@ end
 
 
 % --- Executes during object creation, after setting all properties.
-function L_List_CreateFcn(hObject, eventdata, handles)
+function L_List_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_List (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1121,7 +1120,7 @@ end
 
 
 % --- Executes on selection change in R_list.
-function R_list_Callback(hObject, eventdata, handles)
+function R_list_Callback(~, ~, handles)
 % hObject    handle to R_list (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1166,7 +1165,7 @@ if selectMode == 5
 end
 
 % --- Executes during object creation, after setting all properties.
-function R_list_CreateFcn(hObject, eventdata, handles)
+function R_list_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_list (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1179,7 +1178,7 @@ end
 
 
 
-function R_Ki_Edit_Callback(hObject, eventdata, handles)
+function R_Ki_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Ki_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1189,7 +1188,7 @@ function R_Ki_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Ki_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Ki_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Ki_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1202,7 +1201,7 @@ end
 
 
 
-function R_Kd_Edit_Callback(hObject, eventdata, handles)
+function R_Kd_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Kd_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1212,7 +1211,7 @@ function R_Kd_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Kd_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Kd_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Kd_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1225,7 +1224,7 @@ end
 
 
 
-function R_Kp_Edit_Callback(hObject, eventdata, handles)
+function R_Kp_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Kp_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1235,7 +1234,7 @@ function R_Kp_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Kp_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Kp_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Kp_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1248,7 +1247,7 @@ end
 
 
 % --- Executes on button press in R_Set_PID.
-function R_Set_PID_Callback(hObject, eventdata, handles)
+function R_Set_PID_Callback(~, ~, handles)
 % hObject    handle to R_Set_PID (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1300,7 +1299,7 @@ if(bt.Status=="open")
 end
 
 % --- Executes on button press in R_Get_PID.
-function [rkp,rkd,rki]=R_Get_PID_Callback(hObject, eventdata, handles)
+function [rkp,rkd,rki]=R_Get_PID_Callback(~, ~, handles)
 % SEND 'k' char 107
 global GUI_Variables
 bt = GUI_Variables.BT;
@@ -1325,7 +1324,7 @@ if(bt.Status=="open")
 end
 
 % --- Executes on button press in L_Get_PID.
-function [lkp,lkd,lki]=L_Get_PID_Callback(hObject, eventdata, handles)
+function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
 % SEND 'K' char 75
 global GUI_Variables
 bt = GUI_Variables.BT;
@@ -1349,7 +1348,7 @@ if(bt.Status=="open")
     end
 end
 % --- Executes on button press in L_Set_PID.
-function L_Set_PID_Callback(hObject, eventdata, handles)
+function L_Set_PID_Callback(~, ~, handles)
 % hObject    handle to L_Set_PID (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1401,7 +1400,7 @@ if(bt.Status=="open")
     fwrite(bt,ki,'double');
 end
 
-function L_Kp_Edit_Callback(hObject, eventdata, handles)
+function L_Kp_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Kp_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1411,7 +1410,7 @@ function L_Kp_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Kp_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Kp_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Kp_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1424,7 +1423,7 @@ end
 
 
 
-function L_Kd_Edit_Callback(hObject, eventdata, handles)
+function L_Kd_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Kd_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1434,7 +1433,7 @@ function L_Kd_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Kd_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Kd_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Kd_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1447,7 +1446,7 @@ end
 
 
 % --- Executes on button press in R_Set_Setpoint.
-function R_Set_Setpoint_Callback(hObject, eventdata, handles)
+function R_Set_Setpoint_Callback(~, ~, handles)
 % hObject    handle to R_Set_Setpoint (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1465,7 +1464,7 @@ fwrite(bt,NewSetpoint,'double');
 NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit, 'String')); % Gets the Value entered into the edit Box in the G
 fwrite(bt,NewSetpoint_Dorsi,'double'); 
 
-function R_Setpoint_Edit_Callback(hObject, eventdata, handles)
+function R_Setpoint_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Setpoint_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1475,7 +1474,7 @@ function R_Setpoint_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Setpoint_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Setpoint_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Setpoint_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1488,7 +1487,7 @@ end
 
 
 % --- Executes on button press in R_Get_Setpoint.
-function R_Get_Setpoint_Callback(hObject, eventdata, handles)
+function R_Get_Setpoint_Callback(~, ~, handles)
 %  SEND 'd'
 global GUI_Variables
 bt = GUI_Variables.BT;
@@ -1511,7 +1510,7 @@ if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
 
 end
 % --- Executes on button press in L_Get_Setpoint.
-function L_Get_Setpoint_Callback(hObject, eventdata, handles)
+function L_Get_Setpoint_Callback(~, ~, handles)
 % SEND 'D'
 global GUI_Variables
 bt = GUI_Variables.BT;
@@ -1531,7 +1530,7 @@ if message == 'D'
 end
 
 
-function L_Setpoint_Edit_Callback(hObject, eventdata, handles)
+function L_Setpoint_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Setpoint_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1542,7 +1541,7 @@ function L_Setpoint_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Setpoint_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Setpoint_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Setpoint_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1555,7 +1554,7 @@ end
 
 
 % --- Executes on button press in L_Set_Setpoint.
-function L_Set_Setpoint_Callback(hObject, eventdata, handles)
+function L_Set_Setpoint_Callback(~, ~, handles)
 % hObject    handle to L_Set_Setpoint (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1584,7 +1583,7 @@ plot([1 1],ylim,'-.k')
 plot(xlim,[NewSetpoint NewSetpoint],'-.k')
 
 % --- Executes on button press in Get_Smoothing.
-function [n1,n2,n3]=Get_Smoothing_Callback(hObject, eventdata, handles)
+function [n1,n2,n3]=Get_Smoothing_Callback(~, ~, handles)
 % SEND '(' to get the smoothing
 global GUI_Variables
 bt = GUI_Variables.BT;
@@ -1619,7 +1618,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in Set_Smoothing.
-function Set_Smoothing_Callback(hObject, eventdata, handles)
+function Set_Smoothing_Callback(~, ~, handles)
 % hObject    handle to Set_Smoothing (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1646,7 +1645,7 @@ if (bt.Status=="open")
     end
 end
 
-function N1_Edit_Callback(hObject, eventdata, handles)
+function N1_Edit_Callback(~, ~, ~)
 % hObject    handle to N1_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1656,7 +1655,7 @@ function N1_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function N1_Edit_CreateFcn(hObject, eventdata, handles)
+function N1_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to N1_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1669,7 +1668,7 @@ end
 
 
 
-function N2_Edit_Callback(hObject, eventdata, handles)
+function N2_Edit_Callback(~, ~, ~)
 % hObject    handle to N2_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1679,7 +1678,7 @@ function N2_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function N2_Edit_CreateFcn(hObject, eventdata, handles)
+function N2_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to N2_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1692,7 +1691,7 @@ end
 
 
 
-function N3_Edit_Callback(hObject, eventdata, handles)
+function N3_Edit_Callback(~, ~, ~)
 % hObject    handle to N3_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1702,7 +1701,7 @@ function N3_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function N3_Edit_CreateFcn(hObject, eventdata, handles)
+function N3_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to N3_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1715,7 +1714,7 @@ end
 
 
 % --- Executes on button press in R_Bs_Frq.
-function R_Bs_Frq_Callback(hObject, eventdata, handles)
+function R_Bs_Frq_Callback(~, ~, ~)
 % hObject    handle to R_Bs_Frq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1731,7 +1730,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in R_N3_Adj.
-function R_N3_Adj_Callback(hObject, eventdata, handles)
+function R_N3_Adj_Callback(~, ~, ~)
 % hObject    handle to R_N3_Adj (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1748,7 +1747,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in L_N3_Adj.
-function L_N3_Adj_Callback(hObject, eventdata, handles)
+function L_N3_Adj_Callback(~, ~, ~)
 % hObject    handle to L_N3_Adj (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1765,7 +1764,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in L_Bs_Frq.
-function L_Bs_Frq_Callback(hObject, eventdata, handles)
+function L_Bs_Frq_Callback(~, ~, ~)
 % hObject    handle to L_Bs_Frq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1780,7 +1779,7 @@ if (bt.Status=="open")
 end
 
 
-function R_Send_KF_Edit_Callback(hObject, eventdata, handles)
+function R_Send_KF_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Send_KF_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1790,7 +1789,7 @@ function R_Send_KF_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Send_KF_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Send_KF_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Send_KF_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1803,7 +1802,7 @@ end
 
 
 % --- Executes on button press in R_Send_KF.
-function R_Send_KF_Callback(hObject, eventdata, handles)
+function R_Send_KF_Callback(~, ~, handles)
 % hObject    handle to R_Send_KF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1828,7 +1827,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in R_Check_KF.
-function rkf=R_Check_KF_Callback(hObject, eventdata, handles)
+function rkf=R_Check_KF_Callback(~, ~, handles)
 global GUI_Variables;
 bt = GUI_Variables.BT; 
 rkf=0;
@@ -1858,7 +1857,7 @@ if (bt.Status=="closed")
 end
 
 % --- Executes on button press in L_Check_FSR_Th.
-function lfsr=L_Check_FSR_Th_Callback(hObject, eventdata, handles)
+function lfsr=L_Check_FSR_Th_Callback(~, ~, handles)
 global GUI_Variables;
 bt = GUI_Variables.BT; 
 lfsr=0;
@@ -1883,7 +1882,7 @@ if (bt.Status=="closed")
 end
 
 
-function L_Send_FSR_Edit_Callback(hObject, eventdata, handles)
+function L_Send_FSR_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Send_FSR_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1893,7 +1892,7 @@ function L_Send_FSR_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Send_FSR_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Send_FSR_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Send_FSR_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1906,7 +1905,7 @@ end
 
 
 % --- Executes on button press in L_Send_FSR_Th.
-function L_Send_FSR_Th_Callback(hObject, eventdata, handles)
+function L_Send_FSR_Th_Callback(~, ~, handles)
 % hObject    handle to L_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1925,7 +1924,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in R_Check_FSR_Th.
-function rfsr=R_Check_FSR_Th_Callback(hObject, eventdata, handles)
+function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
 global GUI_Variables;
 bt = GUI_Variables.BT; 
 rfsr=0;
@@ -1953,7 +1952,7 @@ if (bt.Status=="closed")
 end
 
 
-function R_Send_FSR_Edit_Callback(hObject, eventdata, handles)
+function R_Send_FSR_Edit_Callback(hObject, ~, ~)
 % hObject    handle to R_Send_FSR_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1967,7 +1966,7 @@ end
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Send_FSR_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Send_FSR_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Send_FSR_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -1980,7 +1979,7 @@ end
 
 
 % --- Executes on button press in R_Send_FSR_Th.
-function R_Send_FSR_Th_Callback(hObject, eventdata, handles)
+function R_Send_FSR_Th_Callback(~, ~, handles)
 % hObject    handle to R_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1999,14 +1998,14 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in Enable_Arduino_Trig.
-function Enable_Arduino_Trig_Callback(hObject, eventdata, handles)
+function Enable_Arduino_Trig_Callback(~, ~, ~)
 % hObject    handle to Enable_Arduino_Trig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of Enable_Arduino_Trig
 
-function L_Ki_Edit_Callback(hObject, eventdata, handles)
+function L_Ki_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Ki_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2016,7 +2015,7 @@ function L_Ki_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Ki_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Ki_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Ki_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -2029,7 +2028,7 @@ end
 
 
 % --- Executes on button press in L_Set_Perc.
-function L_Set_Perc_Callback(hObject, eventdata, handles)
+function L_Set_Perc_Callback(~, ~, handles)
 % hObject    handle to L_Set_Perc (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2048,7 +2047,7 @@ end
 
 
 
-function L_Set_Perc_Edit_Callback(hObject, eventdata, handles)
+function L_Set_Perc_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Set_Perc_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2058,7 +2057,7 @@ function L_Set_Perc_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Set_Perc_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Set_Perc_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Set_Perc_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -2071,7 +2070,7 @@ end
 
 
 % --- Executes on button press in R_Set_Perc.
-function R_Set_Perc_Callback(hObject, eventdata, handles)
+function R_Set_Perc_Callback(~, ~, handles)
 % hObject    handle to R_Set_Perc (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2089,7 +2088,7 @@ if (bt.Status=="open")
 end
 
 
-function R_Set_Perc_Edit_Callback(hObject, eventdata, handles)
+function R_Set_Perc_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Set_Perc_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2099,7 +2098,7 @@ function R_Set_Perc_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Set_Perc_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Set_Perc_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Set_Perc_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -2112,7 +2111,7 @@ end
 
 
 % --- Executes on button press in L_Stop_N3.
-function L_Stop_N3_Callback(hObject, eventdata, handles)
+function L_Stop_N3_Callback(~, ~, ~)
 % hObject    handle to L_Stop_N3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2130,7 +2129,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in L_Stop_Trq.
-function L_Stop_Trq_Callback(hObject, eventdata, handles)
+function L_Stop_Trq_Callback(~, ~, ~)
 % hObject    handle to L_Stop_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2145,7 +2144,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in R_Stop_N3.
-function R_Stop_N3_Callback(hObject, eventdata, handles)
+function R_Stop_N3_Callback(~, ~, ~)
 % hObject    handle to R_Stop_N3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2163,7 +2162,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in R_Stop_Trq.
-function R_Stop_Trq_Callback(hObject, eventdata, handles)
+function R_Stop_Trq_Callback(~, ~, ~)
 % hObject    handle to R_Stop_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2178,7 +2177,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in Save_EXP_Prm.
-function Save_EXP_Prm_Callback(hObject, eventdata, handles)
+function Save_EXP_Prm_Callback(~, ~, ~)
 % hObject    handle to Save_EXP_Prm (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2325,7 +2324,7 @@ end %end file exists
 
 
 % --- Executes on button press in L_InverseSign_RadioButton.
-function L_InverseSign_RadioButton_Callback(hObject, eventdata, handles)
+function L_InverseSign_RadioButton_Callback(hObject, ~, ~)
 % hObject    handle to L_InverseSign_RadioButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2355,7 +2354,7 @@ end
 
 
 % --- Executes on button press in R_InverseSign_RadioButton.
-function R_InverseSign_RadioButton_Callback(hObject, eventdata, handles)
+function R_InverseSign_RadioButton_Callback(hObject, ~, ~)
 % hObject    handle to R_InverseSign_RadioButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2384,7 +2383,7 @@ end
 
 
 % --- Executes on button press in R_Check_Gain.
-function R_Check_Gain_Callback(hObject, eventdata, handles)
+function R_Check_Gain_Callback(~, ~, handles)
 % hObject    handle to R_Check_Gain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2407,7 +2406,7 @@ if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
 end
 
 % --- Executes on button press in R_Set_Gain.
-function R_Set_Gain_Callback(hObject, eventdata, handles)
+function R_Set_Gain_Callback(~, ~, handles)
 % hObject    handle to R_Set_Gain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2428,7 +2427,7 @@ end
 
 
 
-function R_Set_Gain_Edit_Callback(hObject, eventdata, handles)
+function R_Set_Gain_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Set_Gain_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2438,7 +2437,7 @@ function R_Set_Gain_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Set_Gain_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Set_Gain_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Set_Gain_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -2451,7 +2450,7 @@ end
 
 
 % --- Executes on button press in L_Check_Gain.
-function L_Check_Gain_Callback(hObject, eventdata, handles)
+function L_Check_Gain_Callback(~, ~, handles)
 % hObject    handle to L_Check_Gain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2479,7 +2478,7 @@ end
 
 
 % --- Executes on button press in L_Set_Gain.
-function L_Set_Gain_Callback(hObject, eventdata, handles)
+function L_Set_Gain_Callback(~, ~, handles)
 % hObject    handle to L_Set_Gain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2513,7 +2512,7 @@ end
 
 
 
-function L_Set_Gain_Edit_Callback(hObject, eventdata, handles)
+function L_Set_Gain_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Set_Gain_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2523,7 +2522,7 @@ function L_Set_Gain_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Set_Gain_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Set_Gain_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Set_Gain_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -2536,7 +2535,7 @@ end
 
 
 % --- Executes on button press in Activate_Balance.
-function Activate_Balance_Callback(hObject, eventdata, handles)
+function Activate_Balance_Callback(hObject, ~, ~)
 % hObject    handle to Activate_Balance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2565,7 +2564,7 @@ end
 
 
 % --- Executes on button press in radiobutton12.
-function radiobutton12_Callback(hObject, eventdata, handles)
+function radiobutton12_Callback(~, ~, ~)
 % hObject    handle to radiobutton12 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2574,7 +2573,7 @@ function radiobutton12_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in radiobutton11.
-function radiobutton11_Callback(hObject, eventdata, handles)
+function radiobutton11_Callback(~, ~, ~)
 % hObject    handle to radiobutton11 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2583,14 +2582,14 @@ function radiobutton11_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Torque_CreateFcn(hObject, eventdata, handles)
+function R_Torque_CreateFcn(~, ~, ~)
 % hObject    handle to R_Torque (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 
 % --- Executes on button press in Activate_Balance.
-function radiobutton13_Callback(hObject, eventdata, handles)
+function radiobutton13_Callback(~, ~, ~)
 % hObject    handle to Activate_Balance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2599,7 +2598,7 @@ function radiobutton13_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in L_Auto_KF.
-function L_Auto_KF_Callback(hObject, eventdata, handles)
+function L_Auto_KF_Callback(hObject, ~, ~)
 % hObject    handle to L_Auto_KF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2627,7 +2626,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in Activate_Prop_Pivot.
-function Activate_Prop_Pivot_Callback(hObject, eventdata, handles)
+function Activate_Prop_Pivot_Callback(hObject, ~, handles)
 % hObject    handle to Activate_Prop_Pivot (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2662,7 +2661,7 @@ if (bt.Status=="open")
 end
 
 % --- Executes on button press in Fast_0_Trq.
-function Fast_0_Trq_Callback(hObject, eventdata, handles)
+function Fast_0_Trq_Callback(~, ~, ~)
 % hObject    handle to Fast_0_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2690,7 +2689,7 @@ end
 
 
 % --- Executes on button press in Slow_0_Trq.
-function Slow_0_Trq_Callback(hObject, eventdata, handles)
+function Slow_0_Trq_Callback(~, ~, ~)
 % hObject    handle to Slow_0_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2718,7 +2717,7 @@ end
 
 
 % --- Executes on button press in Take_Baseline.
-function Take_Baseline_Callback(hObject, eventdata, handles)
+function Take_Baseline_Callback(~, ~, ~)
 % hObject    handle to Take_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2738,7 +2737,7 @@ end
 
 
 % --- Executes on button press in Check_Baseline.
-function Check_Baseline_Callback(hObject, eventdata, handles)
+function Check_Baseline_Callback(~, ~, ~)
 % hObject    handle to Check_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2764,7 +2763,7 @@ end
 
 
 
-function L_Setpoint_Dorsi_Edit_Callback(hObject, eventdata, handles)
+function L_Setpoint_Dorsi_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Setpoint_Dorsi_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2774,7 +2773,7 @@ function L_Setpoint_Dorsi_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Setpoint_Dorsi_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Setpoint_Dorsi_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Setpoint_Dorsi_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -2787,7 +2786,7 @@ end
 
 
 
-function R_Setpoint_Dorsi_Edit_Callback(hObject, eventdata, handles)
+function R_Setpoint_Dorsi_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Setpoint_Dorsi_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2797,7 +2796,7 @@ function R_Setpoint_Dorsi_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Setpoint_Dorsi_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Setpoint_Dorsi_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Setpoint_Dorsi_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -2810,7 +2809,7 @@ end
 
 
 
-function L_Zero_Modif_Edit_Callback(hObject, eventdata, handles)
+function L_Zero_Modif_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Zero_Modif_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2820,7 +2819,7 @@ function L_Zero_Modif_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function L_Zero_Modif_Edit_CreateFcn(hObject, eventdata, handles)
+function L_Zero_Modif_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to L_Zero_Modif_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -2833,7 +2832,7 @@ end
 
 
 % --- Executes on button press in L_Set_Zero_Modif.
-function L_Set_Zero_Modif_Callback(hObject, eventdata, handles)
+function L_Set_Zero_Modif_Callback(~, ~, handles)
 % hObject    handle to L_Set_Zero_Modif (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2852,7 +2851,7 @@ catch
 end
 
 
-function R_Zero_Modif_Edit_Callback(hObject, eventdata, handles)
+function R_Zero_Modif_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Zero_Modif_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2862,7 +2861,7 @@ function R_Zero_Modif_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function R_Zero_Modif_Edit_CreateFcn(hObject, eventdata, handles)
+function R_Zero_Modif_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to R_Zero_Modif_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -2875,7 +2874,7 @@ end
 
 
 % --- Executes on button press in R_Set_Zero_Modif.
-function R_Set_Zero_Modif_Callback(hObject, eventdata, handles)
+function R_Set_Zero_Modif_Callback(~, ~, handles)
 % hObject    handle to R_Set_Zero_Modif (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2895,7 +2894,7 @@ end
 
 
 % --- Executes on button press in Balance_Baseline.
-function Balance_Baseline_Callback(hObject, eventdata, handles)
+function Balance_Baseline_Callback(~, ~, ~)
 % hObject    handle to Balance_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
