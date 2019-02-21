@@ -51,15 +51,19 @@ function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to A_EXO_s (see VARARGIN)
+% CLEAN
+% clear all
+% clc
+% close all
 
 handles.output = hObject;
 
 % bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
-
-BT_NAME={'Exo_Bluetooth_3','Capstone_Bluetooth_1','Exo_Bluetooth_2','Exo_High_Power'};
-bt = Bluetooth(BT_NAME{1},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
+BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_2'};
+bt = Bluetooth(BT_NAME{3},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
+bt.Timeout=2;
 disp('')%Exo_Bluetooth_2
 % Capstone_Bluetooth_1
 str_uno=input('Would you use the arduino trigger? [y/n] ','s');
@@ -88,7 +92,13 @@ GUI_Variables = struct('BT',bt,'Timer',NaN,'state',0,'RLTorque',NaN(1,60000), ..
     'L_COUNT_SPEED',[],'R_COUNT_SPEED',[],...
     'RLSET',NaN(1,60000),'LLSET',NaN(1,60000),'MEM',ones(1,3)*2,...
     'SIG1',NaN(1,60000),'SIG2',NaN(1,60000),'SIG3',NaN(1,60000),'SIG4',NaN(1,60000),...
-    'BASEL',NaN(1,60000),'BASER',NaN(1,60000),'basel',0,'baser',0,'counter',0); 
+    'BASEL',NaN(1,60000),'BASER',NaN(1,60000),'basel',0,'baser',0,'counter',0,...
+    'flag_end_trial',0,'count_connection',0,'BT_connection',NaN(1,100)); 
+
+
+
+
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -107,17 +117,21 @@ varargout{1} = handles.output;
 % --- Executes on button press in Start_Trial.
 function Start_Trial_Callback(hObject, eventdata, handles)
 %Make a further check of the connection before starting
-disp("Before Starting we check the connections");
-set(handles.statusText,'String','Checking Connections');
-pause(0.01)
-
-disp("Check BT")
-Check_Bluetooth_Callback(hObject, eventdata, handles);
-set(handles.statusText,'String','Connections Checked');
-pause(0.01)
+% disp("Before Starting we check the connections");
+% set(handles.statusText,'String','Checking Connections');
+% pause(0.01)
+% 
+% disp("Check BT")
+% Check_Bluetooth_Callback(hObject, eventdata, handles);
+% set(handles.statusText,'String','Connections Checked');
+% pause(0.01)
 
 global GUI_Variables
 bt = GUI_Variables.BT;
+
+if(GUI_Variables.flag_end_trial==1)
+    GUI_Variables.flag_end_trial=0;
+end
 
 % if(bt.Status == "open")
 %     try
@@ -173,7 +187,7 @@ GUI_Variables.SIG4=SIG4;
 GUI_Variables.BASEL=BASEL;
 GUI_Variables.BASER=BASER;
 
-
+BT_Was_Disconnected=0;
 GUI_Variables.counter=0;
 set(handles.TRIG_NUM_TEXT,'String',0);
 
@@ -260,18 +274,18 @@ tic
 if state == 1 % both connected
     disp('both connected')
     while strcmp(get(handles.Start_Trial,'Enable'), 'off')                         %Will Loop continuously until the "End Trial" button is pressed
-        if RLCount > 1
-            if toc > 0.9
-                toc
-                disp('')
-                disp(' It takes too much time to communicate with the bluetooth')
-                disp('')
-                set(handles.End_Trial,'Enable','off');
-                set(handles.statusText,'String','One of the Bluetooths has stopped streaming, all systems have shut down. Remaining Data is being saved.');
-                pause(.0001);
-                End_Trial_Callback(hObject, eventdata, handles)
-            end
-        end
+%         if RLCount > 1
+%             if toc > 0.9
+%                 toc
+%                 disp('')
+%                 disp(' It takes too much time to communicate with the bluetooth')
+%                 disp('')
+%                 set(handles.End_Trial,'Enable','off');
+%                 set(handles.statusText,'String','One of the Bluetooths has stopped streaming, all systems have shut down. Remaining Data is being saved.');
+%                 pause(.0001);
+%                 End_Trial_Callback(hObject, eventdata, handles)
+%             end
+%         end
         
         if GUI_Variables.flag_calib==1
 % % %         flushinput(bt);   % Not sure if this was commented? Giamma
@@ -293,7 +307,114 @@ if state == 1 % both connected
             end
         end
         pause(.000000001); 
+        
+        
+%         if(bt.bytesAvailable==0 && bt.status=="open" && GUI_Variables.flag_end_trial==0)
+%             bt_wait_time=toc;
+%             
+%             if (bt_wait_time>1)
+%             disp("NO DATA AVAILABLE!!!");
+%             pause(.000000001);
+%                     GUI_Variables.count_disconnection=GUI_Variables.count_disconnection+1;
+%                     GUI_Variables.BT_disconnection(GUI_Variables.count_disconnection)=RLCount;
+%                     RLCount = RLCount + 1;
+%                     
+%             try
+%                 fclose(bt);
+%                 pause(.5); 
+%                 fopen(bt);
+%                 disp('Wait half second more')
+%                 pause(0.5); 
+%                 disp('New Status')
+%                 disp(bt.status);
+%                 if(bt.status=="open")
+%                     fwrite(bt,char(69));
+%                     GUI_Variables.count_connection=GUI_Variables.count_connection+1;
+%                     GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
+%                 end
+%                 toc
+%                 tic
+%             catch
+%             end
+%             tic
+%             end
+%         end
+
+
+
+
+        if(bt.bytesAvailable==0 && bt.status=="open" && GUI_Variables.flag_end_trial==0)
+            bt_wait_time=toc;
+            
+            if (bt_wait_time>1)
+                BT_Was_Disconnected=1;
+            disp("NO DATA AVAILABLE!!!");
+            pause(.000000001);
+%                     GUI_Variables.count_disconnection=GUI_Variables.count_disconnection+1;
+%                     GUI_Variables.BT_disconnection(GUI_Variables.count_disconnection)=RLCount;
+%                     RLCount = RLCount + 1;
+                    
+            try
+                fclose(bt);
+                pause(.5); 
+                fopen(bt);
+                disp('Wait half second more')
+                pause(0.5); 
+                disp('New Status')
+                disp(bt.status);
+                if(bt.status=="open")
+                    fwrite(bt,char(69));
+%                     GUI_Variables.count_connection=GUI_Variables.count_connection+1;
+%                     GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
+                end
+                toc
+                RLCount=RLCount+round(toc*100);
+                LLCount=RLCount;
+                tic
+            catch
+            end
+            tic
+            end
+        end
+
+
+
+
+% % % % %         
+% % % % % %            try
+% % % % %                disp("Check BT");
+% % % % %                disp(bt.status);
+% % % % % % Check_Bluetooth_Callback(hObject, eventdata, handles);
+% % % % % 
+% % % % % if (bt.status=="closed")
+% % % % %     fopen(bt);
+% % % % % %     pause(1);
+% % % % %     tic
+% % % % % end
+% % % % % 
+% % % % % if (bt.status=="open")
+% % % % %    fclose(bt);
+% % % % %        fopen(bt);
+% % % % % %     pause(1);
+% % % % %     tic
+% % % % % end
+% % % % %     disp(bt.status);
+% % % % % %             catch
+% % % % % %             end
+% % % % %             
+% % % % %             end
+% % % % %         end
+        
+        
         if ((bt.bytesAvailable > 0))
+            
+            
+            if(BT_Was_Disconnected)
+                GUI_Variables.count_connection=GUI_Variables.count_connection+1;
+                GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
+                BT_was_Disconnected=0;
+            end
+            
 %           disp('saving in global variables');%Checks if Knee Arduino Sent a new Torque Value
             tic
             message = fgetl(bt);
@@ -560,7 +681,7 @@ if state == 1 % both connected
                 
                 %toc
             end
-        end
+        end % end if bt.bytes available >0
     end
 end
 
@@ -774,6 +895,20 @@ R_SPEED(GUI_Variables.R_COUNT_SPEED(i,1))=GUI_Variables.R_COUNT_SPEED(i,2);
 end
 end
 
+
+BT_CONNECTION=zeros(size(LLSET));
+
+% for i=1:length(LLSET)
+
+% BT_Vect=find(GUI_Variables.BT_connection(:)>0)
+%      BT_CONNECTION(BT_Vect)=1;
+
+%      GUI_Variables.count_connection=GUI_Variables.count_connection+1;
+%                 GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
+%                 BT_was_Disconnected=0;
+
+% end
+
 % TRIG
 % size(TRIG)
 % size(LLSET)
@@ -940,6 +1075,8 @@ GUI_Variables.SIG4=SIG4;
 
 GUI_Variables.BASEL=BASEL;
 GUI_Variables.BASER=BASER;
+
+GUI_Variables.flag_end_trial=1;
 
 else
 set(handles.L_Get_Setpoint,'Enable','on');
