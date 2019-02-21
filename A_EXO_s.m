@@ -27,11 +27,11 @@ function varargout = A_EXO_s(varargin)
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @A_EXO_s_OpeningFcn, ...
-                   'gui_OutputFcn',  @A_EXO_s_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+                    'gui_Singleton',  gui_Singleton, ...
+                    'gui_OpeningFcn', @A_EXO_s_OpeningFcn, ...
+                    'gui_OutputFcn',  @A_EXO_s_OutputFcn, ...
+                    'gui_LayoutFcn',  [] , ...
+                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -3385,7 +3385,7 @@ function L_Setpoint_Dorsi_Edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -3408,7 +3408,7 @@ function R_Setpoint_Dorsi_Edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -3431,7 +3431,7 @@ function L_Zero_Modif_Edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -3473,7 +3473,7 @@ function R_Zero_Modif_Edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -3540,8 +3540,8 @@ function Steady_Balance_Base_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-	global GUI_Variables
-	bt = GUI_Variables.BT;
+    global GUI_Variables
+    bt = GUI_Variables.BT;
 
     try
         if(bt.Status=="open")
@@ -3559,8 +3559,8 @@ function Dynamic_Balance_Base_Callback(hObject, eventdata, handles)
 % hObject    handle to Dynamic_Balance_Base (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	global GUI_Variables
-	bt = GUI_Variables.BT;
+    global GUI_Variables
+    bt = GUI_Variables.BT;
 
     try
         if(bt.Status=="open")
@@ -3578,8 +3578,8 @@ function Set_Steady_Val_Callback(hObject, eventdata, handles)
 % hObject    handle to Set_Steady_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	global GUI_Variables
-	bt = GUI_Variables.BT;
+    global GUI_Variables
+    bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
         try
@@ -3597,8 +3597,8 @@ function Check_Steady_Val_Callback(hObject, eventdata, handles)
 % hObject    handle to Check_Steady_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	global GUI_Variables
-	bt=GUI_Variables.BT;
+    global GUI_Variables
+    bt=GUI_Variables.BT;
     if(bt.Status=="open")
         try
             fwrite(bt,'V');
@@ -3622,8 +3622,8 @@ function Set_Dyn_Val_Callback(hObject, eventdata, handles)
 % hObject    handle to Set_Dyn_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	global GUI_Variables
-	bt = GUI_Variables.BT;
+    global GUI_Variables
+    bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
         try
@@ -3640,8 +3640,8 @@ function Check_Dyn_Val_Callback(hObject, eventdata, handles)
 % hObject    handle to Check_Dyn_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	global GUI_Variables
-	bt = GUI_Variables.BT;
+    global GUI_Variables
+    bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
         try
@@ -3680,7 +3680,7 @@ function Steady_Edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -3703,7 +3703,7 @@ function Dyn_Edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -3801,8 +3801,8 @@ function Set_Bias_Callback(hObject, eventdata, handles)
 % hObject    handle to Set_Bias (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	global GUI_Variables
-	bt = GUI_Variables.BT;
+    global GUI_Variables
+    bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
         try
@@ -3824,8 +3824,8 @@ function Set_Target_Callback(hObject, eventdata, handles)
 % hObject    handle to Set_Target (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	global GUI_Variables
-	bt = GUI_Variables.BT;
+    global GUI_Variables
+    bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
         try
@@ -3859,7 +3859,7 @@ function Set_Bias_Edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -3882,7 +3882,7 @@ function Set_Target_Edit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -3948,8 +3948,8 @@ function Close_TCP_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-	global GUI_Variables
-	try
+    global GUI_Variables
+    try
         t = GUI_Variables.t;
     catch
     end
@@ -3973,8 +3973,8 @@ function Start_Optimization_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-	global GUI_Variables
-	try
+    global GUI_Variables
+    try
         t = GUI_Variables.t;
     catch
         fprintf('No TCP connection established, cannot start optimization');
@@ -4003,7 +4003,7 @@ function Start_Optimization_Callback(hObject, eventdata, handles)
             fwrite(t,"start")
             set(handles.statusText,'String',"Initializing optimization (no BT)...")
         end
-	end
+    end
 
 
 % --- Executes on button press in Stop_Optimization.
@@ -4011,8 +4011,8 @@ function Stop_Optimization_Callback(hObject, eventdata, handles)
 % hObject    handle to Stop_Optimization (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	global GUI_Variables
-	try
+    global GUI_Variables
+    try
         t = GUI_Variables.t;
         bt = GUI_Variables.BT;
     catch
@@ -4032,7 +4032,7 @@ function Stop_Optimization_Callback(hObject, eventdata, handles)
             fwrite(t,"end")
             set(handles.statusText,'String',"Stopping optimization...")
         end
-	end
+    end
 
 
 
@@ -4044,7 +4044,7 @@ function IP_list_CreateFcn(hObject, eventdata, handles)
 
 % Hint: listbox controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -4124,7 +4124,7 @@ function FSR_Distance_In_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -4147,7 +4147,7 @@ function Ankle2FSR_Distance_In_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-	if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 
@@ -4158,9 +4158,9 @@ function SSID_Input_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-	global GUI_Variables
+    global GUI_Variables
 
-	GUI_Variables.SSID = get(hObject,'String');
+    GUI_Variables.SSID = get(hObject,'String');
 
 
 
