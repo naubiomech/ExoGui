@@ -59,10 +59,10 @@ function A_EXO_s_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 % bt = Bluetooth('Exo_Bluetooth_5',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
-% bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
+bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16); %Creates Bluetooth Object
 % bt = Bluetooth('RNBT-0B45',1,'UserData',0,'InputBufferSize',2048*16*4); %Creates Bluetooth Object
 BT_NAME={'Exo_High_Power','Capstone_Bluetooth_1','Exo_Bluetooth_3','Jasons_Bluetooth','Exo_Bluetooth_2'};
-bt = Bluetooth(BT_NAME{5},1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
+bt = Bluetooth('Exo_Bluetooth_2',1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
 bt.Timeout=2;
 disp('')%Exo_Bluetooth_2
 % Capstone_Bluetooth_1
