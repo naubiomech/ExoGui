@@ -91,7 +91,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = A_EXO_s_OutputFcn(~, ~, handles) 
+function varargout = A_EXO_s_OutputFcn(~, ~, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -185,7 +185,7 @@ GUI_Variables.BASER=BASER;
 GUI_Variables.counter=0;
 set(handles.TRIG_NUM_TEXT,'String',0);
 
-if(bt.Status == "open") 
+if(bt.Status == "open")
     state = 1;
 else
     state = 0;
@@ -210,12 +210,12 @@ set(handles.Calibrate_Torque,'Enable','off');
 set(handles.Check_Memory,'Enable','off');
 set(handles.Clean_Memory,'Enable','off');
 set(handles.Start_Trial,'Enable','off');
-set(handles.End_Trial,'Enable','on'); 
+set(handles.End_Trial,'Enable','on');
 
 GUI_Variables.flag_start=1;
 
 pause(.01);
-if state == 1 
+if state == 1
     fwrite(bt,char(69)); % Sends ASCII character 69 to the Arduino, which the Arduino will
 end
 pause(.001);
@@ -240,7 +240,7 @@ if state == 1 % both connected
                 End_Trial_Callback(hObject, eventdata, handles)
             end
         end
-        
+
         if GUI_Variables.flag_calib==1
             if GUI_Variables.first_calib==0
                 start_count=clock;
@@ -257,34 +257,34 @@ if state == 1 % both connected
                 GUI_Variables.first_calib=0;
             end
         end
-        pause(.000000001); 
+        pause(.000000001);
         if ((bt.bytesAvailable > 0))
             tic
             [RLCount,LLCount] = Receive_Data_Message(RLCount,LLCount,hObject, eventdata, handles);
             if(mod(RLCount,100) == 0)
                 plots = {{GUI_Variables.RLTorque,GUI_Variables.RLSET}, ...
-                    {GUI_Variables.RLFSR}, ...
-                    {GUI_Variables.LLTorque}, ...
-                    {GUI_Variables.LLFSR}, ...
-                    {GUI_Variables.LLFSR}, ...
-                    {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,GUI_Variables.BASEL}, ...
-                    {GUI_Variables.RLVOLT,GUI_Variables.RLVOLT_H,GUI_Variables.BASER}, ...
-                    {GUI_Variables.SIG1}, ...
-                    {GUI_Variables.SIG2}, ...
-                    {GUI_Variables.SIG3}, ...
-                    {GUI_Variables.SIG4}};
-                
+                         {GUI_Variables.RLFSR}, ...
+                         {GUI_Variables.LLTorque}, ...
+                         {GUI_Variables.LLFSR}, ...
+                         {GUI_Variables.LLFSR}, ...
+                         {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,GUI_Variables.BASEL}, ...
+                         {GUI_Variables.RLVOLT,GUI_Variables.RLVOLT_H,GUI_Variables.BASER}, ...
+                         {GUI_Variables.SIG1}, ...
+                         {GUI_Variables.SIG2}, ...
+                         {GUI_Variables.SIG3}, ...
+                         {GUI_Variables.SIG4}};
+
                 titles = {"RL Torque","RL State","LL Torque","LL State","LL Force Toe and Heel", ...
-                     "RL Force Toe and Heel","SIG1","SIG2","SIG3","SIG4"};
-                 
+                          "RL Force Toe and Heel","SIG1","SIG2","SIG3","SIG4"};
+
                 axes(handles.Bottom_Axes);
                 whichPlotLeft = get(handles.Bottom_Graph,'Value');
-               
+
                 plotData = plots{whichPlotLeft};
                 plotTitle = titles{whichPlotLeft};
-                
+
                 if RLCount <= 1000
-                	dataLength = 1:RLCount;
+                    dataLength = 1:RLCount;
                 else
                     dataLength = (RLCount-1000):RLCount-1;
                 end
@@ -296,14 +296,14 @@ if state == 1 % both connected
                 end
                 plot(dataLength, data);
                 title(plotTitle);
-                
+
                 whichPlotRight = get(handles.Top_Graph,'Value');
                 axes(handles.Top_Axes);
                 plotData = plots{whichPlotRight};
                 plotTitle = titles{whichPlotRight};
-                
+
                 if RLCount <= 1000
-                	dataLength = 1:RLCount;
+                    dataLength = 1:RLCount;
                 else
                     dataLength = (RLCount-1000):RLCount-1;
                 end
@@ -468,11 +468,11 @@ if bt.Status=="open"
         L_SPEED=zeros(size(LLTorque));
         R_SPEED=zeros(size(LLTorque));
     end
-    
+
     dt = .01; % Since the Arduino is set to send values every 10 ms, dt is .01 S
     t = 1:length(RLTorque); % Creates a time Vector equal in length to the number of Torque Values Recieved
     t = t .* dt; % Scales the time Vector, knowing how often Arduino sends values,
-    
+
     if isempty(GUI_Variables.COUNT) || (length(GUI_Variables.COUNT)==1) %beacuse the first is zero
     else
         count_trig_c=GUI_Variables.COUNT(2:end);
@@ -545,7 +545,7 @@ if bt.Status=="open"
         [lkp,lkd,lki]=L_Get_PID_Callback(hObject, eventdata, handles);
         [rkp,rkd,rki]=R_Get_PID_Callback(hObject, eventdata, handles);
     catch
-        
+
         n1 = -1;
         n2 = -1;
         n3 = -1;
@@ -743,7 +743,7 @@ if(bt.Status == "open")
         check_torque = data(1);
         check_FSR = data(2);
         check_EXP = data(3);
-        
+
         if(check_torque == 1)
             set(handles.axes10,'Color',[0 1 0])
             mem(2)=1;
@@ -800,7 +800,7 @@ set(handles.statusText,'String','Memory Cleared');
 % --- Executes on button press in L_Check_KF.
 function lkf=L_Check_KF_Callback(~, ~, handles)
 global GUI_Variables;
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 lkf=0;
 if (bt.Status=="open")
     fwrite(bt,'`'); % send the character "`"
@@ -820,7 +820,7 @@ if (bt.Status=="open")
     end
 end
 
-if (bt.Status=="closed") 
+if (bt.Status=="closed")
     disp("Impossible to know KF");
     set(handles.L_Check_KF_Text,'String',"NaN");
 end
@@ -836,7 +836,7 @@ new_KF = str2double(get(handles.L_Send_KF_Edit,'String'));         %Gets the Val
 global GUI_Variables
 state=GUI_Variables.state;
 
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
     try
@@ -996,7 +996,7 @@ try
                     set(handles.EXP_Params_axes,'Color',[0 0 1])
                 end
                 valBT=1;
-                
+
             else
                 try
                     set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
@@ -1005,7 +1005,7 @@ try
                     set(handles.axes10,'Color',[0 0 0])
                     set(handles.EXP_Params_axes,'Color',[0 0 0])
                     valBT=0;
-                    fclose(bt);                   
+                    fclose(bt);
                 catch
                 end
             end
@@ -1287,7 +1287,7 @@ if(bt.Status=="open")
             kd=k1(1);
         end
     end
-    
+
     disp(' New R PID gain')
     disp(kp)
     disp(kd)
@@ -1388,7 +1388,7 @@ if(bt.Status=="open")
             kd=k1(1);
         end
     end
-    
+
     disp(' New L PID gain')
     disp(kp)
     disp(kd)
@@ -1460,9 +1460,9 @@ if(bt.Status=="open")
 end
 
 NewSetpoint = str2double(get(handles.R_Setpoint_Edit,'String')); % Gets the Value entered into the edit Box in the G
-fwrite(bt,NewSetpoint,'double'); 
+fwrite(bt,NewSetpoint,'double');
 NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit, 'String')); % Gets the Value entered into the edit Box in the G
-fwrite(bt,NewSetpoint_Dorsi,'double'); 
+fwrite(bt,NewSetpoint_Dorsi,'double');
 
 function R_Setpoint_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Setpoint_Edit (see GCBO)
@@ -1568,9 +1568,9 @@ if(bt.Status=="open")
 end
 
 NewSetpoint = str2double(get(handles.L_Setpoint_Edit,'String')); % Gets the Value entered into the edit Box in the G
-fwrite(bt,NewSetpoint,'double'); 
+fwrite(bt,NewSetpoint,'double');
 NewSetpoint_Dorsi = str2double(get(handles.L_Setpoint_Dorsi_Edit,'String'));
-fwrite(bt,NewSetpoint_Dorsi,'double'); 
+fwrite(bt,NewSetpoint_Dorsi,'double');
 
 GUI_Variables.Setpoint=NewSetpoint;
 axes(handles.PROP_FUNCTION_axes);
@@ -1719,7 +1719,7 @@ function R_Bs_Frq_Callback(~, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global GUI_Variables;
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 
 disp('Right torque adaption')
 if (bt.Status=="open")
@@ -1735,7 +1735,7 @@ function R_N3_Adj_Callback(~, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global GUI_Variables;
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 count_speed=0;
 if (bt.Status=="open")
     try
@@ -1752,7 +1752,7 @@ function L_N3_Adj_Callback(~, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global GUI_Variables;
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 count_speed=0;
 if (bt.Status=="open")
     try
@@ -1769,7 +1769,7 @@ function L_Bs_Frq_Callback(~, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global GUI_Variables;
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
     try
@@ -1812,7 +1812,7 @@ global GUI_Variables
 state=GUI_Variables.state;
 disp(state);
 
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
     try
@@ -1829,7 +1829,7 @@ end
 % --- Executes on button press in R_Check_KF.
 function rkf=R_Check_KF_Callback(~, ~, handles)
 global GUI_Variables;
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 rkf=0;
 if (bt.Status=="open")
     try
@@ -1851,7 +1851,7 @@ if (bt.Status=="open")
     end
 end
 
-if (bt.Status=="closed") 
+if (bt.Status=="closed")
     disp("Impossible to know KF");
     set(handles.R_Check_KF_Text,'String',"NaN");
 end
@@ -1859,7 +1859,7 @@ end
 % --- Executes on button press in L_Check_FSR_Th.
 function lfsr=L_Check_FSR_Th_Callback(~, ~, handles)
 global GUI_Variables;
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 lfsr=0;
 if (bt.Status=="open")
     fwrite(bt,char('Q')); % send the character "Q"
@@ -1875,7 +1875,7 @@ if (bt.Status=="open")
 
     end
 end
-if (bt.Status=="closed") 
+if (bt.Status=="closed")
     disp("Impossible to know FSR THs");
     set(handles.L_Check_FSR_Text,'String',"NaN");
     set(handles.R_Check_FSR_Text,'String',"NaN");
@@ -1926,7 +1926,7 @@ end
 % --- Executes on button press in R_Check_FSR_Th.
 function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
 global GUI_Variables;
-bt = GUI_Variables.BT; 
+bt = GUI_Variables.BT;
 rfsr=0;
 if (bt.Status=="open")
     try
@@ -1945,7 +1945,7 @@ if (bt.Status=="open")
     end
 end
 
-if (bt.Status=="closed") 
+if (bt.Status=="closed")
     disp("Impossible to know FSR THs");
     set(handles.L_Check_FSR_Text,'String',"NaN");
     set(handles.R_Check_FSR_Text,'String',"NaN");
@@ -2222,7 +2222,7 @@ strfile=input('Which file do you want to upload: ','s');
 
 if not(exist(strfile))
     fprintf("File does not exists\n");
-    
+
 else
 
     set(handles.statusText,'String','Uploading data from file, WAIT!');
@@ -2244,21 +2244,21 @@ else
         if strcmp('N3',ASTR{i})
             n3=Data(i);
         end
-        
+
         if strcmp('KF_LL',ASTR{i})
             lkf=Data(i);
         end
         if strcmp('KF_RL',ASTR{i})
             rkf=Data(i);
         end
-        
+
         if strcmp('FSR_TH_LL',ASTR{i})
             lfsr=Data(i);
         end
         if strcmp('FSR_TH_RL',ASTR{i})
             rfsr=Data(i);
         end
-        
+
         if strcmp('KP_L',ASTR{i})
             lkp=Data(i);
         end
@@ -2268,7 +2268,7 @@ else
         if strcmp('KI_L',ASTR{i})
             lki=Data(i);
         end
-        
+
         if strcmp('KP_R',ASTR{i})
             rkp=Data(i);
         end
@@ -2343,10 +2343,10 @@ if (bt.Status=="open")
 
         if LD
             %activate Decline
-            fwrite(bt,'W'); 
+            fwrite(bt,'W');
         else
             %deactivate Decline
-            fwrite(bt,'X'); 
+            fwrite(bt,'X');
         end
     catch
     end
@@ -2684,7 +2684,7 @@ try
     fwrite(bt,-1,'double');
 
 catch
-    
+
 end
 
 
@@ -2712,7 +2712,7 @@ try
     fwrite(bt,0,'double');
 
 catch
-    
+
 end
 
 
@@ -2909,6 +2909,3 @@ try
     disp('Balance Baseline');
 catch
 end
-
-
-
