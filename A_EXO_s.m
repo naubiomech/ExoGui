@@ -105,10 +105,11 @@ function varargout = A_EXO_s_OutputFcn(~, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-    varargout{1} = handles.output;
+    varargout{1} = 0;
+    %varargout{1} = handles.output;
 
 % --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, ~, ~)
+function figure1_CloseRequestFcn(hObject, ~, ~) %#ok<*DEFNU>
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -416,9 +417,9 @@ function Start_Trial_Callback(hObject, eventdata, handles)
 
 
                 if(mod(RLCount,100) == 0)
-                    plots = {{GUI_Variables.RLTorque,GUI_Variables.RLSET}, ...
+                    plots = {{GUI_Variables.RLTRQ, GUI_Variables.RLSET}, ...
                              {GUI_Variables.RLFSR}, ...
-                             {GUI_Variables.LLTorque}, ...
+                             {GUI_Variables.LLTRQ}, ...
                              {GUI_Variables.LLFSR}, ...
                              {GUI_Variables.LLFSR}, ...
                              {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,GUI_Variables.BASEL}, ...
@@ -426,21 +427,19 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                              {GUI_Variables.SIG1}, ...
                              {GUI_Variables.SIG2}, ...
                              {GUI_Variables.SIG3}, ...
-                             {GUI_Variables.SIG4},
+                             {GUI_Variables.SIG4}, ...
                              {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,...
                               GUI_Variables.L_BAL_DYN_TOE,...
                               GUI_Variables.L_BAL_STEADY_TOE,...
                               GUI_Variables.LLVOLT_H,...
                               GUI_Variables.L_BAL_DYN_HEEL,...
-                              GUI_Variables.L_BAL_STEADY_HEEL},
-                             {GUI_Variables.RLVOLT,GUI_Variables.RLVOLT_H,...
+                              GUI_Variables.L_BAL_STEADY_HEEL}, ...
+                             {GUI_Variables.RLVOLT, GUI_Variables.RLVOLT_H,...
                               GUI_Variables.R_BAL_DYN_TOE,...
                               GUI_Variables.R_BAL_STEADY_TOE,...
                               GUI_Variables.RLVOLT_H,...
                               GUI_Variables.R_BAL_DYN_HEEL,...
-                              GUI_Variables.R_BAL_STEADY_HEEL}
-
-                            };
+                              GUI_Variables.R_BAL_STEADY_HEEL} };
 
                     titles = {"RL Torque","RL State","LL Torque","LL State","LL Force Toe and Heel", ...
                               "RL Force Toe and Heel","SIG1","SIG2", ...
@@ -554,7 +553,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
                     if(bt.bytesAvailable > 0)
                         [msg, Data] = get_message();
                         if(msg == '?')
-                            RLTorque(RLCount) = Data(1); % Gets the new Torque Value and Stores it
+                            RLTRQ(RLCount) = Data(1); % Gets the new Torque Value and Stores it
                             RLFSR(RLCount) = Data(2);
                             RLSET(RLCount) = Data(3); % New to save also the set point
                             RLVOLT(RLCount) = Data(4);
@@ -988,8 +987,7 @@ function Check_Memory_Callback(~, ~, handles)
         fwrite(bt,char(60));
         try
             [message, data] = get_message();
-        catch MER1
-            MER1
+        catch
         end
         if message == '<'
 
@@ -1299,7 +1297,7 @@ function Connect_BT_Callback(~, ~, handles)
 
     try
         fopen(bt); % Attempts to Make a connection to Bluetooth Object
-    catch ME_right_open
+    catch
         set(handles.flag_bluetooth,'Color',[1 0 0]);
         set(handles.axes8,'Color',[0 0 0])
         set(handles.axes10,'Color',[0 0 0])
@@ -1999,52 +1997,6 @@ function N3_Edit_CreateFcn(hObject, ~, ~)
 %       See ISPC and COMPUTER.
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
-    end
-
-function R_Send_KF_Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to R_Send_KF_Edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of R_Send_KF_Edit as text
-%        str2double(get(hObject,'String')) returns contents of R_Send_KF_Edit as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function R_Send_KF_Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to R_Send_KF_Edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-
-
-% --- Executes on button press in R_Send_KF.
-function R_Send_KF_Callback(~, ~, ~)
-% hObject    handle to R_Send_KF (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    new_KF = str2double(get(handles.R_Send_KF_Edit,'String'));         %Gets the Value entered into the edit Box in the G
-
-    global GUI_Variables
-    state=GUI_Variables.state;
-    disp(state);
-
-    bt = GUI_Variables.BT;
-
-    if (bt.Status=="open")
-        try
-            fwrite(bt,'-'); %send the character "-"
-            fwrite(bt,new_KF,'double');
-            disp("Send new Right KF ");
-            disp(new_KF);
-
-        catch
-        end
     end
 
 % --- Executes on button press in R_N3_Adj.
@@ -3370,7 +3322,7 @@ function Set_Dyn_Val_Callback(hObject, eventdata, handles)
     end
 
 % --- Executes on button press in Check_Dyn_Val.
-function Check_Dyn_Val_Callback(hObject, eventdata, handles)
+function Check_Dyn_Val_Callback(~, ~, handles)
 % hObject    handle to Check_Dyn_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3397,7 +3349,7 @@ function Check_Dyn_Val_Callback(hObject, eventdata, handles)
     end
 
 
-function Steady_Edit_Callback(hObject, eventdata, handles)
+function Steady_Edit_Callback(~, ~, ~)
 % hObject    handle to Steady_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3407,7 +3359,7 @@ function Steady_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function Steady_Edit_CreateFcn(hObject, eventdata, handles)
+function Steady_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to Steady_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -3420,7 +3372,7 @@ function Steady_Edit_CreateFcn(hObject, eventdata, handles)
 
 
 
-function Dyn_Edit_Callback(hObject, eventdata, handles)
+function Dyn_Edit_Callback(~, ~, ~)
 % hObject    handle to Dyn_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3430,7 +3382,7 @@ function Dyn_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function Dyn_Edit_CreateFcn(hObject, eventdata, handles)
+function Dyn_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to Dyn_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -3442,7 +3394,7 @@ function Dyn_Edit_CreateFcn(hObject, eventdata, handles)
     end
 
 % --- Executes on button press Flush Bluetooth.
-function Flush_Biobluetooth_Callback(hObject, eventdata, handles)
+function Flush_Biobluetooth_Callback(~, ~, ~)
 % hObject    handle to Flush_Bluetooth (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3456,7 +3408,7 @@ function Flush_Biobluetooth_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in BT_Auto_Reconnection.
-function BT_Auto_Reconnection_Callback(hObject, eventdata, handles)
+function BT_Auto_Reconnection_Callback(~, ~, handles)
 % hObject    handle to BT_Auto_Reconnection (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3464,7 +3416,7 @@ function BT_Auto_Reconnection_Callback(hObject, eventdata, handles)
     global GUI_Variables
     bt = GUI_Variables.BT;
 
-    BT_auto=get(handles.BT_Text,'String')
+    BT_auto=get(handles.BT_Text,'String');
 
     if strcmp(BT_auto,'On')
         %deactivate prop control
@@ -3488,7 +3440,7 @@ function BT_Auto_Reconnection_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in radiobutton23.
-function radiobutton23_Callback(hObject, eventdata, handles)
+function radiobutton23_Callback(~, ~, ~)
 % hObject    handle to radiobutton23 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3504,7 +3456,7 @@ function radiobutton23_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in Activate_BioFeedback.
-function Activate_BioFeedback_Callback(hObject, eventdata, handles)
+function Activate_BioFeedback_Callback(~, ~, handles)
 % hObject    handle to Activate_BioFeedback (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3531,7 +3483,7 @@ function Activate_BioFeedback_Callback(hObject, eventdata, handles)
     end
 
 % --- Executes on button press in Set_Bias.
-function Set_Bias_Callback(hObject, eventdata, handles)
+function Set_Bias_Callback(~, ~, handles)
 % hObject    handle to Set_Bias (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3554,7 +3506,7 @@ function Set_Bias_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in Set_Target.
-function Set_Target_Callback(hObject, eventdata, handles)
+function Set_Target_Callback(~, ~, handles)
 % hObject    handle to Set_Target (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3576,7 +3528,7 @@ function Set_Target_Callback(hObject, eventdata, handles)
     end
 
 
-function Set_Bias_Edit_Callback(hObject, eventdata, handles)
+function Set_Bias_Edit_Callback(~, ~, ~)
 % hObject    handle to Set_Bias_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3586,7 +3538,7 @@ function Set_Bias_Edit_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function Set_Bias_Edit_CreateFcn(hObject, eventdata, handles)
+function Set_Bias_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to Set_Bias_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -3599,7 +3551,7 @@ function Set_Bias_Edit_CreateFcn(hObject, eventdata, handles)
 
 
 
-function Set_Target_Edit_Callback(hObject, eventdata, handles)
+function Set_Target_Edit_Callback(~, ~, ~)
 % hObject    handle to Set_Target_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
