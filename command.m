@@ -23,8 +23,6 @@ switch(msg)
     set(handles.L_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_LL);
   case 'd'
     Setpoint_RL = data(1);
-    %         disp("Right New Setpoint")
-    %         disp(Setpoint_RL)
     set(handles.R_Setpoint_Text,'String',Setpoint_RL);
     Setpoint_Dorsi_RL = data(2);
     set(handles.R_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_RL);
@@ -66,12 +64,41 @@ switch(msg)
     R_Gain = data(1);
     set(handles.R_Check_Gain_Text,'String',R_Gain);
   case 'B'
-    GUI_Variables.basel= data(1);
-    GUI_Variables.baser= data(2);
+    val=strcmp(get(handles.Balance_Text,'String'),'On');
+    get(handles.Activate_BioFeedback_Text,'String')
+    val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')
+    
+    if (val_biofb==1)
+        disp('biofeedback baseline');
+        GUI_Variables.basel_biofb=data(1);
+        disp(GUI_Variables.basel_biofb)
+    elseif (val==1)
+        disp('balance baseline');
+        GUI_Variables.L_Bal_steady_Toe= data(1);
+        GUI_Variables.L_Bal_steady_Heel= data(2);
+        GUI_Variables.R_Bal_steady_Toe= data(3);
+        GUI_Variables.R_Bal_steady_Heel= data(4);
+        
+        GUI_Variables.L_Bal_dyn_Toe= data(5);
+        GUI_Variables.L_Bal_dyn_Heel= data(6);
+        GUI_Variables.R_Bal_dyn_Toe= data(7);
+        GUI_Variables.R_Bal_dyn_Heel= data(8);
+    elseif(val==0)
+        GUI_Variables.basel= data(1);
+        GUI_Variables.baser= data(2);
     disp('command');
     disp(GUI_Variables.basel);
     disp(GUI_Variables.baser);
 
+    end
+  case 'V'
+    steady_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
+    set(handles.Steady_Text,'String',steady_val);
+    disp(["Check Steady Val ",num2str(steady_val)]);
+  case 'A'
+    dyn_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
+    set(handles.Dyn_Text,'String',dyn_val);
+    disp(["Check Dyn Val ",num2str(dyn_val)]);
   otherwise
     %Do nothing
 end
