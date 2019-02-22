@@ -64,7 +64,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
     str_uno=input('Would you use the arduino trigger? [y/n] ','s');
 
     if (strcmp(str_uno,'y'))
-        if exist('Uno')
+        if exist('Uno', 'var')
             disp('Uno already exists in the workspace');
         else
             try
@@ -94,6 +94,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'PropOn',0,'SSID','No_ID');
+    guidata(hObject, handles);
 
 
 
@@ -105,8 +106,8 @@ function varargout = A_EXO_s_OutputFcn(~, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-    varargout{1} = 0;
-    %varargout{1} = handles.output;
+    %varargout{1} = 0;
+    varargout{1} = handles.output;
 
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, ~, ~) %#ok<*DEFNU>
@@ -120,6 +121,8 @@ function figure1_CloseRequestFcn(hObject, ~, ~) %#ok<*DEFNU>
     bt = GUI_Variables.BT;
     try
         fclose(bt);
+    catch
+        disp('Bluetooth already closed');
     end
     delete(hObject);
 
@@ -410,7 +413,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
                 if(BT_Was_Disconnected)
                     GUI_Variables.count_connection=GUI_Variables.count_connection+1;
                     GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
-                    BT_was_Disconnected=0;
+                    BT_Was_Disconnected=0;
                 end
                 tic
                 [RLCount,LLCount] = Receive_Data_Message(RLCount,LLCount,hObject, eventdata, handles);
@@ -571,7 +574,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
 
                             RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value
-                            RLCount = RLCount;
                             LLTRQ(LLCount) = Data(6);              %Gets the new Torque Value and stores it
                             LLFSR(LLCount) = Data(7);
                             LLSET(LLCount) = Data(8); % New to save also the set point
@@ -708,9 +710,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
                 R_SPEED(GUI_Variables.R_COUNT_SPEED(i,1))=GUI_Variables.R_COUNT_SPEED(i,2);
             end
         end
-
-
-        BT_CONNECTION=zeros(size(LLSET));
 
         A = {'t'; 'RLTRQ'; 'RLFSR'; 'RLSET'; 'RLVOLT'; 'RLVOLT_H'; 'LLTRQ';...
              'LLFSR'; 'LLSET'; 'LLVOLT'; 'LLVOLT_H'; ...
@@ -1057,7 +1056,7 @@ function lkf=L_Check_KF_Callback(~, ~, handles)
         fwrite(bt,'`'); % send the character "`"
         if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
             [message, data] = get_message();
-            if mssage(2) == '`'
+            if message(2) == '`'
                 KF_LL = data(1);
 
                 set(handles.L_Check_KF_Text,'String',KF_LL);
@@ -1085,7 +1084,6 @@ function L_Send_KF_Callback(~, ~, handles)
     new_KF = str2double(get(handles.L_Send_KF_Edit,'String'));         %Gets the Value entered into the edit Box in the G
 
     global GUI_Variables
-    state=GUI_Variables.state;
 
     bt = GUI_Variables.BT;
 
@@ -1261,7 +1259,7 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
                     end
                 end
             end
-        catch ME_right_read
+        catch
             set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
             set(handles.flag_bluetooth,'Color',[1 0 0]);
             set(handles.axes8,'Color',[0 0 0])
@@ -2006,7 +2004,6 @@ function R_N3_Adj_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
     global GUI_Variables;
     bt = GUI_Variables.BT;
-    count_speed=0;
     if (bt.Status=="open")
         try
             fwrite(bt,'o'); % char(111)
@@ -2023,7 +2020,6 @@ function L_N3_Adj_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
     global GUI_Variables;
     bt = GUI_Variables.BT;
-    count_speed=0;
     if (bt.Status=="open")
         try
             fwrite(bt,'O'); % char(79)
@@ -2385,7 +2381,6 @@ function L_Stop_N3_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
     global GUI_Variables
     bt = GUI_Variables.BT;
-    count_speed=0;
     if (bt.Status=="open")
         try
             fwrite(bt,'T');
@@ -2418,7 +2413,6 @@ function R_Stop_N3_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
     global GUI_Variables
     bt = GUI_Variables.BT;
-    count_speed=0;
     if (bt.Status=="open")
         try
             fwrite(bt,'t');
@@ -2488,7 +2482,7 @@ function Load_From_File_Callback(hObject, eventdata, handles)
     disp('Load from File ');
     strfile=input('Which file do you want to upload: ','s');
 
-    if not(exist(strfile))
+    if not(exist(strfile, 'file'))
         fprintf("File does not exists\n");
 
     else
@@ -2802,7 +2796,7 @@ function L_Set_Gain_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in Activate_Balance.
-function Activate_Balance_Callback(hObject, ~, ~)
+function Activate_Balance_Callback(~, ~, ~)
 % hObject    handle to Activate_Balance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3191,7 +3185,7 @@ function Balance_Baseline_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 % --- Executes on button press in BT_auto_reconnect_radiobutton.
-function BT_auto_reconnect_radiobutton_Callback(hObject, eventdata, handles)
+function BT_auto_reconnect_radiobutton_Callback(hObject, ~, ~)
 % hObject    handle to BT_auto_reconnect_radiobutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3220,7 +3214,7 @@ function BT_auto_reconnect_radiobutton_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in Steady_Balance_Base.
-function Steady_Balance_Base_Callback(hObject, eventdata, handles)
+function Steady_Balance_Base_Callback(~, ~, ~)
 % hObject    handle to Steady_Balance_Base (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3241,7 +3235,7 @@ function Steady_Balance_Base_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in Dynamic_Balance_Base.
-function Dynamic_Balance_Base_Callback(hObject, eventdata, handles)
+function Dynamic_Balance_Base_Callback(~, ~, ~)
 % hObject    handle to Dynamic_Balance_Base (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3260,7 +3254,7 @@ function Dynamic_Balance_Base_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in Set_Steady_Val.
-function Set_Steady_Val_Callback(hObject, eventdata, handles)
+function Set_Steady_Val_Callback(~, ~, handles)
 % hObject    handle to Set_Steady_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3279,7 +3273,7 @@ function Set_Steady_Val_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in Check_Steady_Val.
-function Check_Steady_Val_Callback(hObject, eventdata, handles)
+function Check_Steady_Val_Callback(~, ~, handles)
 % hObject    handle to Check_Steady_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3288,7 +3282,6 @@ function Check_Steady_Val_Callback(hObject, eventdata, handles)
     if(bt.Status=="open")
         try
             fwrite(bt,'V');
-            steady_val=0;
 
             if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
                 message = fgetl(bt);
@@ -3304,7 +3297,7 @@ function Check_Steady_Val_Callback(hObject, eventdata, handles)
     end
 
 % --- Executes on button press in Set_Dyn_Val.
-function Set_Dyn_Val_Callback(hObject, eventdata, handles)
+function Set_Dyn_Val_Callback(~, ~, handles)
 % hObject    handle to Set_Dyn_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3332,13 +3325,12 @@ function Check_Dyn_Val_Callback(~, ~, handles)
     if(bt.Status=="open")
         try
             fwrite(bt,'A');
-            dyn_val=0;
 
             if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-                message = fgetl(bt)
+                message = fgetl(bt);
                 if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'A'
                     indexes = find(message==44);
-                    dyn_val = str2double(message((indexes(1)+1):(indexes(2)-1)))
+                    dyn_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
                     set(handles.Dyn_Text,'String',dyn_val);
                     disp(['Check Steady Val ',num2str(dyn_val)]);
                 end
@@ -3492,7 +3484,7 @@ function Set_Bias_Callback(~, ~, handles)
 
     if (bt.Status=="open")
         try
-            bias=str2num(get(handles.Set_Bias_Edit,'String'));
+            bias=str2double(get(handles.Set_Bias_Edit,'String'));
             if not(isempty(bias))
                 fwrite(bt,'*');
                 fwrite(bt,bias,'double');
@@ -3515,7 +3507,7 @@ function Set_Target_Callback(~, ~, handles)
 
     if (bt.Status=="open")
         try
-            target=str2num(get(handles.Set_Target_Edit,'String'));
+            target=str2double(get(handles.Set_Target_Edit,'String'));
             fwrite(bt,'u');
             if not(isempty(target))
 
@@ -3561,7 +3553,7 @@ function Set_Target_Edit_Callback(~, ~, ~)
 
 
 % --- Executes during object creation, after setting all properties.
-function Set_Target_Edit_CreateFcn(hObject, eventdata, handles)
+function Set_Target_Edit_CreateFcn(hObject, ~, ~)
 % hObject    handle to Set_Target_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -3573,7 +3565,7 @@ function Set_Target_Edit_CreateFcn(hObject, eventdata, handles)
     end
 
 % --- Executes on selection change in IP_list.
-function IP_list_Callback(hObject, eventdata, handles)
+function IP_list_Callback(~, ~, handles)
 % hObject    handle to IP_list (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3591,7 +3583,7 @@ function IP_list_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in Start_TCP.
-function Open_TCP_Callback(hObject, eventdata, handles)
+function Open_TCP_Callback(~, ~, handles)
 % hObject    handle to Start_TCP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3629,7 +3621,7 @@ function Open_TCP_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in Close_TCP.
-function Close_TCP_Callback(hObject, eventdata, handles)
+function Close_TCP_Callback(~, ~, handles)
 % hObject    handle to Close_TCP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3654,7 +3646,7 @@ function Close_TCP_Callback(hObject, eventdata, handles)
     end
 
 % --- Executes on button press in Start_Optimization.
-function Start_Optimization_Callback(hObject, eventdata, handles)
+function Start_Optimization_Callback(~, ~, handles)
 % hObject    handle to Start_Optimization (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3693,7 +3685,7 @@ function Start_Optimization_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in Stop_Optimization.
-function Stop_Optimization_Callback(hObject, eventdata, handles)
+function Stop_Optimization_Callback(~, ~, handles)
 % hObject    handle to Stop_Optimization (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3723,7 +3715,7 @@ function Stop_Optimization_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function IP_list_CreateFcn(hObject, eventdata, handles)
+function IP_list_CreateFcn(hObject, ~, ~)
 % hObject    handle to IP_list (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -3736,7 +3728,7 @@ function IP_list_CreateFcn(hObject, eventdata, handles)
 
 
 % --- Executes on button press in BioFeedback_Baseline.
-function BioFeedback_Baseline_Callback(hObject, eventdata, handles)
+function BioFeedback_Baseline_Callback(~, ~, ~)
 % hObject    handle to BioFeedback_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3748,7 +3740,7 @@ function BioFeedback_Baseline_Callback(hObject, eventdata, handles)
 
             fwrite(bt,':');
 
-            disp(['BioFeedback Baseline for 4 steps (Default)']);
+            disp('BioFeedback Baseline for 4 steps (Default)');
 
 
         catch
@@ -3756,7 +3748,7 @@ function BioFeedback_Baseline_Callback(hObject, eventdata, handles)
     end
 
 % --- Executes during object creation, after setting all properties.
-function TCP_Status_CreateFcn(hObject, eventdata, handles)
+function TCP_Status_CreateFcn(~, ~, ~)
 % hObject    handle to TCP_Status (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -3765,35 +3757,35 @@ function TCP_Status_CreateFcn(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function Open_TCP_CreateFcn(hObject, eventdata, handles)
+function Open_TCP_CreateFcn(~, ~, ~)
 % hObject    handle to Open_TCP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 
 % --- Executes during object creation, after setting all properties.
-function Close_TCP_CreateFcn(hObject, eventdata, handles)
+function Close_TCP_CreateFcn(~, ~, ~)
 % hObject    handle to Close_TCP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 
 % --- Executes during object creation, after setting all properties.
-function Start_Optimization_CreateFcn(hObject, eventdata, handles)
+function Start_Optimization_CreateFcn(~, ~, ~)
 % hObject    handle to Start_Optimization (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 
 % --- Executes during object creation, after setting all properties.
-function Stop_Optimization_CreateFcn(hObject, eventdata, handles)
+function Stop_Optimization_CreateFcn(~, ~, ~)
 % hObject    handle to Stop_Optimization (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 
 
-function FSR_Distance_In_Callback(hObject, eventdata, handles)
+function FSR_Distance_In_Callback(~, ~, ~)
 % hObject    handle to FSR_Distance_In (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3803,7 +3795,7 @@ function FSR_Distance_In_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function FSR_Distance_In_CreateFcn(hObject, eventdata, handles)
+function FSR_Distance_In_CreateFcn(hObject, ~, ~)
 % hObject    handle to FSR_Distance_In (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -3816,7 +3808,7 @@ function FSR_Distance_In_CreateFcn(hObject, eventdata, handles)
 
 
 
-function Ankle2FSR_Distance_In_Callback(hObject, eventdata, handles)
+function Ankle2FSR_Distance_In_Callback(~, ~, ~)
 % hObject    handle to Ankle2FSR_Distance_In (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3826,7 +3818,7 @@ function Ankle2FSR_Distance_In_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function Ankle2FSR_Distance_In_CreateFcn(hObject, eventdata, handles)
+function Ankle2FSR_Distance_In_CreateFcn(hObject, ~, ~)
 % hObject    handle to Ankle2FSR_Distance_In (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -3839,7 +3831,7 @@ function Ankle2FSR_Distance_In_CreateFcn(hObject, eventdata, handles)
 
 
 
-function SSID_Input_Callback(hObject, eventdata, handles)
+function SSID_Input_Callback(hObject, ~, ~)
 % hObject    handle to SSID_Input (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3855,7 +3847,7 @@ function SSID_Input_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function SSID_Input_CreateFcn(hObject, eventdata, handles)
+function SSID_Input_CreateFcn(hObject, ~, ~)
 % hObject    handle to SSID_Input (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
