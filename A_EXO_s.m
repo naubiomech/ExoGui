@@ -106,7 +106,6 @@ function varargout = A_EXO_s_OutputFcn(~, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-    %varargout{1} = 0;
     varargout{1} = handles.output;
 
 % --- Executes when user attempts to close figure1.
