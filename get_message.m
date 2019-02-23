@@ -1,7 +1,5 @@
-function [msg, data] = get_message()
+function [msg, data] = get_message(bt)
 
-    global GUI_Variables
-    bt = GUI_Variables.BT;
     msg = '\0';
     data = [];
     count = 0;
