@@ -139,85 +139,9 @@ function Start_Trial_Callback(hObject, eventdata, handles)
 
     flushinput(bt);
     flushoutput(bt);
-    allocated = 100000;
-    RLTRQ = NaN(1,allocated);
-    LLTRQ = NaN(1,allocated);
-    RLFSR = NaN(1,allocated);
-    LLFSR = NaN(1,allocated);
-
-    SIG1 = NaN(1,allocated);
-    SIG2 = NaN(1,allocated);
-    SIG3 = NaN(1,allocated);
-    SIG4 = NaN(1,allocated);
-    BASEL=NaN(1,allocated);
-    BASER=NaN(1,allocated);
-    BASEL_BIOFB=NaN(1,allocated);
-    basel=0;
-    baser=0;
-    GUI_Variables.basel= basel;
-    GUI_Variables.baser= baser;
-
-    basel_biofb=0;
-
-    RLCount = 1; %Initializes the starting space for the Vector holding the Torque Values
-    LLCount = 1;
-    GUI_Variables.LLFSR = LLFSR;
-    GUI_Variables.RLFSR = RLFSR;
-    GUI_Variables.RLTRQ = RLTRQ;
-    GUI_Variables.LLTRQ = LLTRQ;
-
-    LLSET = NaN(1,allocated);
-    RLSET = NaN(1,allocated);
-    GUI_Variables.RLSET = RLSET;
-    GUI_Variables.LLSET = LLSET;
-
-
-    LLVOLT = NaN(1,allocated);
-    RLVOLT = NaN(1,allocated);
-    GUI_Variables.LLVOLT = LLVOLT;
-    GUI_Variables.RLVOLT = RLVOLT;
-
-    LLVOLT_H = NaN(1,allocated);
-    RLVOLT_H = NaN(1,allocated);
-    GUI_Variables.LLVOLT_H = LLVOLT_H;
-    GUI_Variables.RLVOLT_H = RLVOLT_H;
-
-
-    L_BAL_DYN_TOE=ones(1,allocated)*0;
-    L_BAL_STEADY_TOE=ones(1,allocated)*0;
-    R_BAL_DYN_TOE=ones(1,allocated)*0;
-    R_BAL_STEADY_TOE=ones(1,allocated)*0;
-
-    L_BAL_DYN_HEEL=ones(1,allocated)*0;
-    L_BAL_STEADY_HEEL=ones(1,allocated)*0;
-    R_BAL_DYN_HEEL=ones(1,allocated)*0;
-    R_BAL_STEADY_HEEL=ones(1,allocated)*0;
-
-
-    GUI_Variables.L_BAL_DYN_HEEL=L_BAL_DYN_HEEL;
-    GUI_Variables.L_BAL_STEADY_HEEL=L_BAL_STEADY_HEEL;
-    GUI_Variables.R_BAL_DYN_HEEL=R_BAL_DYN_HEEL;
-    GUI_Variables.R_BAL_STEADY_HEEL=R_BAL_STEADY_HEEL;
-
-    GUI_Variables.L_BAL_DYN_TOE=L_BAL_DYN_TOE;
-    GUI_Variables.L_BAL_STEADY_TOE=L_BAL_STEADY_TOE;
-    GUI_Variables.R_BAL_DYN_TOE=R_BAL_DYN_TOE;
-    GUI_Variables.R_BAL_STEADY_TOE=R_BAL_STEADY_TOE;
-
-
-    GUI_Variables.SIG1=SIG1;
-    GUI_Variables.SIG2=SIG2;
-    GUI_Variables.SIG3=SIG3;
-    GUI_Variables.SIG4=SIG4;
-
-    GUI_Variables.BASEL=BASEL;
-    GUI_Variables.BASER=BASER;
-
-    GUI_Variables.BASEL_BIOFB=BASEL_BIOFB;
-
-
+    GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     BT_Was_Disconnected=0;
-    GUI_Variables.counter=0;
+
     set(handles.TRIG_NUM_TEXT,'String',0);
 
     if(bt.Status == "open")
@@ -490,8 +414,52 @@ function Start_Trial_Callback(hObject, eventdata, handles)
             end
         end
     end
+    
+function GUI_Variables = Reset_GUI_Variables(GUI_Variables)
+    allocated = 100000;
+    
+    GUI_Variables.basel = 0;
+    GUI_Variables.baser = 0;
+
+    GUI_Variables.RLCount = 1;
+    GUI_Variables.LLCount = 1;
+    GUI_Variables.LLFSR = NaN(1,allocated);
+    GUI_Variables.RLFSR = NaN(1,allocated);
+    GUI_Variables.RLTRQ = NaN(1,allocated);
+    GUI_Variables.LLTRQ = NaN(1,allocated);
+
+    GUI_Variables.RLSET = NaN(1,allocated);
+    GUI_Variables.LLSET = NaN(1,allocated);
+
+    GUI_Variables.LLVOLT = NaN(1,allocated);
+    GUI_Variables.RLVOLT = NaN(1,allocated);
+
+    GUI_Variables.LLVOLT_H = NaN(1,allocated);
+    GUI_Variables.RLVOLT_H = NaN(1,allocated);
 
 
+    GUI_Variables.L_BAL_DYN_HEEL=NaN(1,allocated);
+    GUI_Variables.L_BAL_STEADY_HEEL=NaN(1,allocated);
+    GUI_Variables.R_BAL_DYN_HEEL=NaN(1,allocated);
+    GUI_Variables.R_BAL_STEADY_HEEL=NaN(1,allocated);
+
+    GUI_Variables.L_BAL_DYN_TOE=NaN(1,allocated);
+    GUI_Variables.L_BAL_STEADY_TOE=NaN(1,allocated);
+    GUI_Variables.R_BAL_DYN_TOE=NaN(1,allocated);
+    GUI_Variables.R_BAL_STEADY_TOE=NaN(1,allocated);
+
+    GUI_Variables.SIG1=NaN(1,allocated);
+    GUI_Variables.SIG2=NaN(1,allocated);
+    GUI_Variables.SIG3=NaN(1,allocated);
+    GUI_Variables.SIG4=NaN(1,allocated);
+
+    GUI_Variables.BASEL=NaN(1,allocated);
+    GUI_Variables.BASER=NaN(1,allocated);
+
+    GUI_Variables.BASEL_BIOFB=NaN(1,allocated);
+
+
+    GUI_Variables.counter=0;
 
 % --- Executes on button press in End_Trial.
 function End_Trial_Callback(hObject, eventdata, handles)
