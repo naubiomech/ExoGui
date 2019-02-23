@@ -142,7 +142,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     flushinput(bt);
     flushoutput(bt);
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
-    BT_Was_Disconnected=0;
 
     set(handles.TRIG_NUM_TEXT,'String',0);
 
@@ -176,247 +175,270 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     GUI_Variables.flag_start=1;
 
     pause(.01);
-    if state == 1
+    if state == 1 && bt.Status == "open"
         fwrite(bt,char(69)); % Sends ASCII character 69 to the Arduino, which the Arduino will
     end
     pause(.001);
 
 
     start_count=0;
-
+    BT_Was_Disconnected=0;
+    GUI_Variables.BT_Was_Disconnected = 0;
+    GUI_Variables.start_count = 0;
     set(handles.statusText,'String','Trial has been started');
     tic
     if state == 1 % both connected
         disp('both connected')
         while strcmp(get(handles.Start_Trial,'Enable'), 'off')
+            GUI_Variables = Update_GUI(GUI_Variables, handles);
+        end
+    end
 
-            if GUI_Variables.flag_calib==1
-                if GUI_Variables.first_calib==0
-                    start_count=clock;
-                    start_count=start_count(6);
-                    disp("Start FSR Calib")
-                    GUI_Variables.first_calib=1;
-                end
-                v=clock;
-                if (v(6)-start_count)>5
-                    set(handles.statusText,'String','Finished Calibrating the FSRs');
-                    pause(0.00000001);
-                    disp("End FSR Calib")
-                    GUI_Variables.flag_calib=0;
-                    GUI_Variables.first_calib=0;
+function GUI_Variables = Update_GUI(GUI_Variables, handles)
+    RLCount = GUI_Variables.RLCount;
+    LLCount = GUI_Variables.LLCount;
+    bt = GUI_Variables.BT;
+    start_count = GUI_Variables.start_count;
+    BT_Was_Disconnected = GUI_Variables.BT_Was_Disconnected;
+    
+    if GUI_Variables.flag_calib==1
+        if GUI_Variables.first_calib==0
+            start_count=clock;
+            start_count=start_count(6);
+            disp("Start FSR Calib")
+            GUI_Variables.first_calib=1;
+        end
+        v=clock;
+        if (v(6)-start_count)>5
+            set(handles.statusText,'String','Finished Calibrating the FSRs');
+            pause(0.00000001);
+            disp("End FSR Calib")
+            GUI_Variables.flag_calib=0;
+            GUI_Variables.first_calib=0;
+        end
+    end
+    pause(.000000001);
+
+    %---------------------Optimization-----------------------------------------
+
+    try %Flush input buffer if approaching overflow
+        if GUI_Variables.BT.BytesAvailable>0.9*GUI_Variables.BT.InputBufferSize
+            flushinput(GUI_Variables.BT);
+            fprintf('BT input buffer flushed to avoid overflow \n')
+        end
+    catch
+    end
+
+    %------------Bang-Bang-------------------------
+    if ~GUI_Variables.PropOn
+        try
+            if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
+                if GUI_Variables.t.BytesAvailable>0
+                    Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
+                    if char(Setpoints') == "done"
+                        fwrite(GUI_Variables.BT,',');           %Optimization done
+                        set(handles.statusText,'String',"Optimization generation complete.")
+                    else
+                        if ~contains(char(Setpoints'),'_') %One parameter bang-bang optimization (sigmoid)
+                            if GUI_Variables.BT.Status == "open"
+                                Trq_Setpoint = str2double(char(Setpoints'));    %Torque setpoint
+                                fwrite(GUI_Variables.BT,'F');                   %Left leg setpoints
+                                fwrite(GUI_Variables.BT,Trq_Setpoint,'double'); %Plantarflexion
+                                fwrite(GUI_Variables.BT,0,'double');            %Dorsiflexion
+                                fwrite(GUI_Variables.BT,'f');                   %Right leg setpoints
+                                fwrite(GUI_Variables.BT,Trq_Setpoint,'double'); %Plantarflexion
+                                fwrite(GUI_Variables.BT,0,'double');            %Dorsiflexion
+                                disp(['Sent Data: ',num2str(Trq_Setpoint)]);
+                            end
+                        else %Two parameter bang-bang optimization (zero-jerk spline)
+                            if GUI_Variables.BT.Status == "open"
+                                Char_Setpoints = strsplit(char(Setpoints'),'_');
+                                Trq_Setpoint = str2double(Char_Setpoints{1});    %Torque Setpoint
+                                RT_Setpoint = str2double(Char_Setpoints{2})/100; %Rise time %
+                                fwrite(GUI_Variables.BT,'$');       %Two optimization values incoming
+                                fwrite(GUI_Variables.BT,Trq_Setpoint,'double');  %Torque setpoint
+                                fwrite(GUI_Variables.BT,RT_Setpoint,'double');   %Rise time %
+                                disp(['Sent Data: ',num2str(Trq_Setpoint),' , ', num2str(RT_Setpoint)]);
+                            end
+                        end
+                    end
                 end
             end
-            pause(.000000001);
+        catch error
+            disp(error)
+            fprintf('Unable to apply optimization setpoints \n')
+        end
 
-            %---------------------Optimization-----------------------------------------
-
-            try %Flush input buffer if approaching overflow
-                if GUI_Variables.BT.BytesAvailable>0.9*GUI_Variables.BT.InputBufferSize
-                    flushinput(GUI_Variables.BT);
-                    fprintf('BT input buffer flushed to avoid overflow \n')
+        %------------Proportional----------------------
+    elseif GUI_Variables.PropOn
+        try
+            if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
+                if GUI_Variables.t.BytesAvailable>0
+                    Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
+                    if char(Setpoints') == "done"
+                        fwrite(GUI_Variables.BT,',');
+                        set(handles.statusText,'String',"Optimization generation complete.")
+                    else
+                        if ~contains(char(Setpoints'),'_')
+                            Trq_Setpoint = str2double(char(Setpoints'));  %Torque Setpoint
+                            if GUI_Variables.BT.Status == "open"
+                                fwrite(GUI_Variables.BT,'"');   %Need new symbol for prop optimization
+                                fwrite(GUI_Variables.BT,Trq_Setpoint,'double');
+                                disp(['Sent Data: ',num2str(Trq_Setpoint)]);
+                            end
+                        else
+                            warning('Two parameter optimization for proportional control is not possible.');
+                        end
+                    end
                 end
-            catch
             end
+        catch error
+            disp(error)
+            fprintf('Unable to apply optimization setpoint \n')
+        end
 
-            %------------Bang-Bang-------------------------
-            if ~GUI_Variables.PropOn
+    end
+    %---------------------AUTORECONNECT--------------------
+
+    if strcmp(get(handles.BT_Text,'String'),'On')
+        % disp('Activating the BT auto reconnection Matlab gui side')
+
+        if(bt.bytesAvailable==0 && bt.status=="open" && GUI_Variables.flag_end_trial==0)
+            bt_wait_time=toc;
+
+            if (bt_wait_time>1)
+                BT_Was_Disconnected=1;
+                disp("NO DATA AVAILABLE!!!");
+                pause(.000000001);
+
+                disp('Close BT')
                 try
-                    if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
-                        if GUI_Variables.t.BytesAvailable>0
-                            Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
-                            if char(Setpoints') == "done"
-                                fwrite(GUI_Variables.BT,',');           %Optimization done
-                                set(handles.statusText,'String',"Optimization generation complete.")
-                            else
-                                if ~contains(char(Setpoints'),'_') %One parameter bang-bang optimization (sigmoid)
-                                    if GUI_Variables.BT.Status == "open"
-                                        Trq_Setpoint = str2double(char(Setpoints'));    %Torque setpoint
-                                        fwrite(GUI_Variables.BT,'F');                   %Left leg setpoints
-                                        fwrite(GUI_Variables.BT,Trq_Setpoint,'double'); %Plantarflexion
-                                        fwrite(GUI_Variables.BT,0,'double');            %Dorsiflexion
-                                        fwrite(GUI_Variables.BT,'f');                   %Right leg setpoints
-                                        fwrite(GUI_Variables.BT,Trq_Setpoint,'double'); %Plantarflexion
-                                        fwrite(GUI_Variables.BT,0,'double');            %Dorsiflexion
-                                        disp(['Sent Data: ',num2str(Trq_Setpoint)]);
-                                    end
-                                else %Two parameter bang-bang optimization (zero-jerk spline)
-                                    if GUI_Variables.BT.Status == "open"
-                                        Char_Setpoints = strsplit(char(Setpoints'),'_');
-                                        Trq_Setpoint = str2double(Char_Setpoints{1});    %Torque Setpoint
-                                        RT_Setpoint = str2double(Char_Setpoints{2})/100; %Rise time %
-                                        fwrite(GUI_Variables.BT,'$');       %Two optimization values incoming
-                                        fwrite(GUI_Variables.BT,Trq_Setpoint,'double');  %Torque setpoint
-                                        fwrite(GUI_Variables.BT,RT_Setpoint,'double');   %Rise time %
-                                        disp(['Sent Data: ',num2str(Trq_Setpoint),' , ', num2str(RT_Setpoint)]);
-                                    end
-                                end
-                            end
-                        end
-                    end
-                catch error
-                    disp(error)
-                    fprintf('Unable to apply optimization setpoints \n')
+                    fclose(bt);
+                catch
                 end
-
-                %------------Proportional----------------------
-            elseif GUI_Variables.PropOn
-                try
-                    if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
-                        if GUI_Variables.t.BytesAvailable>0
-                            Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
-                            if char(Setpoints') == "done"
-                                fwrite(GUI_Variables.BT,',');
-                                set(handles.statusText,'String',"Optimization generation complete.")
-                            else
-                                if ~contains(char(Setpoints'),'_')
-                                    Trq_Setpoint = str2double(char(Setpoints'));  %Torque Setpoint
-                                    if GUI_Variables.BT.Status == "open"
-                                        fwrite(GUI_Variables.BT,'"');   %Need new symbol for prop optimization
-                                        fwrite(GUI_Variables.BT,Trq_Setpoint,'double');
-                                        disp(['Sent Data: ',num2str(Trq_Setpoint)]);
-                                    end
-                                else
-                                    warning('Two parameter optimization for proportional control is not possible.');
-                                end
-                            end
-                        end
-                    end
-                catch error
-                    disp(error)
-                    fprintf('Unable to apply optimization setpoint \n')
-                end
-
-            end
-            %---------------------AUTORECONNECT--------------------
-
-            if strcmp(get(handles.BT_Text,'String'),'On')
-                % disp('Activating the BT auto reconnection Matlab gui side')
-
-                if(bt.bytesAvailable==0 && bt.status=="open" && GUI_Variables.flag_end_trial==0)
-                    bt_wait_time=toc;
-
-                    if (bt_wait_time>1)
-                        BT_Was_Disconnected=1;
-                        disp("NO DATA AVAILABLE!!!");
-                        pause(.000000001);
-
-                        disp('Close BT')
-                        try
-                            fclose(bt);
-                        catch
-                        end
-                        while(bt.status=="closed")
-                            pause(.5);
-                            disp('Try Open BT')
-                            try
-                                fopen(bt);
-                            catch
-                            end
-                        end
-                        disp('Wait half second more')
-                        pause(0.5);
-                        disp('New Status')
-                        disp(bt.status);
-                        if(bt.status=="open")
-                            fwrite(bt,char(69));
-                            GUI_Variables.count_connection=GUI_Variables.count_connection+1;
-                            GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
-                        end
-                        toc
-                        RLCount=RLCount+round(toc*100);
-                        LLCount=RLCount;
-                        tic
-                        tic
+                while(bt.status=="closed")
+                    pause(.5);
+                    disp('Try Open BT')
+                    try
+                        fopen(bt);
+                    catch
                     end
                 end
-
-            end
-            %---------------------------------------------------
-
-
-
-            if ((bt.bytesAvailable > 0))
-                if(BT_Was_Disconnected)
+                disp('Wait half second more')
+                pause(0.5);
+                disp('New Status')
+                disp(bt.status);
+                if(bt.status=="open")
+                    fwrite(bt,char(69));
                     GUI_Variables.count_connection=GUI_Variables.count_connection+1;
                     GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
-                    BT_Was_Disconnected=0;
                 end
+                toc
+                RLCount=RLCount+round(toc*100);
+                LLCount=RLCount;
                 tic
-                [RLCount,LLCount] = Receive_Data_Message(RLCount,LLCount,hObject, eventdata, handles);
+                tic
+            end
+        end
+
+    end
+    %---------------------------------------------------
 
 
-                if(mod(RLCount,100) == 0)
-                    plots = {{GUI_Variables.RLTRQ, GUI_Variables.RLSET}, ...
-                             {GUI_Variables.RLFSR}, ...
-                             {GUI_Variables.LLTRQ}, ...
-                             {GUI_Variables.LLFSR}, ...
-                             {GUI_Variables.LLFSR}, ...
-                             {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,GUI_Variables.BASEL}, ...
-                             {GUI_Variables.RLVOLT,GUI_Variables.RLVOLT_H,GUI_Variables.BASER}, ...
-                             {GUI_Variables.SIG1}, ...
-                             {GUI_Variables.SIG2}, ...
-                             {GUI_Variables.SIG3}, ...
-                             {GUI_Variables.SIG4}, ...
-                             {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,...
-                              GUI_Variables.L_BAL_DYN_TOE,...
-                              GUI_Variables.L_BAL_STEADY_TOE,...
-                              GUI_Variables.LLVOLT_H,...
-                              GUI_Variables.L_BAL_DYN_HEEL,...
-                              GUI_Variables.L_BAL_STEADY_HEEL}, ...
-                             {GUI_Variables.RLVOLT, GUI_Variables.RLVOLT_H,...
-                              GUI_Variables.R_BAL_DYN_TOE,...
-                              GUI_Variables.R_BAL_STEADY_TOE,...
-                              GUI_Variables.RLVOLT_H,...
-                              GUI_Variables.R_BAL_DYN_HEEL,...
-                              GUI_Variables.R_BAL_STEADY_HEEL} };
 
-                    titles = {"RL Torque","RL State","LL Torque","LL State","LL Force Toe and Heel", ...
-                              "RL Force Toe and Heel","SIG1","SIG2", ...
-                              "SIG3","SIG4","Left Balance", "Right Balance"};
+    if ((bt.bytesAvailable > 0))
+        if(BT_Was_Disconnected)
+            GUI_Variables.count_connection=GUI_Variables.count_connection+1;
+            GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
+            BT_Was_Disconnected=0;
+        end
+        tic
+        
+        GUI_Variables.RLCount = RLCount;
+        GUI_Variables.LLCount = LLCount;
+        
+        GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+        
+        RLCount = GUI_Variables.RLCount;
+        LLCount = GUI_Variables.LLCount;
 
-                    axes(handles.Bottom_Axes);
-                    whichPlotLeft = get(handles.Bottom_Graph,'Value');
 
-                    plotData = plots{whichPlotLeft};
-                    plotTitle = titles{whichPlotLeft};
+        if(mod(RLCount,100) == 0)
+            plots = {{GUI_Variables.RLTRQ, GUI_Variables.RLSET}, ...
+                     {GUI_Variables.RLFSR}, ...
+                     {GUI_Variables.LLTRQ}, ...
+                     {GUI_Variables.LLFSR}, ...
+                     {GUI_Variables.LLFSR}, ...
+                     {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,GUI_Variables.BASEL}, ...
+                     {GUI_Variables.RLVOLT,GUI_Variables.RLVOLT_H,GUI_Variables.BASER}, ...
+                     {GUI_Variables.SIG1}, ...
+                     {GUI_Variables.SIG2}, ...
+                     {GUI_Variables.SIG3}, ...
+                     {GUI_Variables.SIG4}, ...
+                     {GUI_Variables.LLVOLT,GUI_Variables.LLVOLT_H,...
+                      GUI_Variables.L_BAL_DYN_TOE,...
+                      GUI_Variables.L_BAL_STEADY_TOE,...
+                      GUI_Variables.LLVOLT_H,...
+                      GUI_Variables.L_BAL_DYN_HEEL,...
+                      GUI_Variables.L_BAL_STEADY_HEEL}, ...
+                     {GUI_Variables.RLVOLT, GUI_Variables.RLVOLT_H,...
+                      GUI_Variables.R_BAL_DYN_TOE,...
+                      GUI_Variables.R_BAL_STEADY_TOE,...
+                      GUI_Variables.RLVOLT_H,...
+                      GUI_Variables.R_BAL_DYN_HEEL,...
+                      GUI_Variables.R_BAL_STEADY_HEEL} };
 
-                    if RLCount <= 1000
-                        dataLength = 1:RLCount;
-                    else
-                        dataLength = (RLCount-1000):RLCount-1;
-                    end
-                    data = plotData{1}(dataLength);
-                    if length(plotData) > 1
-                        for i=2:length(plotData)
-                            data = [data; plotData{i}(dataLength)];
-                        end
-                    end
-                    plot(dataLength, data);
-                    title(plotTitle);
+            titles = {"RL Torque","RL State","LL Torque","LL State","LL Force Toe and Heel", ...
+                      "RL Force Toe and Heel","SIG1","SIG2", ...
+                      "SIG3","SIG4","Left Balance", "Right Balance"};
 
-                    whichPlotRight = get(handles.Top_Graph,'Value');
-                    axes(handles.Top_Axes);
-                    plotData = plots{whichPlotRight};
-                    plotTitle = titles{whichPlotRight};
+            axes(handles.Bottom_Axes);
+            whichPlotLeft = get(handles.Bottom_Graph,'Value');
 
-                    if RLCount <= 1000
-                        dataLength = 1:RLCount;
-                    else
-                        dataLength = (RLCount-1000):RLCount-1;
-                    end
-                    data = plotData{1}(dataLength);
-                    if length(plotData) > 1
-                        for i=2:length(plotData)
-                            data = [data; plotData{i}(dataLength)];
-                        end
-                    end
-                    plot(dataLength, data);
-                    title(plotTitle);
+            plotData = plots{whichPlotLeft};
+            plotTitle = titles{whichPlotLeft};
+
+            if RLCount <= 1000
+                dataLength = 1:RLCount;
+            else
+                dataLength = (RLCount-1000):RLCount-1;
+            end
+            data = plotData{1}(dataLength);
+            if length(plotData) > 1
+                for i=2:length(plotData)
+                    data = [data; plotData{i}(dataLength)];
                 end
             end
+            plot(dataLength, data);
+            title(plotTitle);
+
+            whichPlotRight = get(handles.Top_Graph,'Value');
+            axes(handles.Top_Axes);
+            plotData = plots{whichPlotRight};
+            plotTitle = titles{whichPlotRight};
+
+            if RLCount <= 1000
+                dataLength = 1:RLCount;
+            else
+                dataLength = (RLCount-1000):RLCount-1;
+            end
+            data = plotData{1}(dataLength);
+            if length(plotData) > 1
+                for i=2:length(plotData)
+                    data = [data; plotData{i}(dataLength)];
+                end
+            end
+            plot(dataLength, data);
+            title(plotTitle);
         end
     end
     
+    GUI_Variables.RLCount = RLCount;
+    GUI_Variables.LLCount = LLCount;
+    GUI_Variables.start_count = start_count;
+    GUI_Variables.BT_Was_Disconnected = BT_Was_Disconnected;
+    
+        
 function GUI_Variables = Reset_GUI_Variables(GUI_Variables)
     allocated = 100000;
     
@@ -524,7 +546,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
                                           %I can pause after it think its finished looping (emptied the buffer), and then check if it should have finished looping (emptied the buffer) and if it is not finished, have it loop again
                 while((bt.bytesAvailable > 0)) % While there are still torque values in the bluetooth buffer
                     if(bt.bytesAvailable > 0)
-                        [msg, Data] = get_message();
+                        [msg, Data] = get_message(bt);
                         if(msg == '?')
                             RLTRQ(RLCount) = Data(1); % Gets the new Torque Value and Stores it
                             RLFSR(RLCount) = Data(2);
@@ -696,10 +718,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
         A=[A;A2];
         A_mat=[A_mat;A_mat2];
 
+        
         currDir = cd;       % Current directory
-        saveDir = [currDir,'\',GUI_Variables.SSID,'_',date];    % Save directory specific to subject and date
-        mkdir(currDir,[GUI_Variables.SSID,'_',date]);           % Generate a save directory
-        Filename = sprintf('%s_%d',fullfile(saveDir,[GUI_Variables.SSID,'_',date,'_','Trial_Number_']),...
+        saveDir = [GUI_Variables.SSID,'_',date];
+        savePath = [currDir,'\',saveDir];    % Save directory specific to subject and date
+        if ~exist(saveDir, 'dir')
+            mkdir(currDir, saveDir);           % Make a save directory
+        end
+        Filename = sprintf('%s_%d',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_','Trial_Number_']),...
                            bt.UserData);               %Creates a new filename called "Torque_#"
 
 
@@ -774,9 +800,12 @@ function End_Trial_Callback(hObject, eventdata, handles)
         end
 
         currDir = cd;       % Current directory
-        saveDir = [currDir,'\',GUI_Variables.SSID,'_',date];    % Save directory specific to subject and date
-        mkdir(currDir,[GUI_Variables.SSID,'_',date]);           % Make a save directory
-        Filename = sprintf('%s_%d',fullfile(saveDir,[GUI_Variables.SSID,'_',date,'_','Parameters_Trial_Number_']),...
+        saveDir = [GUI_Variables.SSID,'_',date];
+        savePath = [currDir,'\',saveDir];    % Save directory specific to subject and date
+        if ~exist(saveDir, 'dir')
+            mkdir(currDir, saveDir);           % Make a save directory
+        end
+        Filename = sprintf('%s_%d',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_','Parameters_Trial_Number_']),...
                            bt.UserData);               %Creates a new filename called "Torque_#"
         fileID = fopen(Filename,'w'); % Actually creates that file
         pause(.01);
@@ -955,7 +984,7 @@ function Check_Memory_Callback(~, ~, handles)
     if(bt.Status == "open")
         fwrite(bt,char(60));
         try
-            [message, data] = get_message();
+            [message, data] = get_message(bt);
         catch
         end
         if message == '<'
@@ -1025,7 +1054,7 @@ function lkf=L_Check_KF_Callback(~, ~, handles)
     if (bt.Status=="open")
         fwrite(bt,'`'); % send the character "`"
         if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-            [message, data] = get_message();
+            [message, data] = get_message(bt);
             if message(2) == '`'
                 KF_LL = data(1);
 
@@ -1184,7 +1213,7 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
     try
         fwrite(bt,char(78))
         try
-            [message, data] = get_message();
+            [message, data] = get_message(bt);
             if message == 'N'
                 check1 = data(1);
                 check2 = data(2);
@@ -1229,7 +1258,7 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
                     end
                 end
             end
-        catch
+        catch E
             set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
             set(handles.flag_bluetooth,'Color',[1 0 0]);
             set(handles.axes8,'Color',[0 0 0])
@@ -1238,7 +1267,7 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
             valBT=0;
             fclose(bt);
         end
-    catch
+    catch E 
         try
             set(handles.flag_bluetooth,'Color',[1 0 0]);
             set(handles.axes8,'Color',[0 0 0])
@@ -1568,7 +1597,7 @@ function [rkp,rkd,rki]=R_Get_PID_Callback(~, ~, handles)
     if(bt.Status=="open")
         fwrite(bt,char(107));
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-            [message, data] = get_message();
+            [message, data] = get_message(bt);
             if message == 'k'
                 rkp = data(1);
                 rkd = data(2);
@@ -1593,7 +1622,7 @@ function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
     if(bt.Status=="open")
         fwrite(bt,char(75));
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-            [message, data] = get_message();
+            [message, data] = get_message(bt);
             if message == 'K'
                 lkp = data(1);
                 lkd = data(2);
@@ -1754,7 +1783,7 @@ function R_Get_Setpoint_Callback(~, ~, handles)
     end
 
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        [message, data] = get_message();
+        [message, data] = get_message(bt);
         if message == 'd'
             Setpoint_RL = data(1);
             Setpoint_Dorsi_RL = data(2);
@@ -1776,7 +1805,7 @@ function L_Get_Setpoint_Callback(~, ~, handles)
                     % 68 to Arduino Which the Arduino understands to
                     % send parameters back
                     % Gets the Current Arduino Torque Setpoint if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-    [message, data] = get_message();
+    [message, data] = get_message(bt);
     if message == 'D'
         Setpoint_LL = data(1);
         Setpoint_Dorsi_LL = data(2);
@@ -1851,7 +1880,7 @@ function [n1,n2,n3]=Get_Smoothing_Callback(~, ~, handles)
         try
             fwrite(bt,'(');
             if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-                [message, data] = get_message();
+                [message, data] = get_message(bt);
                 if message == '('
                     N1 = data(1);
                     N2 = data(2);
@@ -2071,7 +2100,7 @@ function rkf=R_Check_KF_Callback(~, ~, handles)
         try
 
             fwrite(bt,'~'); % send the character "~"
-            [message, data] = get_message();
+            [message, data] = get_message(bt);
             if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
                 if message == '~'
                     KF_RL = data(1);
@@ -2100,7 +2129,7 @@ function lfsr=L_Check_FSR_Th_Callback(~, ~, handles)
     if (bt.Status=="open")
         fwrite(bt,char('Q')); % send the character "Q"
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-            message,data = get_message();
+            message,data = get_message(bt);
             if message == 'Q'
                 FSR_thresh_LL = data(1);
                 set(handles.L_Check_FSR_Text,'String',FSR_thresh_LL);
@@ -2167,7 +2196,7 @@ function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
     if (bt.Status=="open")
         try
             fwrite(bt,char('q')); % send the character "Q"
-            message,data = get_message();
+            message,data = get_message(bt);
             if message == 'q'
                 Curr_TH_R = data(1);
                 set(handles.R_Check_FSR_Text,'String',Curr_TH_R);
@@ -2627,7 +2656,7 @@ function R_Check_Gain_Callback(~, ~, handles)
     end
 
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message,data = get_message();
+        message,data = get_message(bt);
         if message == ']'
             R_Gain= data(1);
             disp("Right New Gain Setpoint")
@@ -2696,7 +2725,7 @@ function L_Check_Gain_Callback(~, ~, handles)
         end
 
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-            message,data = get_message();
+            message,data = get_message(bt);
             if message(2) == '}'
                 L_Gain= data(1);
                 disp("Left New Gain Setpoint")
@@ -2990,7 +3019,7 @@ function Check_Baseline_Callback(~, ~, ~)
 
 
         disp('Check Baseline');
-        [message, data] = get_message();
+        [message, data] = get_message(bt);
         if message(2) == 'B'
             if (val_biofb==1)
                 GUI_Variables.basel_biofb=data(1);
