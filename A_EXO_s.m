@@ -115,13 +115,16 @@ function figure1_CloseRequestFcn(hObject, ~, ~) %#ok<*DEFNU>
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: delete(hObject) closes the figure
-
     global GUI_Variables
-    bt = GUI_Variables.BT;
     try
-        fclose(bt);
-    catch
-        disp('Bluetooth already closed');
+        bt = GUI_Variables.BT;
+        try
+            fclose(bt);
+        catch
+            disp('Bluetooth already closed');
+        end
+    catch E
+        disp(E);
     end
     delete(hObject);
 
