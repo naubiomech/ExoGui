@@ -180,9 +180,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     end
     pause(.001);
 
-
-    start_count=0;
-    BT_Was_Disconnected=0;
     GUI_Variables.BT_Was_Disconnected = 0;
     GUI_Variables.start_count = 0;
     set(handles.statusText,'String','Trial has been started');
@@ -1209,56 +1206,11 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
     pause(.01);
     set(handles.statusText,'String',"Checking Bluetooth Connection");
     pause(.01);
-    mem=GUI_Variables.MEM;
     try
         fwrite(bt,char(78))
         try
-            [message, data] = get_message(bt);
-            if message == 'N'
-                check1 = data(1);
-                check2 = data(2);
-                check3 = data(3);
-                if(check1 == 0 && check2 == 1 && check3 == 2)
-                    set(handles.statusText,'String',"Working as Expected!");
-                    set(handles.flag_bluetooth,'Color',[0 1 0]);
-
-                    if mem(1)==0
-                        set(handles.axes8,'Color',[1 0 0])
-                    elseif mem(1)==1
-                        set(handles.axes8,'Color',[0 1 0])
-                    else
-                        set(handles.axes8,'Color',[0 0 1])
-                    end
-                    if mem(2)==0
-                        set(handles.axes10,'Color',[1 0 0])
-                    elseif mem(2)==1
-                        set(handles.axes10,'Color',[0 1 0])
-                    else
-                        set(handles.axes10,'Color',[0 0 1])
-                    end
-                    if mem(3)==0
-                        set(handles.EXP_Params_axes,'Color',[1 0 0])
-                    elseif mem(3)==1
-                        set(handles.EXP_Params_axes,'Color',[0 1 0])
-                    else
-                        set(handles.EXP_Params_axes,'Color',[0 0 1])
-                    end
-                    valBT=1;
-
-                else
-                    try
-                        set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
-                        set(handles.flag_bluetooth,'Color',[1 0 0]);
-                        set(handles.axes8,'Color',[0 0 0])
-                        set(handles.axes10,'Color',[0 0 0])
-                        set(handles.EXP_Params_axes,'Color',[0 0 0])
-                        valBT=0;
-                        fclose(bt);
-                    catch
-                    end
-                end
-            end
-        catch E
+            Receive_Data_Message(GUI_Variables, handles);
+        catch
             set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
             set(handles.flag_bluetooth,'Color',[1 0 0]);
             set(handles.axes8,'Color',[0 0 0])
@@ -1267,7 +1219,7 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
             valBT=0;
             fclose(bt);
         end
-    catch E 
+    catch
         try
             set(handles.flag_bluetooth,'Color',[1 0 0]);
             set(handles.axes8,'Color',[0 0 0])
@@ -1590,24 +1542,15 @@ function [rkp,rkd,rki]=R_Get_PID_Callback(~, ~, handles)
     global GUI_Variables
     bt = GUI_Variables.BT;
 
-    rkp=0;
-    rkd=0;
-    rki=0;
-
     if(bt.Status=="open")
         fwrite(bt,char(107));
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-            [message, data] = get_message(bt);
-            if message == 'k'
-                rkp = data(1);
-                rkd = data(2);
-                rki = data(3);
-                set(handles.R_Kp_text,'String',rkp);
-                set(handles.R_Kd_Text,'String',rkd);
-                set(handles.R_Ki_Text,'String',rki);
-            end
+            Receive_Data_Message(GUI_Variables, handles);
         end
     end
+    rkp = get(handles.R_Kp_text,'String');
+    rkd = get(handles.R_Kp_text,'String');
+    rki = get(handles.R_Kp_text,'String');
 
 % --- Executes on button press in L_Get_PID.
 function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
@@ -1615,24 +1558,18 @@ function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
     global GUI_Variables
     bt = GUI_Variables.BT;
 
-    lkp=0;
-    lkd=0;
-    lki=0;
-
     if(bt.Status=="open")
         fwrite(bt,char(75));
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-            [message, data] = get_message(bt);
-            if message == 'K'
-                lkp = data(1);
-                lkd = data(2);
-                lki = data(3);
-            end
-            set(handles.L_Kp_text,'String',lkp);
-            set(handles.L_Kd_text,'String',lkd);
-            set(handles.L_Ki_text,'String',lki);
+            Receive_Data_Message(GUI_Variables, handles);
         end
     end
+    
+    lkp = get(handles.L_Kp_text,'String');
+    lkd = get(handles.L_Kd_text,'String');
+    lki = get(handles.L_Ki_text,'String');
+
+
 % --- Executes on button press in L_Set_PID.
 function L_Set_PID_Callback(~, ~, handles)
 % hObject    handle to L_Set_PID (see GCBO)
@@ -2468,10 +2405,11 @@ function Load_From_File_Callback(hObject, eventdata, handles)
     pause(0.01)
 
     disp("Check BT")
-    valBT=Check_Bluetooth_Callback(hObject, eventdata, handles);
+    Check_Bluetooth_Callback(hObject, eventdata, handles);
     set(handles.statusText,'String','Connections Checked');
     pause(0.01)
 
+    valBT = bt.Status == 'open';
 
     if valBT==0
         set(handles.statusText,'String','Connect BT before');

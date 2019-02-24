@@ -48,7 +48,7 @@ switch(msg)
   case '`'
     KF_LL = data(1);                                          %Gets the Current Arduino Torque Setpoint
     set(handles.L_Check_KF_Text,'String',KF_LL);
-    disp("Right Current KF ");
+    disp("Left Current KF ");
     disp(KF_LL);
 
   case '~'
@@ -139,6 +139,79 @@ switch(msg)
     dyn_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
     set(handles.Dyn_Text,'String',dyn_val);
     disp(["Check Dyn Val ",num2str(dyn_val)]);
+  case '<'
+      
+    mem=GUI_Variables.MEM;
+    check_torque = data(1);
+    check_FSR = data(2);
+    check_EXP = data(3);
+
+    if(check_torque == 1)
+        set(handles.axes10,'Color',[0 1 0])
+        mem(2)=1;
+    else
+        set(handles.axes10,'Color',[1 0 0])
+        mem(2)=0;
+    end
+    if(check_FSR == 1)
+        set(handles.axes8,'Color',[0 1 0])
+        mem(1)=1;
+    else
+        set(handles.axes8,'Color',[1 0 0])
+        mem(1)=0;
+    end
+    if(check_EXP == 1)
+        set(handles.EXP_Params_axes,'Color',[0 1 0])
+        mem(3)=1;
+    else
+        set(handles.EXP_Params_axes,'Color',[1 0 0])
+        mem(3)=0;
+    end
+    GUI_Variables.MEM = mem;
+  case 'N'
+    mem=GUI_Variables.MEM;
+    check1 = data(1);
+    check2 = data(2);
+    check3 = data(3);
+    if(check1 == 0 && check2 == 1 && check3 == 2)
+        set(handles.statusText,'String',"Working as Expected!");
+        set(handles.flag_bluetooth,'Color',[0 1 0]);
+
+        if mem(1)==0
+            set(handles.axes8,'Color',[1 0 0])
+        elseif mem(1)==1
+            set(handles.axes8,'Color',[0 1 0])
+        else
+            set(handles.axes8,'Color',[0 0 1])
+        end
+        if mem(2)==0
+            set(handles.axes10,'Color',[1 0 0])
+        elseif mem(2)==1
+            set(handles.axes10,'Color',[0 1 0])
+        else
+            set(handles.axes10,'Color',[0 0 1])
+        end
+        if mem(3)==0
+            set(handles.EXP_Params_axes,'Color',[1 0 0])
+        elseif mem(3)==1
+            set(handles.EXP_Params_axes,'Color',[0 1 0])
+        else
+            set(handles.EXP_Params_axes,'Color',[0 0 1])
+        end
+        valBT=1;
+
+    else
+        try
+            set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
+            set(handles.flag_bluetooth,'Color',[1 0 0]);
+            set(handles.axes8,'Color',[0 0 0])
+            set(handles.axes10,'Color',[0 0 0])
+            set(handles.EXP_Params_axes,'Color',[0 0 0])
+            valBT=0;
+            fclose(bt);
+        catch
+        end
+    end
   otherwise
     %Do nothing
 end
