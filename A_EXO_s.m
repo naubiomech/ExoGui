@@ -395,18 +395,11 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
             plotData = plots{whichPlotLeft};
             plotTitle = titles{whichPlotLeft};
 
-            if RLCount <= 1000
-                dataLength = 1:RLCount;
-            else
-                dataLength = (RLCount-1000):RLCount-1;
-            end
-            data = plotData{1}(dataLength);
-            if length(plotData) > 1
-                for i=2:length(plotData)
-                    data = [data; plotData{i}(dataLength)];
-                end
-            end
+            dataLength = max(1, RLCount-1000):RLCount-1;
+            data = cellfun(@(x) x(dataLength), plotData', 'UniformOutput', false);
+            data = cat(1,data{:});
             plot(dataLength, data);
+            xlim([dataLength(1),RLCount-1]);
             title(plotTitle);
 
             whichPlotRight = get(handles.Top_Graph,'Value');
@@ -414,18 +407,11 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
             plotData = plots{whichPlotRight};
             plotTitle = titles{whichPlotRight};
 
-            if RLCount <= 1000
-                dataLength = 1:RLCount;
-            else
-                dataLength = (RLCount-1000):RLCount-1;
-            end
-            data = plotData{1}(dataLength);
-            if length(plotData) > 1
-                for i=2:length(plotData)
-                    data = [data; plotData{i}(dataLength)];
-                end
-            end
+            dataLength = max(1, RLCount-1000):RLCount-1;
+            data = cellfun(@(x) x(dataLength), plotData', 'UniformOutput', false);
+            data = cat(1,data{:});
             plot(dataLength, data);
+            xlim([dataLength(1),RLCount-1]);
             title(plotTitle);
         end
     end
