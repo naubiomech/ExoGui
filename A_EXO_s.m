@@ -527,45 +527,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
                                           %I can pause after it think its finished looping (emptied the buffer), and then check if it should have finished looping (emptied the buffer) and if it is not finished, have it loop again
                 while((bt.bytesAvailable > 0)) % While there are still torque values in the bluetooth buffer
                     if(bt.bytesAvailable > 0)
-                        [msg, Data] = get_message(bt);
-                        if(msg == '?')
-                            RLTRQ(RLCount) = Data(1); % Gets the new Torque Value and Stores it
-                            RLFSR(RLCount) = Data(2);
-                            RLSET(RLCount) = Data(3); % New to save also the set point
-                            RLVOLT(RLCount) = Data(4);
-                            RLVOLT_H(RLCount) = Data(5);
-                            SIG1(RLCount) = Data(11);
-                            SIG3(RLCount) = Data(13);
-                            SIG4(RLCount) = Data(14);
-                            BASER(RLCount)=GUI_Variables.baser;
-
-                            R_BAL_DYN_HEEL(RLCount)=GUI_Variables.R_Bal_steady_Heel;
-                            R_BAL_STEADY_HEEL(RLCount)=GUI_Variables.R_BAL_STEADY_HEEL;
-                            R_BAL_DYN_TOE(RLCount)=GUI_Variables.R_Bal_dyn_Toe;
-                            R_BAL_STEADY_TOE(RLCount)=GUI_Variables.R_Bal_steady_Toe;
-                            BASEL_BIOFB(RLCount)=GUI_Variables.basel_biofb;
-
-
-                            RLCount = RLCount + 1;                                         %Increments kneeCount                                          %Checks if Ankle Arduino Sent a new Torque Value
-                            LLTRQ(LLCount) = Data(6);              %Gets the new Torque Value and stores it
-                            LLFSR(LLCount) = Data(7);
-                            LLSET(LLCount) = Data(8); % New to save also the set point
-                            LLVOLT(LLCount) = Data(9);
-                            LLVOLT_H(LLCount) = Data(10);
-                            SIG2(LLCount) = Data(12);
-                            BASEL(LLCount)=GUI_Variables.basel;
-                            LLCount = LLCount + 1; % Increments kneeCount Checks if Ankle Arduino Sent a new Torque Value
-                            BASEL_BIOFB(LLCount)=GUI_Variables.basel_biofb;
-
-
-                            L_BAL_DYN_HEEL(LLCount)=GUI_Variables.L_Bal_dyn_Heel;
-                            L_BAL_STEADY_HEEL(LLCount)=GUI_Variables.L_Bal_steady_Heel;
-                            L_BAL_DYN_TOE(LLCount)=GUI_Variables.L_Bal_dyn_Toe;
-                            L_BAL_STEADY_TOE(LLCount)=GUI_Variables.L_Bal_steady_Toe;
-
-                        else
-                            command(msg, data, handles)
-                        end
+                        GUI_Variables = Receive_Data_Message(GUI_Variables);
                     end                                                                  %Pause Long enough for any data in transit
                 end
                 pause(.5);
@@ -964,38 +926,7 @@ function Check_Memory_Callback(~, ~, handles)
     mem=GUI_Variables.MEM;
     if(bt.Status == "open")
         fwrite(bt,char(60));
-        try
-            [message, data] = get_message(bt);
-        catch
-        end
-        if message == '<'
-
-            check_torque = data(1);
-            check_FSR = data(2);
-            check_EXP = data(3);
-
-            if(check_torque == 1)
-                set(handles.axes10,'Color',[0 1 0])
-                mem(2)=1;
-            else
-                set(handles.axes10,'Color',[1 0 0])
-                mem(2)=0;
-            end
-            if(check_FSR == 1)
-                set(handles.axes8,'Color',[0 1 0])
-                mem(1)=1;
-            else
-                set(handles.axes8,'Color',[1 0 0])
-                mem(1)=0;
-            end
-            if(check_EXP == 1)
-                set(handles.EXP_Params_axes,'Color',[0 1 0])
-                mem(3)=1;
-            else
-                set(handles.EXP_Params_axes,'Color',[1 0 0])
-                mem(3)=0;
-            end
-        end
+        GUI_Variables = Receive_Data_Message(GUI_Variables);
     else
         disp("the status bt is not opened")
         set(handles.axes8,'Color',[0 0 0])
@@ -1035,18 +966,7 @@ function lkf=L_Check_KF_Callback(~, ~, handles)
     if (bt.Status=="open")
         fwrite(bt,'`'); % send the character "`"
         if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-            [message, data] = get_message(bt);
-            if message(2) == '`'
-                KF_LL = data(1);
-
-                set(handles.L_Check_KF_Text,'String',KF_LL);
-                disp("Left Current KF ");
-                disp(KF_LL);
-                lkf=KF_LL;
-            else
-                disp("Something wrong in KF");
-                set(handles.L_Check_KF_Text,'String',"NaN");
-            end
+            GUI_Variables = Receive_Data_Message(GUI_Variables);
         end
     end
 
@@ -1704,17 +1624,7 @@ function R_Get_Setpoint_Callback(~, ~, handles)
     end
 
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        [message, data] = get_message(bt);
-        if message == 'd'
-            Setpoint_RL = data(1);
-            Setpoint_Dorsi_RL = data(2);
-            disp("Right New Setpoint")
-            disp(Setpoint_RL)
-            disp(Setpoint_Dorsi_RL)
-            set(handles.R_Setpoint_Text,'String',Setpoint_RL);
-            set(handles.R_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_RL);
-        end
-
+        GUI_Variables = Receive_Data_Message(GUI_Variables);
     end
 % --- Executes on button press in L_Get_Setpoint.
 function L_Get_Setpoint_Callback(~, ~, handles)
@@ -1726,15 +1636,8 @@ function L_Get_Setpoint_Callback(~, ~, handles)
                     % 68 to Arduino Which the Arduino understands to
                     % send parameters back
                     % Gets the Current Arduino Torque Setpoint if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-    [message, data] = get_message(bt);
-    if message == 'D'
-        Setpoint_LL = data(1);
-        Setpoint_Dorsi_LL = data(2);
-        set(handles.L_Setpoint_Text,'String',Setpoint_LL);
-        set(handles.L_Setpoint_Dorsi_Text,'String',Setpoint_Dorsi_LL);
-        disp("Left New Setpoint")
-        disp(Setpoint_LL)
-    end
+    
+    GUI_Variables = Receive_Data_Message(GUI_Variables);
 
 
 function L_Setpoint_Edit_Callback(~, ~, ~)
@@ -1801,18 +1704,8 @@ function [n1,n2,n3]=Get_Smoothing_Callback(~, ~, handles)
         try
             fwrite(bt,'(');
             if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-                [message, data] = get_message(bt);
-                if message == '('
-                    N1 = data(1);
-                    N2 = data(2);
-                    N3 = data(3);
-                    n1=N1;
-                    n2=N2;
-                    n3=N3;
-                    set(handles.N1_Text,'String',N1);
-                    set(handles.N2_Text,'String',N2);
-                    set(handles.N3_Text,'String',N3);
-                end
+                
+                GUI_Variables = Receive_Data_Message(GUI_Variables);
 
             end
         catch
@@ -2021,15 +1914,9 @@ function rkf=R_Check_KF_Callback(~, ~, handles)
         try
 
             fwrite(bt,'~'); % send the character "~"
-            [message, data] = get_message(bt);
             if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-                if message == '~'
-                    KF_RL = data(1);
-                    set(handles.R_Check_KF_Text,'String',KF_RL);
-                    disp("Right Current KF ");
-                    disp(KF_RL);
-                    rkf=KF_RL;
-                end
+
+                GUI_Variables = Receive_Data_Message(GUI_Variables);
             end
         catch
             disp("Impossible to know KF");
@@ -2048,18 +1935,7 @@ function lfsr=L_Check_FSR_Th_Callback(~, ~, handles)
     bt = GUI_Variables.BT;
     lfsr=0;
     if (bt.Status=="open")
-        fwrite(bt,char('Q')); % send the character "Q"
-        if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-            message,data = get_message(bt);
-            if message == 'Q'
-                FSR_thresh_LL = data(1);
-                set(handles.L_Check_FSR_Text,'String',FSR_thresh_LL);
-                disp("Left Current FSR th ");
-                disp(FSR_thresh_LL);
-                lfsr=FSR_thresh_LL;
-            end
-
-        end
+        GUI_Variables = Receive_Data_Message(GUI_Variables);
     end
     if (bt.Status=="closed")
         disp("Impossible to know FSR THs");
@@ -2578,13 +2454,8 @@ function R_Check_Gain_Callback(~, ~, handles)
     end
 
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message,data = get_message(bt);
-        if message == ']'
-            R_Gain= data(1);
-            disp("Right New Gain Setpoint")
-            disp(R_Gain)
-            set(handles.R_Check_Gain_Text,'String',R_Gain);
-        end
+        
+        GUI_Variables = Receive_Data_Message(GUI_Variables);
 
     end
 
@@ -2647,13 +2518,8 @@ function L_Check_Gain_Callback(~, ~, handles)
         end
 
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-            message,data = get_message(bt);
-            if message(2) == '}'
-                L_Gain= data(1);
-                disp("Left New Gain Setpoint")
-                disp(L_Gain)
-                set(handles.L_Check_Gain_Text,'String',L_Gain);
-            end
+
+            GUI_Variables = Receive_Data_Message(GUI_Variables);
 
         end
     catch
@@ -2941,29 +2807,8 @@ function Check_Baseline_Callback(~, ~, ~)
 
 
         disp('Check Baseline');
-        [message, data] = get_message(bt);
-        if message(2) == 'B'
-            if (val_biofb==1)
-                GUI_Variables.basel_biofb=data(1);
-                disp(GUI_Variables.basel_biofb)
-            elseif (val==1)
-                GUI_Variables.L_Bal_steady_Toe= data(1);
-                GUI_Variables.L_Bal_steady_Heel= data(2);
-                GUI_Variables.R_Bal_steady_Toe= data(3);
-                GUI_Variables.R_Bal_steady_Heel= data(4);
-
-                GUI_Variables.L_Bal_dyn_Toe= data(5);
-                GUI_Variables.L_Bal_dyn_Heel= data(6);
-                GUI_Variables.R_Bal_dyn_Toe= data(7);
-                GUI_Variables.R_Bal_dyn_Heel= data(8);
-            elseif(val==0)
-                GUI_Variables.basel= data(1);
-                GUI_Variables.baser= data(2);
-                disp(GUI_Variables.basel);
-                disp(GUI_Variables.baser);
-
-            end
-        end
+        
+        GUI_Variables = Receive_Data_Message(GUI_Variables);
     catch
     end
 
