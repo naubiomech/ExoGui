@@ -9,7 +9,9 @@ function [msg, data] = get_message(bt)
     if length(header) == 3 && header(1) == 'S'
         msg = header(2);
         count = header(3);
-        data = fread(bt, count, 'float')';
+        if count > 0
+            data = fread(bt, count, 'float')';
+        end
     end
     
     if count ~= length(data)
