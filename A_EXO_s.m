@@ -3203,15 +3203,8 @@ function Check_Steady_Val_Callback(~, ~, handles)
     if(bt.Status=="open")
         try
             fwrite(bt,'V');
-
             if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-                message = fgetl(bt);
-                if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'V'
-                    indexes = find(message==44);
-                    steady_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
-                    set(handles.Steady_Text,'String',steady_val);
-                    disp(['Check Steady Val ',num2str(steady_val)]);
-                end
+                GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
             end
         catch
         end
@@ -3248,12 +3241,8 @@ function Check_Dyn_Val_Callback(~, ~, handles)
             fwrite(bt,'A');
 
             if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-                message = fgetl(bt);
-                if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'A'
-                    indexes = find(message==44);
-                    dyn_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
-                    set(handles.Dyn_Text,'String',dyn_val);
-                    disp(['Check Steady Val ',num2str(dyn_val)]);
+                if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
+                    GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
                 end
             end
 
@@ -3349,9 +3338,6 @@ function BT_Auto_Reconnection_Callback(~, ~, handles)
 
 
 
-
-
-
 % --- Executes on button press in radiobutton23.
 function radiobutton23_Callback(~, ~, ~)
 % hObject    handle to radiobutton23 (see GCBO)
@@ -3359,12 +3345,6 @@ function radiobutton23_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of radiobutton23
-
-
-
-
-
-
 
 
 
