@@ -467,9 +467,20 @@ function GUI_Variables = Reset_GUI_Variables(GUI_Variables)
     GUI_Variables.BASER=NaN(1,allocated);
 
     GUI_Variables.BASEL_BIOFB=NaN(1,allocated);
-
-
+    
+    GUI_Variables.BT_Was_Disconnected = 0;
     GUI_Variables.counter=0;
+    GUI_Variables.COUNT = 0;
+
+    GUI_Variables.flag_calib=0;
+    GUI_Variables.flag_start=0;
+    GUI_Variables.first_calib=0;
+    GUI_Variables.flag_end_trial=1;
+
+    GUI_Variables.L_COUNT_SPEED=[];
+    GUI_Variables.R_COUNT_SPEED=[];
+
+
 
 % --- Executes on button press in End_Trial.
 function End_Trial_Callback(hObject, eventdata, handles)
@@ -773,29 +784,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         fclose(fileID);
 
         set(handles.statusText,'String','Data has finished being Saved');
-        RLTRQ = [];
-        RLFSR = [];
-        LLTRQ =[];
-        LLFSR =[];
-
-        LLSET =[];
-        RLSET =[];
-        LLVOLT=[];
-        RLVOLT=[];
-        LLVOLT_H=[];
-        RLVOLT_H=[];
-
-        SIG1=[];
-        SIG2=[];
-        SIG3=[];
-        SIG4=[];
-
-        BASEL=[];
-        BASER=[];
-        BASEL_BIOFB=[];
-
-        LLCount = 1;
-        RLCount = 1;
+        GUI_Variables = Reset_GUI_Variables(GUI_Variables);
         bt.UserData = bt.UserData + 1; % Increments the trial number
 
 
@@ -818,40 +807,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
-
-        GUI_Variables.RLTRQ = RLTRQ;
-        GUI_Variables.LLTRQ = LLTRQ;
-        GUI_Variables.RLFSR = RLFSR;
-        GUI_Variables.LLFSR = LLFSR;
-        GUI_Variables.RLCount = RLCount;
-        GUI_Variables.LLCount = LLCount;
-
-        GUI_Variables.LLSET = LLSET;
-        GUI_Variables.RLSET = RLSET;
-        GUI_Variables.LLVOLT = LLVOLT;
-        GUI_Variables.RLVOLT = RLVOLT;
-        GUI_Variables.LLVOLT_H = LLVOLT_H;
-        GUI_Variables.RLVOLT_H = RLVOLT_H;
-        GUI_Variables.COUNT =0;
-
-        GUI_Variables.flag_calib=0;
-        GUI_Variables.flag_start=0;
-        GUI_Variables.first_calib=0;
-
-        GUI_Variables.L_COUNT_SPEED=[];
-        GUI_Variables.R_COUNT_SPEED=[];
-
-        GUI_Variables.SIG1=SIG1;
-        GUI_Variables.SIG2=SIG2;
-        GUI_Variables.SIG3=SIG3;
-        GUI_Variables.SIG4=SIG4;
-
-        GUI_Variables.BASEL=BASEL;
-        GUI_Variables.BASER=BASER;
-
-        GUI_Variables.BASEL_BIOFB=BASEL_BIOFB;
-
-        GUI_Variables.flag_end_trial=1;
 
     else
         set(handles.L_Get_Setpoint,'Enable','on');
