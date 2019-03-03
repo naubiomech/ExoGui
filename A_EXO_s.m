@@ -94,6 +94,8 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'PropOn',0,'SSID','No_ID');
+                       
+    GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     guidata(hObject, handles);
 
 
@@ -188,8 +190,11 @@ function Start_Trial_Callback(hObject, eventdata, handles)
         disp('both connected')
         while strcmp(get(handles.Start_Trial,'Enable'), 'off')
             GUI_Variables = Update_GUI(GUI_Variables, handles);
+
+            guidata(hObject, handles);
         end
     end
+    guidata(hObject, handles);
 
 function GUI_Variables = Update_GUI(GUI_Variables, handles)
     RLCount = GUI_Variables.RLCount;
@@ -359,7 +364,7 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
 
 
         if(mod(RLCount,100) == 0)
-            draw_graphs(handles)
+            draw_graphs(handles, GUI_Variables)
         end
     end
 
@@ -368,9 +373,8 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
     GUI_Variables.start_count = start_count;
     GUI_Variables.BT_Was_Disconnected = BT_Was_Disconnected;
 
-    guidata(hObject, handles);
     
-function draw_graphs(handles)
+function draw_graphs(handles, GUI_Variables)
       plots = {{GUI_Variables.RLTRQ, GUI_Variables.RLSET}, ...
              {GUI_Variables.RLFSR}, ...
              {GUI_Variables.LLTRQ}, ...
@@ -399,14 +403,15 @@ function draw_graphs(handles)
               "RL Force Toe and Heel","SIG1","SIG2", ...
               "SIG3","SIG4","Left Balance", "Right Balance"};
           
+    RLCount = GUI_Variables.RLCount;
   
     whichPlotLeft = get(handles.Bottom_Graph,'Value');
     whichPlotRight = get(handles.Top_Graph,'Value');
-    draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes);
-    draw_graph(whichPlotRight, plots, titles, handles.Top_Axes);
+    draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
+    draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
 
           
-function draw_graph(whichPlot, plots, titles, axis)
+function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
     plotData = plots{whichPlot};
     plotTitle = titles{whichPlot};
@@ -417,7 +422,7 @@ function draw_graph(whichPlot, plots, titles, axis)
     
     plot(dataLength, data);
     
-    xlim([dataLength(1),RLCount-1]);
+    xlim([dataLength(1),RLCount]);
     title(plotTitle);
         
 function GUI_Variables = Reset_GUI_Variables(GUI_Variables)
@@ -426,8 +431,8 @@ function GUI_Variables = Reset_GUI_Variables(GUI_Variables)
     GUI_Variables.basel = 0;
     GUI_Variables.baser = 0;
 
-    GUI_Variables.RLCount = 1;
-    GUI_Variables.LLCount = 1;
+    GUI_Variables.RLCount = 2;
+    GUI_Variables.LLCount = 2;
     GUI_Variables.LLFSR = NaN(1,allocated);
     GUI_Variables.RLFSR = NaN(1,allocated);
     GUI_Variables.RLTRQ = NaN(1,allocated);
@@ -1110,6 +1115,7 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
     pause(.01);
     set(handles.statusText,'String',"Checking Bluetooth Connection");
     pause(.01);
+    draw_graphs(handles, GUI_Variables);   
     try
         fwrite(bt,char(78))
         try
