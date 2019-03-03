@@ -629,10 +629,10 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
         if isempty(GUI_Variables.COUNT) || (length(GUI_Variables.COUNT)==1) %beacuse the first is zero
         else
-            count_trig_c=GUI_Variables.COUNT(2:end);
+            count_trig_c=[1;GUI_Variables.COUNT(2:end);length(TRIG)];
 
-            for i=1:length(count_trig_c)
-                TRIG(count_trig_c(i))=1;
+            for i=2:length(count_trig_c)
+                TRIG(count_trig_c(i-1):count_trig_c(i))=i - 2;
             end
 
         end
