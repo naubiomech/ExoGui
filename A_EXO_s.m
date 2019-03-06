@@ -1047,19 +1047,19 @@ function Send_Trig_Callback(~, ~, handles)
             count_trig=LLCount;
         end
     end
+    
 
-    try
-        tic
-        writeDigitalPin(GUI_Variables.UNO, 'D5', 1);
-        toc
-    catch
-    end
     GUI_Variables.COUNT=[GUI_Variables.COUNT;count_trig];
     GUI_Variables.counter=GUI_Variables.counter+1;
     cane=GUI_Variables.counter;
     set(handles.TRIG_NUM_TEXT,'String',num2str(cane));
     try
-        writeDigitalPin(GUI_Variables.UNO, 'D5', 0);
+        for i = 1:GUI_Variables.counter
+            writeDigitalPin(GUI_Variables.UNO, 'D5', 1);
+            pause(0.01);
+            writeDigitalPin(GUI_Variables.UNO, 'D5', 0);
+            pause(0.01);
+        end
     catch
     end
 
