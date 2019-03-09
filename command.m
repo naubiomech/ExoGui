@@ -71,8 +71,8 @@ switch(msg)
     lkd = data(2);
     lki = data(3);
     update_value_handles(lkp, handles.L_Kp_text, handles.L_Kp_Edit);
-    update_value_handles(lkd, handles.L_Kd_Text, handles.L_Kd_Edit);
-    update_value_handles(lki, handles.L_Ki_Text, handles.L_Ki_Edit);
+    update_value_handles(lkd, handles.L_Kd_text, handles.L_Kd_Edit);
+    update_value_handles(lki, handles.L_Ki_text, handles.L_Ki_Edit);
   case 'k'
     rkp = data(1);
     rkd = data(2);
