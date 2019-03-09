@@ -145,28 +145,9 @@ switch(msg)
     check_torque = data(1);
     check_FSR = data(2);
     check_EXP = data(3);
-
-    if(check_torque == 1)
-        set(handles.axes10,'Color',[0 1 0])
-        mem(2)=1;
-    else
-        set(handles.axes10,'Color',[1 0 0])
-        mem(2)=0;
-    end
-    if(check_FSR == 1)
-        set(handles.axes8,'Color',[0 1 0])
-        mem(1)=1;
-    else
-        set(handles.axes8,'Color',[1 0 0])
-        mem(1)=0;
-    end
-    if(check_EXP == 1)
-        set(handles.EXP_Params_axes,'Color',[0 1 0])
-        mem(3)=1;
-    else
-        set(handles.EXP_Params_axes,'Color',[1 0 0])
-        mem(3)=0;
-    end
+    mem = check_memory(check_torque, handles.axes10,mem,2);
+    mem = check_memory(check_FSR, handles.axes8,mem,1);
+    mem = check_memory(check_EXP, handles.EXP_Params_axes,mem,3);
     GUI_Variables.MEM = mem;
   case 'N'
     mem=GUI_Variables.MEM;
@@ -177,41 +158,36 @@ switch(msg)
         set(handles.statusText,'String',"Working as Expected!");
         set(handles.flag_bluetooth,'Color',[0 1 0]);
 
-        if mem(1)==0
-            set(handles.axes8,'Color',[1 0 0])
-        elseif mem(1)==1
-            set(handles.axes8,'Color',[0 1 0])
-        else
-            set(handles.axes8,'Color',[0 0 1])
-        end
-        if mem(2)==0
-            set(handles.axes10,'Color',[1 0 0])
-        elseif mem(2)==1
-            set(handles.axes10,'Color',[0 1 0])
-        else
-            set(handles.axes10,'Color',[0 0 1])
-        end
-        if mem(3)==0
-            set(handles.EXP_Params_axes,'Color',[1 0 0])
-        elseif mem(3)==1
-            set(handles.EXP_Params_axes,'Color',[0 1 0])
-        else
-            set(handles.EXP_Params_axes,'Color',[0 0 1])
-        end
+        set_memory_color(handles.axes8, mem(1))
+        set_memory_color(handles.axes10, mem(2))
+        set_memory_color(handles.EXP_Params_axes, mem(3))
+
         valBT=1;
 
     else
-        try
-            set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
-            set(handles.flag_bluetooth,'Color',[1 0 0]);
-            set(handles.axes8,'Color',[0 0 0])
-            set(handles.axes10,'Color',[0 0 0])
-            set(handles.EXP_Params_axes,'Color',[0 0 0])
-            valBT=0;
-            fclose(bt);
-        catch
-        end
+        set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
+        set(handles.flag_bluetooth,'Color',[1 0 0]);
+        set(handles.axes8,'Color',[0 0 0])
+        set(handles.axes10,'Color',[0 0 0])
+        set(handles.EXP_Params_axes,'Color',[0 0 0])
+        valBT=0;
+        fclose(bt);
     end
   otherwise
     %Do nothing
 end
+
+
+function mem = check_memory(check, axis, mem, mem_index)
+    mem(mem_index) = check;
+    set_memory_color(axis, check)
+
+
+function set_memory_color(axis, value)
+    if value==0
+        set(axis,'Color',[1 0 0])
+    elseif value==1
+        set(axis,'Color',[0 1 0])
+    else
+        set(axis,'Color',[0 0 1])
+    end
