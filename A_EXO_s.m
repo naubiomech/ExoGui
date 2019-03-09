@@ -1399,6 +1399,7 @@ function R_Set_PID_Callback(~, ~, handles)
         fwrite(bt,kp,'double');                                   %Sends the new Torque Value to Arduino
         fwrite(bt,kd,'double');
         fwrite(bt,ki,'double');
+        R_Get_PID_Callback(0,0,handles);
     end
 
 % --- Executes on button press in R_Get_PID.
@@ -1486,6 +1487,7 @@ function L_Set_PID_Callback(~, ~, handles)
         fwrite(bt,kp,'double'); % Sends the new Torque Value to Arduino
         fwrite(bt,kd,'double');
         fwrite(bt,ki,'double');
+        L_Get_PID_Callback(0,0,handles);
     end
 
 function L_Kp_Edit_Callback(~, ~, ~)
