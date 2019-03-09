@@ -543,7 +543,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
                                           %I can pause after it think its finished looping (emptied the buffer), and then check if it should have finished looping (emptied the buffer) and if it is not finished, have it loop again
                 while((bt.bytesAvailable > 0)) % While there are still torque values in the bluetooth buffer
                     if(bt.bytesAvailable > 0)
-                        GUI_Variables = Receive_Data_Message(GUI_Variables);
+                        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
                     end                                                                  %Pause Long enough for any data in transit
                 end
                 pause(.5);
@@ -926,7 +926,7 @@ function lkf=L_Check_KF_Callback(~, ~, handles)
     if (bt.Status=="open")
         fwrite(bt,'`'); % send the character "`"
         if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-            GUI_Variables = Receive_Data_Message(GUI_Variables);
+            GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
         end
     end
 
@@ -1585,7 +1585,7 @@ function R_Get_Setpoint_Callback(~, ~, handles)
     end
 
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        GUI_Variables = Receive_Data_Message(GUI_Variables);
+        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
     end
 % --- Executes on button press in L_Get_Setpoint.
 function L_Get_Setpoint_Callback(~, ~, handles)
@@ -1598,7 +1598,7 @@ function L_Get_Setpoint_Callback(~, ~, handles)
                     % send parameters back
                     % Gets the Current Arduino Torque Setpoint if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
     
-    GUI_Variables = Receive_Data_Message(GUI_Variables);
+    GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
 
 
 function L_Setpoint_Edit_Callback(~, ~, ~)
@@ -1666,7 +1666,7 @@ function [n1,n2,n3]=Get_Smoothing_Callback(~, ~, handles)
             fwrite(bt,'(');
             if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
                 
-                GUI_Variables = Receive_Data_Message(GUI_Variables);
+                GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
 
             end
         catch
@@ -1877,7 +1877,7 @@ function rkf=R_Check_KF_Callback(~, ~, handles)
             fwrite(bt,'~'); % send the character "~"
             if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
 
-                GUI_Variables = Receive_Data_Message(GUI_Variables);
+                GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
             end
         catch
             disp("Impossible to know KF");
@@ -1896,7 +1896,7 @@ function lfsr=L_Check_FSR_Th_Callback(~, ~, handles)
     bt = GUI_Variables.BT;
     lfsr=0;
     if (bt.Status=="open")
-        GUI_Variables = Receive_Data_Message(GUI_Variables);
+        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
     end
     if (bt.Status=="closed")
         disp("Impossible to know FSR THs");
@@ -2416,7 +2416,7 @@ function R_Check_Gain_Callback(~, ~, handles)
 
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
         
-        GUI_Variables = Receive_Data_Message(GUI_Variables);
+        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
 
     end
 
@@ -2480,7 +2480,7 @@ function L_Check_Gain_Callback(~, ~, handles)
 
         if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
 
-            GUI_Variables = Receive_Data_Message(GUI_Variables);
+            GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
 
         end
     catch
@@ -2769,7 +2769,7 @@ function Check_Baseline_Callback(~, ~, ~)
 
         disp('Check Baseline');
         
-        GUI_Variables = Receive_Data_Message(GUI_Variables);
+        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
     catch
     end
 
