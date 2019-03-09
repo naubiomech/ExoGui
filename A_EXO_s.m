@@ -886,7 +886,7 @@ function Check_Memory_Callback(~, ~, handles)
     mem=GUI_Variables.MEM;
     if(bt.Status == "open")
         fwrite(bt,char(60));
-        GUI_Variables = Receive_Data_Message(GUI_Variables);
+        GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
     else
         disp("the status bt is not opened")
         set(handles.axes8,'Color',[0 0 0])
