@@ -1551,6 +1551,8 @@ function R_Set_Setpoint_Callback(~, ~, handles)
     fwrite(bt,NewSetpoint,'double');
     NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit, 'String')); % Gets the Value entered into the edit Box in the G
     fwrite(bt,NewSetpoint_Dorsi,'double');
+    
+    R_Get_Setpoint_Callback(0,0,handles);
 
 function R_Setpoint_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Setpoint_Edit (see GCBO)
@@ -1652,6 +1654,8 @@ function L_Set_Setpoint_Callback(~, ~, handles)
     plot([1 1],ylim,'-.k')
 
     plot(xlim,[NewSetpoint NewSetpoint],'-.k')
+    
+    L_Get_Setpoint_Callback(0,0,handles);
 
 % --- Executes on button press in Get_Smoothing.
 function [n1,n2,n3]=Get_Smoothing_Callback(~, ~, handles)
@@ -1848,7 +1852,7 @@ function R_Send_KF_Callback(~, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
     new_KF = str2double(get(handles.R_Send_KF_Edit,'String')); % Gets the Value entered into the edit Box in the G
 
-    global GUI_Variables
+    global GUGI_Variables
     state=GUI_Variables.state;
     disp(state);
 
