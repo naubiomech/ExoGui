@@ -106,7 +106,7 @@ switch(msg)
   case 'B'
     val=strcmp(get(handles.Balance_Text,'String'),'On');
     get(handles.Activate_BioFeedback_Text,'String')
-    val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')
+    val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
     
     if (val_biofb==1)
         disp('biofeedback baseline');
