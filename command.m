@@ -59,13 +59,13 @@ switch(msg)
   case 'D'
     Setpoint_LL = data(1);
     Setpoint_Dorsi_LL = data(2);
-    update_setpoint(handles.L_Setpoint_Text,handles.L_Setpoint_Edit, Setpoint_LL);
-    update_setpoint(handles.L_Setpoint_Dorsi_Text,handles.L_Setpoint_Dorsi_Edit, Setpoint_Dorsi_LL);
+    update_setpoint(Setpoint_LL, handles.L_Setpoint_Text,handles.L_Setpoint_Edit);
+    update_setpoint(Setpoint_Dorsi_LL, handles.L_Setpoint_Dorsi_Text,handles.L_Setpoint_Dorsi_Edit);
   case 'd'
     Setpoint_RL = data(1);
     Setpoint_Dorsi_RL = data(2);
-    update_setpoint(handles.R_Setpoint_Text,handles.R_Setpoint_Edit, Setpoint_RL);
-    update_setpoint(handles.R_Setpoint_Dorsi_Text,handles.R_Setpoint_Dorsi_Edit, Setpoint_Dorsi_RL);
+    update_value_handles(Setpoint_RL, handles.R_Setpoint_Text,handles.R_Setpoint_Edit);
+    update_value_handles(Setpoint_Dorsi_RL, handles.R_Setpoint_Dorsi_Text,handles.R_Setpoint_Dorsi_Edit);
   case 'K'
     lkp = data(1);
     lkd = data(2);
@@ -177,14 +177,14 @@ switch(msg)
     %Do nothing
 end
 
-function update_setpoint(text_handle, edit_handle, setpoint)
+function update_value_handles(new_value, text_handle, edit_handle)
     old_setpoint = get(text_handle,'String');
     current_edit = get(edit_handle,'String');
-    set(text_handle,'String',setpoint);
+    set(text_handle,'String',new_value);
     if (strcmp(current_edit,"NaN")) || (~isempty(old_setpoint) && strcmp(old_setpoint,current_edit))
-        set(edit_handle,'String',setpoint);
+        set(edit_handle,'String',new_value);
     end
-
+    
 function mem = check_memory(check, axis, mem, mem_index)
     mem(mem_index) = check;
     set_memory_color(axis, check)
