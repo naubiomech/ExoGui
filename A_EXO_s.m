@@ -1399,6 +1399,7 @@ function R_Set_PID_Callback(~, ~, handles)
         fwrite(bt,kp,'double');                                   %Sends the new Torque Value to Arduino
         fwrite(bt,kd,'double');
         fwrite(bt,ki,'double');
+        pause(0.3);
         R_Get_PID_Callback(0,0,handles);
     end
 
@@ -1487,6 +1488,7 @@ function L_Set_PID_Callback(~, ~, handles)
         fwrite(bt,kp,'double'); % Sends the new Torque Value to Arduino
         fwrite(bt,kd,'double');
         fwrite(bt,ki,'double');
+        pause(0.3);
         L_Get_PID_Callback(0,0,handles);
     end
 
@@ -1553,7 +1555,8 @@ function R_Set_Setpoint_Callback(~, ~, handles)
     fwrite(bt,NewSetpoint,'double');
     NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit, 'String')); % Gets the Value entered into the edit Box in the G
     fwrite(bt,NewSetpoint_Dorsi,'double');
-    
+
+    pause(0.3);
     R_Get_Setpoint_Callback(0,0,handles);
 
 function R_Setpoint_Edit_Callback(~, ~, ~)
@@ -1656,7 +1659,8 @@ function L_Set_Setpoint_Callback(~, ~, handles)
     plot([1 1],ylim,'-.k')
 
     plot(xlim,[NewSetpoint NewSetpoint],'-.k')
-    
+
+    pause(0.3);
     L_Get_Setpoint_Callback(0,0,handles);
 
 % --- Executes on button press in Get_Smoothing.
