@@ -70,16 +70,16 @@ switch(msg)
     lkp = data(1);
     lkd = data(2);
     lki = data(3);
-    set(handles.L_Kp_text,'String',lkp);
-    set(handles.L_Kd_text,'String',lkd);
-    set(handles.L_Ki_text,'String',lki);
+    update_value_handles(lkp, handles.L_Kp_text, handles.L_Kp_Edit);
+    update_value_handles(lkd, handles.L_Kd_Text, handles.L_Kd_Edit);
+    update_value_handles(lki, handles.L_Ki_Text, handles.L_Ki_Edit);
   case 'k'
     rkp = data(1);
     rkd = data(2);
     rki = data(3);
-    set(handles.R_Kp_text,'String',rkp);
-    set(handles.R_Kd_Text,'String',rkd);
-    set(handles.R_Ki_Text,'String',rki);
+    update_value_handles(rkp, handles.R_Kp_text, handles.R_Kp_Edit);
+    update_value_handles(rkd, handles.R_Kd_Text, handles.R_Kd_Edit);
+    update_value_handles(rki, handles.R_Ki_Text, handles.R_Ki_Edit);
   case 'Q'
     FSR_thresh_LL = data(1);
     set(handles.L_Check_FSR_Text,'String',FSR_thresh_LL);
