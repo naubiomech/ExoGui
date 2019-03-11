@@ -403,7 +403,7 @@ function draw_graphs(handles, GUI_Variables)
 
           
 function draw_graph(whichPlot, plots, titles, axis, curr_plot, RLCount)
-    % axes(axis);
+    axes(axis);
     plotData = plots{whichPlot};
     plotTitle = titles{whichPlot};
 
@@ -412,10 +412,8 @@ function draw_graph(whichPlot, plots, titles, axis, curr_plot, RLCount)
     set(curr_plot, {'XData'}, {dataLength});
     set(curr_plot, {'YData'}, data);
 
-    % plot(dataLength, data);
-    
-    xlim([dataLength(1),RLCount]);
-    title(plotTitle);
+    xlim(axis, [dataLength(1),RLCount]);
+    title(axis, plotTitle);
         
 function GUI_Variables = Reset_GUI_Variables(GUI_Variables)
     allocated = 100000;
