@@ -1063,7 +1063,6 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
     pause(.01);
     set(handles.statusText,'String',"Checking Bluetooth Connection");
     pause(.01);
-    draw_graphs(handles, GUI_Variables);   
     try
         fwrite(bt,char(78))
         try
