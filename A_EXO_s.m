@@ -79,7 +79,6 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
         Uno=0;
     end
 
-    global GUI_Variables
     GUI_Variables = struct('BT',bt,'IP','0.0.0.0','t',0,'Timer',NaN,'state',0,'RLTRQ',NaN(1,60000), ...
                            'LLTRQ',NaN(1,60000),'LLFSR',NaN(1,60000),'RLFSR',NaN(1,60000),...
                            'LLVOLT',NaN(1,60000),'RLVOLT',NaN(1,60000),'LLVOLT_H',NaN(1,60000),'RLVOLT_H',NaN(1,60000),'RLCount',1,'LLCount',1,...
@@ -101,6 +100,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'BusyMode','drop', 'TimerFcn', {@Update_GUI, hObject});
                        
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
+    handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
 
 
@@ -122,7 +122,7 @@ function figure1_CloseRequestFcn(hObject, ~, ~, handles) %#ok<*DEFNU>
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: delete(hObject) closes the figure
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     try
         bt = GUI_Variables.BT;
         try
@@ -141,7 +141,7 @@ function figure1_CloseRequestFcn(hObject, ~, ~, handles) %#ok<*DEFNU>
 function Start_Trial_Callback(hObject, eventdata, handles)
 %Make a further check of the connection before starting
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(GUI_Variables.flag_end_trial==1)
@@ -196,22 +196,23 @@ function Start_Trial_Callback(hObject, eventdata, handles)
         start(handles.TimerMessage);
         start(handles.TimerGUIUpdate);
     end
+    handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
     
 function accept_message(~,~,hObject)
     handles = guidata(hObject);
-    %GUI_Variables = handles.GUI_Variables;
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     while bt.bytesAvailable() > 0
-        GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+        handles.GUI_Variables = Receive_Data_Message(handles.GUI_Variables, handles);
+        guidata(hObject, handles);
     end
+    guidata(hObject, handles);
 
         
 function Update_GUI(~,~,hObject)
     handles = guidata(hObject);
-    %GUI_Variables = handles.GUI_Variables;
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
 
     RLCount = GUI_Variables.RLCount;
     LLCount = GUI_Variables.LLCount;
@@ -358,6 +359,7 @@ function Update_GUI(~,~,hObject)
     GUI_Variables.RLCount = RLCount;
     GUI_Variables.LLCount = LLCount;
     GUI_Variables.BT_Was_Disconnected = BT_Was_Disconnected;
+    handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
 
     
@@ -476,7 +478,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
     disp('End Trial button pushed')
     disp('')
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     stop(handles.TimerMessage);
@@ -820,6 +822,8 @@ function End_Trial_Callback(hObject, eventdata, handles)
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 
@@ -830,7 +834,7 @@ function Calibrate_Torque_Callback(~, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
     set(handles.statusText,'String',"Calibrating the Torque Sensors! <(^_^<)");
     pause(.01);
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     if(bt.Status == "open")
         try
@@ -842,11 +846,11 @@ function Calibrate_Torque_Callback(~, ~, handles)
     set(handles.statusText,'String',"The Torque Sensors have been Calibrated! (>^_^)>");
 
 % --- Executes on button press in Calibrate_FSR.
-function Calibrate_FSR_Callback(~, ~, handles)
+function Calibrate_FSR_Callback(hObject, ~, handles)
 % hObject    handle to Calibrate_FSR (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
 
     bt = GUI_Variables.BT;
 
@@ -864,15 +868,17 @@ function Calibrate_FSR_Callback(~, ~, handles)
         GUI_Variables.flag_calib=1;
 
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 % --- Executes on button press in Check_Memory.
-function Check_Memory_Callback(~, ~, handles)
+function Check_Memory_Callback(hObject, ~, handles)
     disp("Checking Memory Status")
     set(handles.statusText,'String','Checking Memory Status');
     pause(0.01);
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     mem=GUI_Variables.MEM;
     if(bt.Status == "open")
@@ -887,13 +893,15 @@ function Check_Memory_Callback(~, ~, handles)
     end
     GUI_Variables.MEM=mem;
     set(handles.statusText,'String','Memory Status Checked');
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in Clean_Memory.
 function Clean_Memory_Callback(~, ~, handles)
 % hObject    handle to Clean_Memory (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     set(handles.statusText,'String','Clearing Memory');
@@ -910,8 +918,8 @@ function Clean_Memory_Callback(~, ~, handles)
 
 
 % --- Executes on button press in L_Check_KF.
-function lkf=L_Check_KF_Callback(~, ~, handles)
-    global GUI_Variables;
+function lkf=L_Check_KF_Callback(hObject, ~, handles)
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     lkf=0;
     if (bt.Status=="open")
@@ -925,6 +933,8 @@ function lkf=L_Check_KF_Callback(~, ~, handles)
         disp("Impossible to know KF");
         set(handles.L_Check_KF_Text,'String',"NaN");
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in L_Send_KF.
 function L_Send_KF_Callback(~, ~, handles)
@@ -934,7 +944,7 @@ function L_Send_KF_Callback(~, ~, handles)
 
     new_KF = str2double(get(handles.L_Send_KF_Edit,'String'));         %Gets the Value entered into the edit Box in the G
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
 
     bt = GUI_Variables.BT;
 
@@ -1020,12 +1030,12 @@ function Bottom_Graph_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in Send_Trig.
-function Send_Trig_Callback(~, ~, handles)
+function Send_Trig_Callback(hObject, ~, handles)
 % hObject    handle to Send_Trig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % tic
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     RLCount=GUI_Variables.RLCount;
     LLCount=GUI_Variables.LLCount;
     state=GUI_Variables.state;
@@ -1053,10 +1063,12 @@ function Send_Trig_Callback(~, ~, handles)
         end
     catch
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in Check_Bluetooth.
-function valBT=Check_Bluetooth_Callback(~, ~, handles)
-    global GUI_Variables
+function valBT=Check_Bluetooth_Callback(hObject, ~, handles)
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     pause(.01);
     set(handles.statusText,'String',"Checking Bluetooth Connection");
@@ -1064,7 +1076,7 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
     try
         fwrite(bt,char(78))
         try
-            Receive_Data_Message(GUI_Variables, handles);
+            GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
         catch
             set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
             set(handles.flag_bluetooth,'Color',[1 0 0]);
@@ -1086,13 +1098,15 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
         catch
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in Connect_BT.
-function Connect_BT_Callback(~, ~, handles)
+function Connect_BT_Callback(hObject, ~, handles)
 % hObject    handle to Connect_BT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     fprintf('Attempting to make a connection to the bluetooth\n');
     set(handles.statusText,'String',"Attempting to make a Connection to the Bluetooth!");
@@ -1124,6 +1138,8 @@ function Connect_BT_Callback(~, ~, handles)
         set(handles.EXP_Params_axes,'Color',[0 0 0])
         set(handles.statusText,'String',"Could Not Connect to the Right Ankle Bluetooth :(  Try Again! (If it fails 3+ times attempt a power cycle)");
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 % --- Executes on selection change in L_List.
@@ -1345,7 +1361,7 @@ function R_Set_PID_Callback(~, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % SEND 'm'
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     if(bt.Status=="open")
         fwrite(bt,char(109));
@@ -1396,7 +1412,7 @@ function R_Set_PID_Callback(~, ~, handles)
 % --- Executes on button press in R_Get_PID.
 function [rkp,rkd,rki]=R_Get_PID_Callback(~, ~, handles)
 % SEND 'k' char 107
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -1412,7 +1428,7 @@ function [rkp,rkd,rki]=R_Get_PID_Callback(~, ~, handles)
 % --- Executes on button press in L_Get_PID.
 function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
 % SEND 'K' char 75
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -1434,7 +1450,7 @@ function L_Set_PID_Callback(~, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % SEND 'M'
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     if(bt.Status=="open")
         fwrite(bt,'M');
@@ -1534,7 +1550,7 @@ function R_Set_Setpoint_Callback(~, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % SEND f
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -1572,9 +1588,9 @@ function R_Setpoint_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in R_Get_Setpoint.
-function R_Get_Setpoint_Callback(~, ~, handles)
+function R_Get_Setpoint_Callback(hObject, ~, handles)
 %  SEND 'd'
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -1584,10 +1600,12 @@ function R_Get_Setpoint_Callback(~, ~, handles)
     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
         GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 % --- Executes on button press in L_Get_Setpoint.
-function L_Get_Setpoint_Callback(~, ~, handles)
+function L_Get_Setpoint_Callback(hObject, ~, handles)
 % SEND 'D'
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     fwrite(bt,'D'); % Sends the character corresponding to ASCII value
@@ -1596,6 +1614,8 @@ function L_Get_Setpoint_Callback(~, ~, handles)
                     % Gets the Current Arduino Torque Setpoint if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
     
     GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 function L_Setpoint_Edit_Callback(~, ~, ~)
@@ -1622,13 +1642,13 @@ function L_Setpoint_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in L_Set_Setpoint.
-function L_Set_Setpoint_Callback(~, ~, handles)
+function L_Set_Setpoint_Callback(hObject, ~, handles)
 % hObject    handle to L_Set_Setpoint (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % SEND 'F'
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -1651,12 +1671,14 @@ function L_Set_Setpoint_Callback(~, ~, handles)
     plot(xlim,[NewSetpoint NewSetpoint],'-.k')
 
     pause(0.3);
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
     L_Get_Setpoint_Callback(0,0,handles);
 
 % --- Executes on button press in Get_Smoothing.
-function [n1,n2,n3]=Get_Smoothing_Callback(~, ~, handles)
+function [n1,n2,n3]=Get_Smoothing_Callback(hObject, ~, handles)
 % SEND '(' to get the smoothing
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     n1=0;
     n2=0;
@@ -1677,13 +1699,15 @@ function [n1,n2,n3]=Get_Smoothing_Callback(~, ~, handles)
             set(handles.N3_Text,'String',"NaN");
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in Set_Smoothing.
 function Set_Smoothing_Callback(~, ~, handles)
 % hObject    handle to Set_Smoothing (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -1772,11 +1796,11 @@ function N3_Edit_CreateFcn(hObject, ~, ~)
     end
 
 % --- Executes on button press in R_N3_Adj.
-function R_N3_Adj_Callback(~, ~, ~)
+function R_N3_Adj_Callback(hObject, ~, handles)
 % hObject    handle to R_N3_Adj (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables;
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     if (bt.Status=="open")
         try
@@ -1786,13 +1810,15 @@ function R_N3_Adj_Callback(~, ~, ~)
         catch
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in L_N3_Adj.
-function L_N3_Adj_Callback(~, ~, ~)
+function L_N3_Adj_Callback(hObject, ~, handles)
 % hObject    handle to L_N3_Adj (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables;
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     if (bt.Status=="open")
         try
@@ -1802,13 +1828,15 @@ function L_N3_Adj_Callback(~, ~, ~)
         catch
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in L_Bs_Frq.
 function L_Bs_Frq_Callback(~, ~, ~)
 % hObject    handle to L_Bs_Frq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables;
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -1842,13 +1870,13 @@ function R_Send_KF_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in R_Send_KF.
-function R_Send_KF_Callback(~, ~, handles)
+function R_Send_KF_Callback(hObject, ~, handles)
 % hObject    handle to R_Send_KF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     new_KF = str2double(get(handles.R_Send_KF_Edit,'String')); % Gets the Value entered into the edit Box in the G
 
-    global GUGI_Variables
+    GUI_Variables = handles.GUI_Variables;
     state=GUI_Variables.state;
     disp(state);
 
@@ -1865,10 +1893,12 @@ function R_Send_KF_Callback(~, ~, handles)
             disp("Impossible to write on bt the new KF");
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in R_Check_KF.
-function rkf=R_Check_KF_Callback(~, ~, handles)
-    global GUI_Variables;
+function rkf=R_Check_KF_Callback(hObject, ~, handles)
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     rkf=0;
     if (bt.Status=="open")
@@ -1889,10 +1919,12 @@ function rkf=R_Check_KF_Callback(~, ~, handles)
         disp("Impossible to know KF");
         set(handles.R_Check_KF_Text,'String',"NaN");
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in L_Check_FSR_Th.
-function lfsr=L_Check_FSR_Th_Callback(~, ~, handles)
-    global GUI_Variables;
+function lfsr=L_Check_FSR_Th_Callback(hObject, ~, handles)
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     lfsr=0;
     if (bt.Status=="open")
@@ -1903,6 +1935,8 @@ function lfsr=L_Check_FSR_Th_Callback(~, ~, handles)
         set(handles.L_Check_FSR_Text,'String',"NaN");
         set(handles.R_Check_FSR_Text,'String',"NaN");
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 function L_Send_FSR_Edit_Callback(~, ~, ~)
@@ -1932,7 +1966,7 @@ function L_Send_FSR_Th_Callback(~, ~, handles)
 % hObject    handle to L_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
 
@@ -1948,7 +1982,7 @@ function L_Send_FSR_Th_Callback(~, ~, handles)
 
 % --- Executes on button press in R_Check_FSR_Th.
 function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
-    global GUI_Variables;
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     rfsr=0;
     if (bt.Status=="open")
@@ -2006,7 +2040,7 @@ function R_Send_FSR_Th_Callback(~, ~, handles)
 % hObject    handle to R_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
 
@@ -2055,7 +2089,7 @@ function L_Set_Perc_Callback(~, ~, handles)
 % hObject    handle to L_Set_Perc (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2095,7 +2129,7 @@ function R_Set_Perc_Callback(~, ~, handles)
 % hObject    handle to R_Set_Perc (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2132,11 +2166,11 @@ function R_Set_Perc_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in L_Stop_N3.
-function L_Stop_N3_Callback(~, ~, ~)
+function L_Stop_N3_Callback(hObject, ~, handles)
 % hObject    handle to L_Stop_N3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     if (bt.Status=="open")
         try
@@ -2147,13 +2181,15 @@ function L_Stop_N3_Callback(~, ~, ~)
         catch
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in L_Stop_Trq.
 function L_Stop_Trq_Callback(~, ~, ~)
 % hObject    handle to L_Stop_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2164,11 +2200,11 @@ function L_Stop_Trq_Callback(~, ~, ~)
     end
 
 % --- Executes on button press in R_Stop_N3.
-function R_Stop_N3_Callback(~, ~, ~)
+function R_Stop_N3_Callback(hObject, ~, handles)
 % hObject    handle to R_Stop_N3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     if (bt.Status=="open")
         try
@@ -2179,13 +2215,15 @@ function R_Stop_N3_Callback(~, ~, ~)
         catch
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in R_Stop_Trq.
 function R_Stop_Trq_Callback(~, ~, ~)
 % hObject    handle to R_Stop_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2200,7 +2238,7 @@ function Save_EXP_Prm_Callback(~, ~, ~)
 % hObject    handle to Save_EXP_Prm (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2219,7 +2257,7 @@ function Load_From_File_Callback(hObject, eventdata, handles)
 % hObject    handle to Load_From_File (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt=GUI_Variables.BT;
     disp("Before Starting we check the connections");
     set(handles.statusText,'String','Checking Connections');
@@ -2342,7 +2380,6 @@ function Load_From_File_Callback(hObject, eventdata, handles)
     end %end file exists
 
 
-
 % --- Executes on button press in L_InverseSign_RadioButton.
 function L_InverseSign_RadioButton_Callback(hObject, ~, ~)
 % hObject    handle to L_InverseSign_RadioButton (see GCBO)
@@ -2352,7 +2389,7 @@ function L_InverseSign_RadioButton_Callback(hObject, ~, ~)
 % Hint: get(hObject,'Value') returns toggle state of L_InverseSign_RadioButton
 % Hint: get(hObject,'Value') returns toggle state of L_InverseSign_RadioButton
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2382,7 +2419,7 @@ function R_InverseSign_RadioButton_Callback(hObject, ~, ~)
 % Hint: get(hObject,'Value') returns toggle state of R_InverseSign_RadioButton
 
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2403,11 +2440,11 @@ function R_InverseSign_RadioButton_Callback(hObject, ~, ~)
 
 
 % --- Executes on button press in R_Check_Gain.
-function R_Check_Gain_Callback(~, ~, handles)
+function R_Check_Gain_Callback(hObject, ~, handles)
 % hObject    handle to R_Check_Gain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -2419,13 +2456,15 @@ function R_Check_Gain_Callback(~, ~, handles)
         GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
 
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in R_Set_Gain.
 function R_Set_Gain_Callback(~, ~, handles)
 % hObject    handle to R_Set_Gain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -2465,12 +2504,12 @@ function R_Set_Gain_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in L_Check_Gain.
-function L_Check_Gain_Callback(~, ~, handles)
+function L_Check_Gain_Callback(hObject, ~, handles)
 % hObject    handle to L_Check_Gain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     try
@@ -2485,6 +2524,8 @@ function L_Check_Gain_Callback(~, ~, handles)
         end
     catch
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 % --- Executes on button press in L_Set_Gain.
@@ -2492,7 +2533,7 @@ function L_Set_Gain_Callback(~, ~, handles)
 % hObject    handle to L_Set_Gain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     try
@@ -2549,7 +2590,7 @@ function Activate_Balance_Callback(~, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     % BT_auto_reconnect_radiobutton
@@ -2616,7 +2657,7 @@ function L_Auto_KF_Callback(hObject, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of L_Auto_KF
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2645,7 +2686,7 @@ function Activate_Prop_Pivot_Callback(hObject, ~, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of Activate_Prop_Pivot
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2681,7 +2722,7 @@ function Fast_0_Trq_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 % SEND 'F'
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     disp('goes to 0 Fast')
@@ -2708,7 +2749,7 @@ function Slow_0_Trq_Callback(~, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
 
@@ -2736,7 +2777,7 @@ function Take_Baseline_Callback(~, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     try
@@ -2751,11 +2792,11 @@ function Take_Baseline_Callback(~, ~, ~)
 
 
 % --- Executes on button press in Check_Baseline.
-function Check_Baseline_Callback(~, ~, ~)
+function Check_Baseline_Callback(hObject, ~, handles)
 % hObject    handle to Check_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     try
@@ -2772,6 +2813,8 @@ function Check_Baseline_Callback(~, ~, ~)
         GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
     catch
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 
@@ -2848,7 +2891,7 @@ function L_Set_Zero_Modif_Callback(~, ~, handles)
 % hObject    handle to L_Set_Zero_Modif (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     try
@@ -2890,7 +2933,7 @@ function R_Set_Zero_Modif_Callback(~, ~, handles)
 % hObject    handle to R_Set_Zero_Modif (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     try
@@ -2919,7 +2962,7 @@ function BT_auto_reconnect_radiobutton_Callback(hObject, ~, ~)
 
 % Hint: get(hObject,'Value') returns toggle state of BT_auto_reconnect_radiobutton
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -2947,7 +2990,7 @@ function Steady_Balance_Base_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     try
@@ -2966,7 +3009,7 @@ function Dynamic_Balance_Base_Callback(~, ~, ~)
 % hObject    handle to Dynamic_Balance_Base (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     try
@@ -2985,7 +3028,7 @@ function Set_Steady_Val_Callback(~, ~, handles)
 % hObject    handle to Set_Steady_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -3000,11 +3043,11 @@ function Set_Steady_Val_Callback(~, ~, handles)
 
 
 % --- Executes on button press in Check_Steady_Val.
-function Check_Steady_Val_Callback(~, ~, handles)
+function Check_Steady_Val_Callback(hObject, ~, handles)
 % hObject    handle to Check_Steady_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt=GUI_Variables.BT;
     if(bt.Status=="open")
         try
@@ -3015,13 +3058,15 @@ function Check_Steady_Val_Callback(~, ~, handles)
         catch
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 % --- Executes on button press in Set_Dyn_Val.
 function Set_Dyn_Val_Callback(~, ~, handles)
 % hObject    handle to Set_Dyn_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -3035,11 +3080,11 @@ function Set_Dyn_Val_Callback(~, ~, handles)
     end
 
 % --- Executes on button press in Check_Dyn_Val.
-function Check_Dyn_Val_Callback(~, ~, handles)
+function Check_Dyn_Val_Callback(hObject, ~, handles)
 % hObject    handle to Check_Dyn_Val (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if(bt.Status=="open")
@@ -3055,6 +3100,8 @@ function Check_Dyn_Val_Callback(~, ~, handles)
         catch
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 function Steady_Edit_Callback(~, ~, ~)
@@ -3106,7 +3153,7 @@ function Flush_Biobluetooth_Callback(~, ~, ~)
 % hObject    handle to Flush_Bluetooth (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
     if (bt.Status=="open")
         fwrite(bt,'Y');
@@ -3121,7 +3168,7 @@ function BT_Auto_Reconnection_Callback(~, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     BT_auto=get(handles.BT_Text,'String');
@@ -3159,7 +3206,7 @@ function Activate_BioFeedback_Callback(~, ~, handles)
 % hObject    handle to Activate_BioFeedback (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     % BT_auto_reconnect_radiobutton
@@ -3186,7 +3233,7 @@ function Set_Bias_Callback(~, ~, handles)
 % hObject    handle to Set_Bias (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -3209,7 +3256,7 @@ function Set_Target_Callback(~, ~, handles)
 % hObject    handle to Set_Target (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -3272,11 +3319,11 @@ function Set_Target_Edit_CreateFcn(hObject, ~, ~)
     end
 
 % --- Executes on selection change in IP_list.
-function IP_list_Callback(~, ~, handles)
+function IP_list_Callback(hObject, ~, handles)
 % hObject    handle to IP_list (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     selectMode = get(handles.IP_list,'Value');
     if selectMode == 1
         GUI_Variables.IP = '134.114.52.219';
@@ -3287,15 +3334,17 @@ function IP_list_Callback(~, ~, handles)
     elseif selectMode == 4
         GUI_Variables.IP = '10.18.48.160';
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 % --- Executes on button press in Start_TCP.
-function Open_TCP_Callback(~, ~, handles)
+function Open_TCP_Callback(hObject, ~, handles)
 % hObject    handle to Start_TCP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
 
     if strcmp(GUI_Variables.IP,'0.0.0.0')
         set(handles.statusText,'String',"Select host IP address from drop-down");
@@ -3325,6 +3374,8 @@ function Open_TCP_Callback(~, ~, handles)
             set(handles.statusText,'String',"Could not establish TCP connection to host within time limit. Check host IP and try again.");
         end
     end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 % --- Executes on button press in Close_TCP.
@@ -3333,7 +3384,7 @@ function Close_TCP_Callback(~, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     try
         t = GUI_Variables.t;
     catch
@@ -3358,7 +3409,7 @@ function Start_Optimization_Callback(~, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     try
         t = GUI_Variables.t;
     catch
@@ -3396,7 +3447,7 @@ function Stop_Optimization_Callback(~, ~, handles)
 % hObject    handle to Stop_Optimization (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     try
         t = GUI_Variables.t;
         bt = GUI_Variables.BT;
@@ -3439,7 +3490,7 @@ function BioFeedback_Baseline_Callback(~, ~, ~)
 % hObject    handle to BioFeedback_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
@@ -3538,14 +3589,16 @@ function Ankle2FSR_Distance_In_CreateFcn(hObject, ~, ~)
 
 
 
-function SSID_Input_Callback(hObject, ~, ~)
+function SSID_Input_Callback(hObject, ~, handles)
 % hObject    handle to SSID_Input (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    global GUI_Variables
+    GUI_Variables = handles.GUI_Variables;
 
     GUI_Variables.SSID = get(hObject,'String');
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 
 
