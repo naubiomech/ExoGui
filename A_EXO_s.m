@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 21-Feb-2019 03:24:15
+% Last Modified by GUIDE v2.5 12-Mar-2019 01:58:45
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -3620,3 +3620,22 @@ function SSID_Input_CreateFcn(hObject, ~, ~)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
+
+
+% --- Executes on button press in Version_Button.
+function Version_Button_Callback(hObject, ~, handles)
+% hObject    handle to Version_Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    GUI_Variables = handles.GUI_Variables;
+    bt = GUI_Variables.BT;
+
+    if (bt.Status=="open")
+        try
+            fwrite(bt,'U');
+            GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+        catch E 
+        end
+    end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);

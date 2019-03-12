@@ -149,6 +149,14 @@ switch(msg)
     mem = check_memory(check_FSR, handles.axes8,mem,1);
     mem = check_memory(check_EXP, handles.EXP_Params_axes,mem,3);
     GUI_Variables.MEM = mem;
+  case 'U'
+    version = round(data(1));
+    major = mod(floor(version/100),10);
+    minor = mod(floor(version/10),10);
+    sub_minor = mod(floor(version/1),10);
+    str = sprintf("Reported code version %d.%d.%d", major, minor, sub_minor);
+    set(handles.statusText,'String',str);
+    
   case 'N'
     mem=GUI_Variables.MEM;
     check1 = data(1);
