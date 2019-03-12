@@ -209,7 +209,6 @@ function accept_message(~,~,hObject)
     bt = GUI_Variables.BT;
     while bt.bytesAvailable() > 0
         handles.GUI_Variables = Receive_Data_Message(handles.GUI_Variables, handles);
-        guidata(hObject, handles);
     end
     guidata(hObject, handles);
 
