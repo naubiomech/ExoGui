@@ -94,6 +94,11 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'PropOn',0,'SSID','No_ID');
+        
+    handles.TimerMessage = timer('ExecutionMode','fixedSpacing','Period',0.01,...
+                           'BusyMode','drop', 'TimerFcn', {@accept_message, hObject});
+    handles.TimerGUIUpdate = timer('ExecutionMode','fixedSpacing','StartDelay',0.1,'Period',1,...
+                           'BusyMode','drop', 'TimerFcn', {@Update_GUI, hObject});
                        
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     guidata(hObject, handles);
@@ -111,7 +116,7 @@ function varargout = A_EXO_s_OutputFcn(~, ~, handles)
     varargout{1} = handles.output;
 
 % --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, ~, ~) %#ok<*DEFNU>
+function figure1_CloseRequestFcn(hObject, ~, ~, handles) %#ok<*DEFNU>
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -125,6 +130,8 @@ function figure1_CloseRequestFcn(hObject, ~, ~) %#ok<*DEFNU>
         catch
             disp('Bluetooth already closed');
         end
+        delete(handles.TimerMessage);
+        delete(handles.TimerGUIUpdate);
     catch E
         disp(E);
     end
@@ -182,44 +189,34 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     end
     pause(.001);
 
-    GUI_Variables.BT_Was_Disconnected = 0;
-    GUI_Variables.start_count = 0;
     set(handles.statusText,'String','Trial has been started');
     tic
     if state == 1 % both connected
         disp('both connected')
-        while strcmp(get(handles.Start_Trial,'Enable'), 'off')
-            GUI_Variables = Update_GUI(GUI_Variables, handles);
-
-            guidata(hObject, handles);
-        end
+        start(handles.TimerMessage);
+        start(handles.TimerGUIUpdate);
     end
     guidata(hObject, handles);
+    
+function accept_message(~,~,hObject)
+    handles = guidata(hObject);
+    %GUI_Variables = handles.GUI_Variables;
+    global GUI_Variables
+    bt = GUI_Variables.BT;
+    while bt.bytesAvailable() > 0
+        GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+    end
 
-function GUI_Variables = Update_GUI(GUI_Variables, handles)
+        
+function Update_GUI(~,~,hObject)
+    handles = guidata(hObject);
+    %GUI_Variables = handles.GUI_Variables;
+    global GUI_Variables
+
     RLCount = GUI_Variables.RLCount;
     LLCount = GUI_Variables.LLCount;
     bt = GUI_Variables.BT;
-    start_count = GUI_Variables.start_count;
     BT_Was_Disconnected = GUI_Variables.BT_Was_Disconnected;
-    
-    if GUI_Variables.flag_calib==1
-        if GUI_Variables.first_calib==0
-            start_count=clock;
-            start_count=start_count(6);
-            disp("Start FSR Calib")
-            GUI_Variables.first_calib=1;
-        end
-        v=clock;
-        if (v(6)-start_count)>5
-            set(handles.statusText,'String','Finished Calibrating the FSRs');
-            pause(0.00000001);
-            disp("End FSR Calib")
-            GUI_Variables.flag_calib=0;
-            GUI_Variables.first_calib=0;
-        end
-    end
-    pause(.000000001);
 
     %---------------------Optimization-----------------------------------------
 
@@ -352,26 +349,16 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
             GUI_Variables.BT_connection(GUI_Variables.count_connection)=RLCount;
             BT_Was_Disconnected=0;
         end
-        tic
-        
-        GUI_Variables.RLCount = RLCount;
-        GUI_Variables.LLCount = LLCount;
-        
-        GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
-        
-        RLCount = GUI_Variables.RLCount;
-        LLCount = GUI_Variables.LLCount;
-
 
         if(mod(RLCount,100) == 0)
             draw_graphs(handles, GUI_Variables)
         end
     end
-
+    draw_graphs(handles, GUI_Variables);
     GUI_Variables.RLCount = RLCount;
     GUI_Variables.LLCount = LLCount;
-    GUI_Variables.start_count = start_count;
     GUI_Variables.BT_Was_Disconnected = BT_Was_Disconnected;
+    guidata(hObject, handles);
 
     
 function draw_graphs(handles, GUI_Variables)
@@ -409,6 +396,7 @@ function draw_graphs(handles, GUI_Variables)
     whichPlotRight = get(handles.Top_Graph,'Value');
     draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
     draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
+    drawnow;
 
           
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
@@ -419,11 +407,11 @@ function draw_graph(whichPlot, plots, titles, axis, RLCount)
     dataLength = max(1, RLCount-1000):RLCount-1;
     data = cellfun(@(x) x(dataLength), plotData', 'UniformOutput', false);
     data = cat(1,data{:});
-    
-    plot(dataLength, data);
-    
-    xlim([dataLength(1),RLCount]);
-    title(plotTitle);
+
+    plot(axis,dataLength,data);
+
+    xlim(axis, [dataLength(1),RLCount]);
+    title(axis, plotTitle);
         
 function GUI_Variables = Reset_GUI_Variables(GUI_Variables)
     allocated = 100000;
@@ -490,6 +478,9 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
     global GUI_Variables
     bt = GUI_Variables.BT;
+
+    stop(handles.TimerMessage);
+    stop(handles.TimerGUIUpdate);
 
     if bt.Status=="open"
         LLTRQ = GUI_Variables.LLTRQ;
@@ -1070,7 +1061,6 @@ function valBT=Check_Bluetooth_Callback(~, ~, handles)
     pause(.01);
     set(handles.statusText,'String',"Checking Bluetooth Connection");
     pause(.01);
-    draw_graphs(handles, GUI_Variables);   
     try
         fwrite(bt,char(78))
         try
