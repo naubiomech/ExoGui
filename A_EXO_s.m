@@ -100,10 +100,6 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
     handles.TimerGUIUpdate = timer('ExecutionMode','fixedSpacing','StartDelay',0.1,'Period',1,...
                            'BusyMode','drop', 'TimerFcn', {@Update_GUI, hObject});
                        
-    axes(handles.Top_Axes);
-    handles.Top_Plot = plot([],[]);
-    axes(handles.Bottom_Axes);
-    handles.Bottom_Plot = plot([],[]);
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     guidata(hObject, handles);
 
@@ -398,19 +394,21 @@ function draw_graphs(handles, GUI_Variables)
   
     whichPlotLeft = get(handles.Bottom_Graph,'Value');
     whichPlotRight = get(handles.Top_Graph,'Value');
-    draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, handles.Bottom_Plot, RLCount);
-    draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, handles.Top_Plot, RLCount);
+    draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
+    draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
+    drawnow;
 
           
-function draw_graph(whichPlot, plots, titles, axis, curr_plot, RLCount)
+function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
     plotData = plots{whichPlot};
     plotTitle = titles{whichPlot};
 
     dataLength = max(1, RLCount-1000):RLCount-1;
     data = cellfun(@(x) x(dataLength), plotData', 'UniformOutput', false);
-    set(curr_plot, {'XData'}, {dataLength});
-    set(curr_plot, {'YData'}, data);
+    data = cat(1,data{:});
+
+    plot(axis,dataLength,data);
 
     xlim(axis, [dataLength(1),RLCount]);
     title(axis, plotTitle);
