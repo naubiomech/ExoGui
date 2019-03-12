@@ -116,14 +116,14 @@ function varargout = A_EXO_s_OutputFcn(~, ~, handles)
     varargout{1} = handles.output;
 
 % --- Executes when user attempts to close figure1.
-function figure1_CloseRequestFcn(hObject, ~, ~, handles) %#ok<*DEFNU>
+function figure1_CloseRequestFcn(hObject, ~, handles) %#ok<*DEFNU>
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: delete(hObject) closes the figure
-    GUI_Variables = handles.GUI_Variables;
     try
+        GUI_Variables = handles.GUI_Variables;
         bt = GUI_Variables.BT;
         try
             fclose(bt);
@@ -135,7 +135,11 @@ function figure1_CloseRequestFcn(hObject, ~, ~, handles) %#ok<*DEFNU>
     catch E
         disp(E);
     end
-    delete(hObject);
+    try
+        delete(hObject);
+    catch E 
+        disp(E);
+    end
 
 % --- Executes on button press in Start_Trial.
 function Start_Trial_Callback(hObject, eventdata, handles)
