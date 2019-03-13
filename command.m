@@ -157,6 +157,9 @@ switch(msg)
     str = sprintf("Reported code version %d.%d.%d", major, minor, sub_minor);
     set(handles.statusText,'String',str);
     
+  case 'z'
+    set(handles.Motor_Error,'value',data(1));
+
   case 'N'
     mem=GUI_Variables.MEM;
     check1 = data(1);
