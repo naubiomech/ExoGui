@@ -1931,7 +1931,13 @@ function lfsr=L_Check_FSR_Th_Callback(hObject, ~, handles)
     bt = GUI_Variables.BT;
     lfsr=0;
     if (bt.Status=="open")
-        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+        try
+            fwrite(bt,char('Q')); % send the character "Q"
+            GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+        catch
+            disp("Impossible to know R FSR TH");
+            set(handles.R_Check_FSR_Text,'String',"NaN");
+        end
     end
     if (bt.Status=="closed")
         disp("Impossible to know FSR THs");
