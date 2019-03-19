@@ -15,6 +15,5 @@ function [msg, data] = get_message(bt)
     end
     
     if count ~= length(data)
-        msg = '\0';
-        data = [];
+        data = NaN(count);
     end
