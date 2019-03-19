@@ -1,4 +1,5 @@
 #include "ArduinoInterface.hpp"
+#include "Arduino.hpp"
 #include "Pin.hpp"
 #include "ros/console.h"
 
