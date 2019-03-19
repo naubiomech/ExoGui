@@ -1835,7 +1835,7 @@ function L_N3_Adj_Callback(hObject, ~, handles)
     guidata(hObject, handles);
 
 % --- Executes on button press in L_Bs_Frq.
-function L_Bs_Frq_Callback(~, ~, ~)
+function L_Bs_Frq_Callback(~, ~, handles)
 % hObject    handle to L_Bs_Frq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2188,7 +2188,7 @@ function L_Stop_N3_Callback(hObject, ~, handles)
     guidata(hObject, handles);
 
 % --- Executes on button press in L_Stop_Trq.
-function L_Stop_Trq_Callback(~, ~, ~)
+function L_Stop_Trq_Callback(~, ~, handles)
 % hObject    handle to L_Stop_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2222,7 +2222,7 @@ function R_Stop_N3_Callback(hObject, ~, handles)
     guidata(hObject, handles);
 
 % --- Executes on button press in R_Stop_Trq.
-function R_Stop_Trq_Callback(~, ~, ~)
+function R_Stop_Trq_Callback(~, ~, handles)
 % hObject    handle to R_Stop_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2237,7 +2237,7 @@ function R_Stop_Trq_Callback(~, ~, ~)
     end
 
 % --- Executes on button press in Save_EXP_Prm.
-function Save_EXP_Prm_Callback(~, ~, ~)
+function Save_EXP_Prm_Callback(~, ~, handles)
 % hObject    handle to Save_EXP_Prm (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2384,7 +2384,7 @@ function Load_From_File_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in L_InverseSign_RadioButton.
-function L_InverseSign_RadioButton_Callback(hObject, ~, ~)
+function L_InverseSign_RadioButton_Callback(hObject, ~, handless)
 % hObject    handle to L_InverseSign_RadioButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2414,7 +2414,7 @@ function L_InverseSign_RadioButton_Callback(hObject, ~, ~)
 
 
 % --- Executes on button press in R_InverseSign_RadioButton.
-function R_InverseSign_RadioButton_Callback(hObject, ~, ~)
+function R_InverseSign_RadioButton_Callback(hObject, ~, handles)
 % hObject    handle to R_InverseSign_RadioButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2588,7 +2588,7 @@ function L_Set_Gain_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in Activate_Balance.
-function Activate_Balance_Callback(~, ~, ~)
+function Activate_Balance_Callback(~, ~, handles)
 % hObject    handle to Activate_Balance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2654,7 +2654,7 @@ function radiobutton13_Callback(~, ~, ~)
 
 
 % --- Executes on button press in L_Auto_KF.
-function L_Auto_KF_Callback(hObject, ~, ~)
+function L_Auto_KF_Callback(hObject, ~, handles)
 % hObject    handle to L_Auto_KF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2719,7 +2719,7 @@ function Activate_Prop_Pivot_Callback(hObject, ~, handles)
     end
 
 % --- Executes on button press in Fast_0_Trq.
-function Fast_0_Trq_Callback(~, ~, ~)
+function Fast_0_Trq_Callback(~, ~, handles)
 % hObject    handle to Fast_0_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2747,7 +2747,7 @@ function Fast_0_Trq_Callback(~, ~, ~)
 
 
 % --- Executes on button press in Slow_0_Trq.
-function Slow_0_Trq_Callback(~, ~, ~)
+function Slow_0_Trq_Callback(~, ~, handles)
 % hObject    handle to Slow_0_Trq (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2775,7 +2775,7 @@ function Slow_0_Trq_Callback(~, ~, ~)
 
 
 % --- Executes on button press in Take_Baseline.
-function Take_Baseline_Callback(~, ~, ~)
+function Take_Baseline_Callback(~, ~, handles)
 % hObject    handle to Take_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2958,7 +2958,7 @@ function Balance_Baseline_Callback(~, ~, ~)
 % handles    structure with handles and user data (see GUIDATA)
 
 % --- Executes on button press in BT_auto_reconnect_radiobutton.
-function BT_auto_reconnect_radiobutton_Callback(hObject, ~, ~)
+function BT_auto_reconnect_radiobutton_Callback(hObject, ~, handles)
 % hObject    handle to BT_auto_reconnect_radiobutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2987,7 +2987,7 @@ function BT_auto_reconnect_radiobutton_Callback(hObject, ~, ~)
 
 
 % --- Executes on button press in Steady_Balance_Base.
-function Steady_Balance_Base_Callback(~, ~, ~)
+function Steady_Balance_Base_Callback(~, ~, handles)
 % hObject    handle to Steady_Balance_Base (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3008,7 +3008,7 @@ function Steady_Balance_Base_Callback(~, ~, ~)
 
 
 % --- Executes on button press in Dynamic_Balance_Base.
-function Dynamic_Balance_Base_Callback(~, ~, ~)
+function Dynamic_Balance_Base_Callback(~, ~, handles)
 % hObject    handle to Dynamic_Balance_Base (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3152,7 +3152,7 @@ function Dyn_Edit_CreateFcn(hObject, ~, ~)
     end
 
 % --- Executes on button press Flush Bluetooth.
-function Flush_Biobluetooth_Callback(~, ~, ~)
+function Flush_Biobluetooth_Callback(~, ~, handles)
 % hObject    handle to Flush_Bluetooth (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
