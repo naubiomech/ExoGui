@@ -132,11 +132,11 @@ switch(msg)
 
     end
   case 'V'
-    steady_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
+    steady_val = (data(1));
     set(handles.Steady_Text,'String',steady_val);
     disp(["Check Steady Val ",num2str(steady_val)]);
   case 'A'
-    dyn_val = str2double(message((indexes(1)+1):(indexes(2)-1)));
+    dyn_val = (data(1));
     set(handles.Dyn_Text,'String',dyn_val);
     disp(["Check Dyn Val ",num2str(dyn_val)]);
   case '<'
