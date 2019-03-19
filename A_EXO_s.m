@@ -1053,7 +1053,7 @@ function Send_Trig_Callback(hObject, ~, handles)
     end
     
 
-    GUI_Variables.COUNT=[GUI_Variables.COUNT;count_trig];
+    GUI_Variables.COUNT=[GUI_Variables.COUNT;max(0,count_trig-50)];
     GUI_Variables.counter=GUI_Variables.counter+1;
     cane=GUI_Variables.counter;
     set(handles.TRIG_NUM_TEXT,'String',num2str(cane));
@@ -1547,7 +1547,7 @@ function L_Kd_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in R_Set_Setpoint.
-function R_Set_Setpoint_Callback(~, ~, handles)
+function R_Set_Setpoint_Callback(hObject, ~, handles)
 % hObject    handle to R_Set_Setpoint (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1566,7 +1566,7 @@ function R_Set_Setpoint_Callback(~, ~, handles)
     fwrite(bt,NewSetpoint_Dorsi,'double');
 
     pause(0.3);
-    R_Get_Setpoint_Callback(0,0,handles);
+    R_Get_Setpoint_Callback(hObject,0,handles);
 
 function R_Setpoint_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Setpoint_Edit (see GCBO)
@@ -1676,7 +1676,7 @@ function L_Set_Setpoint_Callback(hObject, ~, handles)
     pause(0.3);
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
-    L_Get_Setpoint_Callback(0,0,handles);
+    L_Get_Setpoint_Callback(hObject,0,handles);
 
 % --- Executes on button press in Get_Smoothing.
 function [n1,n2,n3]=Get_Smoothing_Callback(hObject, ~, handles)
