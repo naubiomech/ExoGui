@@ -1053,7 +1053,7 @@ function Send_Trig_Callback(hObject, ~, handles)
     end
     
 
-    GUI_Variables.COUNT=[GUI_Variables.COUNT;max(0,count_trig-50)];
+    GUI_Variables.COUNT=[GUI_Variables.COUNT;max(1,count_trig-50)];
     GUI_Variables.counter=GUI_Variables.counter+1;
     cane=GUI_Variables.counter;
     set(handles.TRIG_NUM_TEXT,'String',num2str(cane));
