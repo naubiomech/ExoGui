@@ -59,8 +59,8 @@ switch(msg)
   case 'D'
     Setpoint_LL = data(1);
     Setpoint_Dorsi_LL = data(2);
-    update_setpoint(Setpoint_LL, handles.L_Setpoint_Text,handles.L_Setpoint_Edit);
-    update_setpoint(Setpoint_Dorsi_LL, handles.L_Setpoint_Dorsi_Text,handles.L_Setpoint_Dorsi_Edit);
+    update_value_handles(Setpoint_LL, handles.L_Setpoint_Text,handles.L_Setpoint_Edit);
+    update_value_handles(Setpoint_Dorsi_LL, handles.L_Setpoint_Dorsi_Text,handles.L_Setpoint_Dorsi_Edit);
   case 'd'
     Setpoint_RL = data(1);
     Setpoint_Dorsi_RL = data(2);
