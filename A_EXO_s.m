@@ -92,7 +92,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'R_Bal_dyn_Toe',20,'R_Bal_dyn_Heel',30,'R_Bal_steady_Toe',40,'R_Bal_steady_Heel',50,...
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
-                           'PropOn',0,'SSID','No_ID');
+                           'PropOn',0,'SSID','No_ID','TimeStamp',' ');
     
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     handles.GUI_Variables = GUI_Variables;
@@ -185,7 +185,10 @@ function Start_Trial_Callback(hObject, eventdata, handles)
         fwrite(bt,char(69)); % Sends ASCII character 69 to the Arduino, which the Arduino will
     end
     pause(.001);
-
+    
+    stamp = fix(clock);                         %Get time stamp
+    time = sprintf('%.0f-',stamp(4:end));       %Change to string and add - delimiter
+    GUI_Variables.TimeStamp = time(1:end-1);    %Avoid last dash and store in structure
     GUI_Variables.BT_Was_Disconnected = 0;
     GUI_Variables.start_count = 0;
     set(handles.statusText,'String','Trial has been started');
@@ -694,8 +697,8 @@ function End_Trial_Callback(hObject, eventdata, handles)
         if ~exist(saveDir, 'dir')
             mkdir(currDir, saveDir);           % Make a save directory
         end
-        Filename = sprintf('%s_%d',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_','Trial_Number_']),...
-                           bt.UserData);               %Creates a new filename called "Torque_#"
+        Filename = sprintf('%s_%d',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',GUI_Variables.TimeStamp,'_',...
+            'Trial_Number_']),bt.UserData);               %Creates a new filename called "Torque_#"
 
 
         fileID = fopen(Filename,'w'); % Actually creates that file
@@ -774,7 +777,8 @@ function End_Trial_Callback(hObject, eventdata, handles)
         if ~exist(saveDir, 'dir')
             mkdir(currDir, saveDir);           % Make a save directory
         end
-        Filename = sprintf('%s_%d',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_','Parameters_Trial_Number_']),...
+        Filename = sprintf('%s_%d',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',...
+            GUI_Variables.TimeStamp,'_','Parameters_Trial_Number_']),...
                            bt.UserData);               %Creates a new filename called "Torque_#"
         fileID = fopen(Filename,'w'); % Actually creates that file
         pause(.01);
