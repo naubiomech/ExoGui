@@ -93,7 +93,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'PropOn',0,'SSID','No_ID');
-                       
+    
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
@@ -193,17 +193,18 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     if state == 1 % both connected
         disp('both connected')
         while strcmp(get(handles.Start_Trial,'Enable'), 'off')
-            handles.GUI_Variables = Update_GUI(GUI_Variables, handles);
-            handles = accept_message(0,0,handles);
+            GUI_Variables = Update_GUI(GUI_Variables, handles);
+            GUI_Variables = accept_message(bt,handles, GUI_Variables);
+            handles.GUI_Variables = GUI_Variables;
+            guidata(hObject, handles);
+            pause(0.01);
         end
     end
     guidata(hObject, handles);
     
-function handles = accept_message(~,~,handles)
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+function GUI_Variables = accept_message(bt, handles, GUI_Variables)
     while bt.bytesAvailable() > 0
-        handles.GUI_Variables = Receive_Data_Message(handles.GUI_Variables, handles);
+        GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
     end
 
 function GUI_Variables = Update_GUI(GUI_Variables, handles)
@@ -373,9 +374,7 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
         LLCount = GUI_Variables.LLCount;
 
 
-        if(mod(RLCount,100) == 0)
-            draw_graphs(handles, GUI_Variables)
-        end
+        draw_graphs(handles, GUI_Variables)
     end
 
     GUI_Variables.RLCount = RLCount;
@@ -385,7 +384,7 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
 
     
 function draw_graphs(handles, GUI_Variables)
-      plots = {{GUI_Variables.RLTRQ, GUI_Variables.RLSET}, ...
+    plots = {{GUI_Variables.RLTRQ, GUI_Variables.RLSET}, ...
              {GUI_Variables.RLFSR}, ...
              {GUI_Variables.RLVOLT,GUI_Variables.RLVOLT_H,GUI_Variables.BASER}, ...
              {GUI_Variables.RLVOLT, GUI_Variables.RLVOLT_H,...
@@ -412,15 +411,15 @@ function draw_graphs(handles, GUI_Variables)
     titles = {"RL Torque","RL State","RL Force Toe and Heel","Right Balance", ...
               "LL Torque","LL State","LL Force Toe and Heel","Left Balance", ...
               "SIG1","SIG2","SIG3","SIG4"};
-          
+    
     RLCount = GUI_Variables.RLCount;
-  
+    
     whichPlotLeft = get(handles.Bottom_Graph,'Value');
     whichPlotRight = get(handles.Top_Graph,'Value');
     draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
     draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
 
-          
+    
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
     plotData = plots{whichPlot};
@@ -434,7 +433,7 @@ function draw_graph(whichPlot, plots, titles, axis, RLCount)
     
     xlim([dataLength(1),RLCount]);
     title(plotTitle);
-        
+    
 function GUI_Variables = Reset_GUI_Variables(GUI_Variables)
     allocated = 100000;
     
