@@ -187,7 +187,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     pause(.001);
     
     stamp = fix(clock);                         %Get time stamp
-    time = sprintf('%.0f-',stamp(4:end));       %Change to string and add - delimiter
+    time = sprintf('%.0f.',stamp(4:end));       %Change to string and add - delimiter
     GUI_Variables.TimeStamp = time(1:end-1);    %Avoid last dash and store in structure
     GUI_Variables.BT_Was_Disconnected = 0;
     GUI_Variables.start_count = 0;
