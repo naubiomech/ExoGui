@@ -187,7 +187,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     pause(.001);
     
     stamp = fix(clock);                         %Get time stamp
-    time = sprintf('%.0f.',stamp(4:end));       %Change to string and add - delimiter
+    time = sprintf('%.0f.',stamp(4:end));       %Change to string and add . delimiter
     GUI_Variables.TimeStamp = time(1:end-1);    %Avoid last dash and store in structure
     GUI_Variables.BT_Was_Disconnected = 0;
     GUI_Variables.start_count = 0;
@@ -200,7 +200,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
             GUI_Variables = accept_message(bt,handles, GUI_Variables);
             handles.GUI_Variables = GUI_Variables;
             guidata(hObject, handles);
-            drawnow;
             pause(0.01);
         end
     end
@@ -422,6 +421,7 @@ function draw_graphs(handles, GUI_Variables)
     whichPlotRight = get(handles.Top_Graph,'Value');
     draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
     draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
+    drawnow nocallbacks;
 
     
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
