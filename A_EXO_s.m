@@ -197,6 +197,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
             GUI_Variables = accept_message(bt,handles, GUI_Variables);
             handles.GUI_Variables = GUI_Variables;
             guidata(hObject, handles);
+            drawnow;
             pause(0.01);
         end
     end
