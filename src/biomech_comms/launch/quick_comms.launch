@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find biomech_comms)/launch/exo_core.launch"/>
+  <include file="$(find biomech_comms)/launch/exo_comms_core.launch"/>
 
   <node
       pkg="biomech_comms"
