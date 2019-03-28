@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-from biomech.srv import GetBluetoothDevices, ConnectToBluetoothDevice
+from biomech_gui.srv import GetBluetoothDevices, ConnectToBluetoothDevice
 
 preferred_device = 'Jacks_Bluetooth' 
 
