@@ -5,9 +5,9 @@ from biomech_comms.srv import GetBluetoothDevices, ConnectToBluetoothDevice
 preferred_device = 'Jacks_Bluetooth' 
 
 def setup_bluetooth():
-    rospy.wait_for_service('/Exo/get_bluetooth_devices')
+    rospy.wait_for_service('get_bluetooth_devices')
     print("Found service for getting bt devs")
-    rospy.wait_for_service('/Exo/connect_to_bluetooth_device')
+    rospy.wait_for_service('connect_to_bluetooth_device')
     print("service connecting")
 
     get_devices = rospy.ServiceProxy('/Exo/get_bluetooth_devices', GetBluetoothDevices)
