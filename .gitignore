@@ -1,6 +1,7 @@
 Trial_Number__*
 Parameters_Trial_Number__*
 
+src/CMakeLists.txt
 devel/
 logs/
 build/
