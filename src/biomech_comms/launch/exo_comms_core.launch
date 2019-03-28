@@ -2,7 +2,7 @@
   <group ns="Exo">
     <node
       pkg = "biomech_comms"
-      type = "Bluetooth.py"
+      type = "bluetooth.py"
       name = "bluetooth"
     />
     <node
