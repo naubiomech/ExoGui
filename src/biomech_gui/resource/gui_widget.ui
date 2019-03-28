@@ -317,6 +317,16 @@
            <widget class="QLineEdit" name="subjectIDLine"/>
           </item>
           <item>
+           <widget class="QPushButton" name="bluetoothConnectButton">
+            <property name="text">
+             <string>Connect</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="bluetoothSelectBox"/>
+          </item>
+          <item>
            <spacer name="verticalSpacer_5">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
