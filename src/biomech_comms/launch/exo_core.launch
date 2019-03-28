@@ -1,12 +1,12 @@
 <launch>
   <group ns="Exo">
     <node
-      pkg = "biomech_gui"
+      pkg = "biomech_comms"
       type = "Bluetooth.py"
       name = "bluetooth"
     />
     <node
-      pkg = "biomech_gui"
+      pkg = "biomech_comms"
       type = "transcriber.py"
       name = "transcriber"
     />

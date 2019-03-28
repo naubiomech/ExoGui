@@ -1,8 +1,8 @@
 <launch>
-  <include file="$(find biomech_gui)/launch/exo_core.launch"/>
+  <include file="$(find biomech_comms)/launch/exo_core.launch"/>
 
   <node
-      pkg="biomech_gui"
+      pkg="biomech_comms"
       type="bt_quick_setup.py"
       name="bt_quick_setup"
      />

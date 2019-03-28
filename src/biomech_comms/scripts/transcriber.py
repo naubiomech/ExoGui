@@ -2,7 +2,7 @@
 
 import rospy
 import struct
-from biomech_gui.msg import ExoCommand
+from biomech_comms.msg import ExoCommand
 from std_msgs.msg import ByteMultiArray
 
 def process_bytes_into_exo_data(byte_msg, exoCommand):

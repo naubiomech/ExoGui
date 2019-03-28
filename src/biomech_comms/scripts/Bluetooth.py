@@ -3,7 +3,7 @@ import rospy
 import bluetooth
 from std_msgs.msg import ByteMultiArray, String
 from std_srvs.srv import Empty
-from biomech_gui.srv import GetBluetoothDevices, ConnectToBluetoothDevice
+from biomech_comms.srv import GetBluetoothDevices, ConnectToBluetoothDevice
 
 class Bluetooth:
     def __init__(self):

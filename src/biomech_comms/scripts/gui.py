@@ -16,7 +16,7 @@ class ExoControlWidget(QApplication):
         """
         super(ExoControlWidget, self).__init__(context)
         rp = rospkg.RosPack()
-        ui_file = os.path.join(rp.get_path('biomech_gui'), 'resource', 'ros_gui.ui')
+        ui_file = os.path.join(rp.get_path('biomech_comms'), 'resource', 'ros_gui.ui')
         loadUi(ui_file, self, {})
 
         self.setObjectName('ExoControl')
