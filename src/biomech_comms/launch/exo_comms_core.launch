@@ -7,7 +7,7 @@
     />
     <node
       pkg = "biomech_comms"
-      type = "transcriber.py"
+      type = "string_transcriber.py"
       name = "transcriber"
     />
   </group>
