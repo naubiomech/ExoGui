@@ -1,0 +1,15 @@
+<launch>
+  <arg name="data" default="float"/>
+
+  <node if="$(eval arg('data') == 'float')"
+        pkg = "biomech_comms"
+        type = "float_transcriber.py"
+        name = "transcriber"
+        />
+  <node if="$(eval arg('data') == 'string')"
+        pkg = "biomech_comms"
+        type = "string_transcriber.py"
+        name = "transcriber"
+        />
+
+</launch>
