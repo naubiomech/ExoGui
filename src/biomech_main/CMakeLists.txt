@@ -8,9 +8,6 @@ project(biomech_main)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  biomech_comms
-  biomech_exo
-  biomech_gui
 )
 
 ## System dependencies are found with CMake's conventions
