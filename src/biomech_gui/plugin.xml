@@ -1,7 +1,7 @@
 <library path="src">
-  <class name="My Plugin" type="biomech_gui.gui.ExoControlPlugin" base_class_type="rqt_gui_py::Plugin">
+  <class name="Biomech Gui" type="biomech_gui.gui.ExoControlPlugin" base_class_type="rqt_gui_py::Plugin">
     <description>
-      An example Python GUI plugin to create a great user interface.
+      The gui used by the biomech lab in order to control the exo skeleton
     </description>
     <qtgui>
       <!-- optional grouping...
@@ -12,7 +12,7 @@
         <label>Subgroup</label>
       </group>
       -->
-      <label>My first Python Plugin</label>
+      <label>Gui widget for the biomech lab</label>
       <icon type="theme">system-help</icon>
       <statustip>Great user interface to provide real value.</statustip>
     </qtgui>
