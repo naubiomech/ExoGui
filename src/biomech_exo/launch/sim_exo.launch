@@ -1,0 +1,7 @@
+<launch>
+  <node
+      pkg = "biomech_exo"
+      type = "sim_exo"
+      name = "simulatedExo"
+      />
+</launch>
