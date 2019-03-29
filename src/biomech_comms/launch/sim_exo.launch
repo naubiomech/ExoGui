@@ -1,0 +1,8 @@
+<launch>
+  <node
+      pkg = "biomech_comms"
+      type = "sim_bluetooth.py"
+      name = "simulated_bluetooth"
+      />
+  <include file="$(find biomech_comms)/launch/transcriber.launch"/>
+</launch>
