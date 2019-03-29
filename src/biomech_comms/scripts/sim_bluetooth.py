@@ -30,8 +30,8 @@ def bluetooth_node():
     msg.layout.dim = []
     msg.layout.data_offset = 0
 
-    rx_port = 'Port0'
-    tx_port = 'Port1'
+    rx_port = 'Pin0'
+    tx_port = 'Pin1'
 
     bt_pub = rospy.Publisher('bluetooth_rx', ByteMultiArray, queue_size=10)
     port_pub = rospy.Publisher(rx_port, ByteMultiArray, queue_size=10)
