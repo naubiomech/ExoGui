@@ -135,8 +135,8 @@ add_library(${PROJECT_NAME}_core
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(exo_sim src/exo.cpp src/ArduinoInterface.cpp src/Pin.cpp)
-target_link_libraries(exo_sim ${catkin_LIBRARIES} ${PROJECT_NAME}_core)
+add_executable(sim_exo src/exo.cpp src/ArduinoInterface.cpp src/Pin.cpp)
+target_link_libraries(sim_exo ${catkin_LIBRARIES} ${PROJECT_NAME}_core)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
