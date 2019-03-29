@@ -2,6 +2,6 @@
   <node
       pkg = "biomech_exo"
       type = "sim_exo"
-      name = "simulatedExo"
+      name = "simulated_exo"
       />
 </launch>
