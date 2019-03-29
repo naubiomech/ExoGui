@@ -1,14 +1,8 @@
 <launch>
-  <group ns="Exo">
-    <node
+  <node
       pkg = "biomech_comms"
       type = "bluetooth.py"
       name = "bluetooth"
-    />
-    <node
-      pkg = "biomech_comms"
-      type = "string_transcriber.py"
-      name = "transcriber"
-    />
-  </group>
+      />
+  <include file="$(find biomech_comms)/launch/transcriber.launch"/>
 </launch>
