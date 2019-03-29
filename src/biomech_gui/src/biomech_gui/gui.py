@@ -23,12 +23,5 @@ class ExoControlPlugin(Plugin):
         ui_file = os.path.join(rp.get_path('biomech_gui'), 'resource', 'gui_widget.ui')
         loadUi(ui_file, self._widget)
         self._widget.setObjectName('BiomechGui')
-        sigsGroup = self._widget.signalsGroup.layout()
         context.add_widget(self._widget)
-        top_graph = DataPlot()
-        top_graph.doSettingsDialog(False)
-        bottom_graph = DataPlot()
-        bottom_graph.doSettingsDialog(False)
-        sigsGroup.addWidget(top_graph)
-        sigsGroup.addWidget(bottom_graph)
 
