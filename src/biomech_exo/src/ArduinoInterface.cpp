@@ -88,4 +88,4 @@ int SoftwareSerial::read(){
 	return pin_ins[rx]->read();
 }
 
-bool SoftwareSerial::available(){return pin_ins[rx]->available() > 0;}
+int SoftwareSerial::available(){return pin_ins[rx]->available();}
