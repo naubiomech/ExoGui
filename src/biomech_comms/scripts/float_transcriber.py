@@ -30,6 +30,8 @@ class Transcriber:
                 end_index = start_index + count*4 + 3
             except ValueError:
                 break
+            except IndexError:
+                break
             msg = self.bluetooth_buffer[start_index:end_index]
             self.bluetooth_buffer = self.bluetooth_buffer[end_index + 1:]
             self.pub.publish(process_bytes_into_exo_data(msg, count, self.exoCommand))
