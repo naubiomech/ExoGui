@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import ByteMultiArray, String
+from std_msgs.msg import ByteMultiArray, Int16
 from std_srvs.srv import Empty
 from biomech_comms.srv import GetBluetoothDevices, ConnectToBluetoothDevice
 
@@ -20,23 +20,37 @@ def connect_bluetooth():
         return [0, "Connected"]
     return _connect_bluetooth
 
-def pass_message(pub):
-    def _pass_message(data):
-        pub.publish(data)
-    return _pass_message
+def pass_into_message(pub):
+    out_msg = Int16()
+
+    def _pass_into_message(data):
+        for data_int in data.data:
+            out_msg.data = data_int
+            pub.publish(out_msg)
+
+    return _pass_into_message
+
+def pass_out_message(pub):
+    out_msg = ByteMultiArray()
+    def _pass_out_message(data):
+        msg_int = int(data.data)
+        out_msg.data = bytes(msg_int)
+        pub.publish(out_msg)
+
+    return _pass_out_message
 
 def bluetooth_node():
     msg = ByteMultiArray()
     msg.layout.dim = []
     msg.layout.data_offset = 0
 
-    rx_port = 'Pin0'
-    tx_port = 'Pin1'
+    rx_port = 'Pin1'
+    tx_port = 'Pin0'
 
     bt_pub = rospy.Publisher('bluetooth_rx', ByteMultiArray, queue_size=10)
-    port_pub = rospy.Publisher(rx_port, ByteMultiArray, queue_size=10)
-    bt_sub = rospy.Subscriber('bluetooth_tx', ByteMultiArray, pass_message(port_pub))
-    port_sub = rospy.Subscriber(tx_port, ByteMultiArray, pass_message(bt_pub))
+    port_pub = rospy.Publisher(rx_port, Int16, queue_size=10)
+    bt_sub = rospy.Subscriber('bluetooth_tx', ByteMultiArray, pass_into_message(port_pub))
+    port_sub = rospy.Subscriber(tx_port, Int16, pass_out_message(bt_pub))
 
     rospy.Service('get_bluetooth_devices', GetBluetoothDevices, scan_devices())
     rospy.Service('connect_to_bluetooth_device', ConnectToBluetoothDevice, connect_bluetooth())
