@@ -32,6 +32,8 @@ def pass_out_message(pub):
 
 def pass_into_message(pub):
     out_msg = ByteMultiArray()
+    out_msg.layout.dim = []
+    out_msg.layout.data_offset = 0
     def _pass_into_message(data):
         msg_int = int(data.data)
         out_msg.data = [msg_int]
@@ -40,10 +42,6 @@ def pass_into_message(pub):
     return _pass_into_message
 
 def bluetooth_node():
-    msg = ByteMultiArray()
-    msg.layout.dim = []
-    msg.layout.data_offset = 0
-
     rx_port = 'Pin0'
     tx_port = 'Pin1'
 
