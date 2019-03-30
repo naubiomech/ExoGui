@@ -35,3 +35,55 @@ int digitalRead(int pin){
 int analogRead(int pin){
 	return pin_ins[pin]->read();
 }
+
+SoftwareSerial Serial = SoftwareSerial(100,101);
+
+SoftwareSerial::SoftwareSerial(int tx, int rx){
+	this->rx = rx;
+	this->tx = tx;
+	pinMode(rx, INPUT);
+	pinMode(tx, OUTPUT);
+}
+bool SoftwareSerial::begin(int){return true;}
+void SoftwareSerial::write(char str){
+	pin_outs[tx]->write(str);
+}
+void SoftwareSerial::write(const char* str){
+	for (int i = 0; str[i] != 0; i++){
+		pin_outs[tx]->write(str[i]);
+	}
+}
+
+void SoftwareSerial::print(const char* str){
+	this->write(str);
+}
+
+void SoftwareSerial::print(double val){
+	char str[100];
+	sprintf(str, "%lf", val);
+	this->write(str);
+}
+
+void SoftwareSerial::println(){
+	pin_outs[tx]->write('\n');
+}
+
+void SoftwareSerial::println(const char* str){
+	this->print(str);
+	this->println();
+}
+
+void SoftwareSerial::println(double val){
+	this->print(val);
+	this->println();
+}
+
+int SoftwareSerial::read(){
+	if (!this->available()){
+		return -1;
+	}
+
+	return pin_ins[rx]->read();
+}
+
+bool SoftwareSerial::available(){return pin_ins[rx]->available() > 0;}
