@@ -2,6 +2,9 @@
   <node
       pkg = "biomech_exo"
       type = "sim_exo"
-      name = "simulated_exo"
-      />
+      name = "simulated_exo" />
+  <node
+      pkg = "biomech_exo"
+      type = "exo_print.py"
+      name = "printer" />
 </launch>
