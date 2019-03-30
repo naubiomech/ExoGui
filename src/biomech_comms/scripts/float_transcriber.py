@@ -5,10 +5,12 @@ import struct
 from biomech_comms.msg import ExoCommand
 from std_msgs.msg import ByteMultiArray
 
-def process_bytes_into_exo_data(byte_msg, exoCommand):
-    msg = bytes(byte_msg)
-    exoCommand.command_code = ord(msg[0])
-    data = struct.unpack('<c' + "d"*len(data), msg[2:])
+def process_bytes_into_exo_data(msg, count, exoCommand):
+    exoCommand.command_code = msg[2]
+    print(msg[3:])
+    msg_data = "".join([chr(c) for c in (msg[3:])])
+    print(msg_data)
+    data = struct.unpack("<f"*count, msg_data)
     exoCommand.data=data
     return exoCommand
 
@@ -25,12 +27,12 @@ class Transcriber:
             try:
                 start_index = self.bluetooth_buffer.index(ord('S'))
                 count = self.bluetooth_buffer[start_index + 2]
-                end_index = start_index + count + 1
+                end_index = start_index + count*4 + 3
             except ValueError:
                 break
             msg = self.bluetooth_buffer[start_index:end_index]
             self.bluetooth_buffer = self.bluetooth_buffer[end_index + 1:]
-            self.pub.publish(process_bytes_into_exo_data(msg, self.exoCommand))
+            self.pub.publish(process_bytes_into_exo_data(msg, count, self.exoCommand))
         
 
 def send_command_message(pub):
