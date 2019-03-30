@@ -21,6 +21,8 @@ int main(int argc, char** argv){
 	ros::NodeHandle n;
 	node_handle = &n;
 	ros::Rate loop_rate(2000);
+	Serial = SoftwareSerial(100,101);
+
 	exo = setupSystem();
 
 	while(ros::ok()){

@@ -36,7 +36,9 @@ int analogRead(int pin){
 	return pin_ins[pin]->read();
 }
 
-SoftwareSerial Serial = SoftwareSerial(100,101);
+SoftwareSerial Serial;
+
+SoftwareSerial::SoftwareSerial(){}
 
 SoftwareSerial::SoftwareSerial(int tx, int rx){
 	this->rx = rx;

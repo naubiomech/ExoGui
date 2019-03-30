@@ -8,6 +8,7 @@ public:
 	int rx;
 	int tx;
 public:
+	SoftwareSerial();
 	SoftwareSerial(int, int);
 	bool begin(int);
 	void write(char character);
