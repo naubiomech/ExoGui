@@ -34,7 +34,7 @@ def pass_out_message(pub):
     out_msg = ByteMultiArray()
     def _pass_out_message(data):
         msg_int = int(data.data)
-        out_msg.data = bytes(msg_int)
+        out_msg.data = [msg_int]
         pub.publish(out_msg)
 
     return _pass_out_message
