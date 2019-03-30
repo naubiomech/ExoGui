@@ -30,6 +30,7 @@ int main(int argc, char** argv){
 		exo->sendReport();
 		exo->receiveMessages();
 
+		ros::spinOnce();
 		loop_rate.sleep();
 	}
 }
