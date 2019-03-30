@@ -41,8 +41,8 @@ def send_command_message(pub):
     def _send_command_message(command):
         command_code = command.command_code
         data = command.data
-        cmd_bytes = struct.pack('<c' + "d"*len(data), chr(command_code).encode('utf-8'), *data)
-        byteArray.data = cmd_bytes
+        cmd_bytes = struct.pack('<c' + "f"*len(data), chr(command_code).encode('utf-8'), *data)
+        byteArray.data = tuple(cmd_bytes)
         pub.publish(byteArray)
 
     return _send_command_message
