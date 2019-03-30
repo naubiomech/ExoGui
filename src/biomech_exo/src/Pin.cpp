@@ -1,17 +1,29 @@
 #include "ros/ros.h"
 #include "Pin.hpp"
 #include "std_msgs/Int16.h"
+#include <queue>
+
 
 PinIn::PinIn(ros::NodeHandle& node, const std::string& portName){
 	sub = node.subscribe(portName, 100, &PinIn::callback, this);
 }
 
 void PinIn::callback(const std_msgs::Int16::ConstPtr& update_msg){
-	this->received = update_msg->data;
+	if (this->queue.size() < 100){
+		this->queue.push(this->received);
+	}
 }
 
 int PinIn::read(){
+	if (this->queue.size() > 0){
+		this->received = this->queue.front();
+		this->queue.pop();
+	}
 	return received;
+}
+
+unsigned int PinIn::available(){
+	return this->queue.size();
 }
 
 PinOut::PinOut(ros::NodeHandle& node, const std::string& portName){
