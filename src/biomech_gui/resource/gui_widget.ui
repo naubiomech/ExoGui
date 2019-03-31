@@ -327,6 +327,13 @@
            <widget class="QComboBox" name="bluetoothSelectBox"/>
           </item>
           <item>
+           <widget class="QPushButton" name="bluetoothCheckButton">
+            <property name="text">
+             <string>Check</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_5">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
