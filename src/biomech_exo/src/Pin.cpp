@@ -5,7 +5,7 @@
 
 
 PinIn::PinIn(ros::NodeHandle& node, const std::string& portName){
-	sub = node.subscribe(portName, 10, &PinIn::callback, this);
+	sub = node.subscribe(portName, 100, &PinIn::callback, this);
 }
 
 void PinIn::callback(const std_msgs::Int16::ConstPtr& update_msg){

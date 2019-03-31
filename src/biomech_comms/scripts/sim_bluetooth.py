@@ -45,8 +45,8 @@ def bluetooth_node():
     rx_port = 'Pin0'
     tx_port = 'Pin1'
 
-    bt_pub = rospy.Publisher('bluetooth_rx', ByteMultiArray, queue_size=10)
-    port_pub = rospy.Publisher(tx_port, Int16, queue_size=10)
+    bt_pub = rospy.Publisher('bluetooth_rx', ByteMultiArray, queue_size=100)
+    port_pub = rospy.Publisher(tx_port, Int16, queue_size=100)
     bt_sub = rospy.Subscriber('bluetooth_tx', ByteMultiArray, pass_out_message(port_pub))
     port_sub = rospy.Subscriber(rx_port, Int16, pass_into_message(bt_pub))
 

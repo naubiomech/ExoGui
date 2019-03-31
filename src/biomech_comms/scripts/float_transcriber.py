@@ -59,7 +59,7 @@ def start_transcriber():
     rospy.init_node('transcriber', anonymous=True)
 
     output_pub = rospy.Publisher('exo_data', ExoCommand, queue_size=10)
-    bt_pub = rospy.Publisher('bluetooth_tx', ByteMultiArray, queue_size=10)
+    bt_pub = rospy.Publisher('bluetooth_tx', ByteMultiArray, queue_size=100)
 
     transcriber = Transcriber(output_pub)
     bt_sub = rospy.Subscriber('bluetooth_rx', ByteMultiArray, transcriber.transcribe) 
