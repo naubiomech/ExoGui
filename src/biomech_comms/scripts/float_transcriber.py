@@ -4,7 +4,7 @@ import rospy
 import struct
 import numpy as np
 from biomech_comms.msg import ExoCommand
-from std_msgs.msg import ByteMultiArray
+from std_msgs.msg import ByteMultiArray,MultiArrayDimension
 
 def process_bytes_into_exo_data(msg, count, exoCommand):
     exoCommand.command_code = msg[1]
@@ -40,7 +40,10 @@ class Transcriber:
 
 def send_command_message(pub):
     byteArray = ByteMultiArray()
-    byteArray.layout.dim = []
+    byteArray.layout.dim.append(MultiArrayDimension())
+    byteArray.layout.dim[0].label = 'Data'
+    byteArray.layout.dim[0].size = 0
+    byteArray.layout.dim[0].stride = 1
     byteArray.layout.data_offset = 0
 
     def _send_command_message(command):
@@ -48,8 +51,10 @@ def send_command_message(pub):
         data = command.data
         cmd_format = '<c' + "f"*len(data)
         cmd_bytes = struct.pack(cmd_format, chr(command_code).encode('utf-8'), *data)
-        out = [ord(c) for c in cmd_bytes]
+        out = np.array([ord(c) for c in cmd_bytes],dtype=np.byte)
         byteArray.data = out
+        byteArray.layout.dim[0].size = len(out)
+
         pub.publish(byteArray)
 
     return _send_command_message
