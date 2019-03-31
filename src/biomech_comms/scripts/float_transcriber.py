@@ -2,15 +2,15 @@
 
 import rospy
 import struct
+import numpy as np
 from biomech_comms.msg import ExoCommand
 from std_msgs.msg import ByteMultiArray
 
 def process_bytes_into_exo_data(msg, count, exoCommand):
-    exoCommand.command_code = msg[2]
-    print(msg[3:])
-    msg_data = "".join([chr(c) for c in (msg[3:])])
-    print(msg_data)
-    data = struct.unpack("<f"*count, msg_data)
+    exoCommand.command_code = msg[1]
+    data = np.array(msg[3:],dtype=np.byte).astype(np.ubyte)
+    msg_data = "".join([chr(c) for c in data])
+    data = struct.unpack("<"+"f"*count, msg_data)
     exoCommand.data=data
     return exoCommand
 
@@ -23,18 +23,19 @@ class Transcriber:
     def transcribe(self, data):
         self.bluetooth_buffer += data.data
 
-        while True:
-            try:
-                start_index = self.bluetooth_buffer.index(ord('S'))
-                count = self.bluetooth_buffer[start_index + 2]
-                end_index = start_index + count*4 + 3
-            except ValueError:
-                break
-            except IndexError:
-                break
+        try:
+            start_index = self.bluetooth_buffer.index(ord('S'))
+            count = self.bluetooth_buffer[start_index + 2]
+            end_index = start_index + count*4 + 3
+            if len(self.bluetooth_buffer) <= end_index:
+                return
             msg = self.bluetooth_buffer[start_index:end_index]
-            self.bluetooth_buffer = self.bluetooth_buffer[end_index + 1:]
-            self.pub.publish(process_bytes_into_exo_data(msg, count, self.exoCommand))
+        except ValueError:
+            return
+        except IndexError:
+            return
+        self.bluetooth_buffer = self.bluetooth_buffer[end_index + 1:]
+        self.pub.publish(process_bytes_into_exo_data(msg, count, self.exoCommand))
         
 
 def send_command_message(pub):
