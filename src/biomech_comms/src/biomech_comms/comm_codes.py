@@ -1,6 +1,4 @@
 class CommandCode:
-    START_TRIAL = ord('E')
-    END_TRIAL = ord('E')
     REQUEST_DATA = ord('?')
     GET_LEFT_ANKLE_SETPOINT = ord('D')
     GET_RIGHT_ANKLE_SETPOINT = ord('d')
