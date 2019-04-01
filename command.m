@@ -41,8 +41,8 @@ switch(msg)
     GUI_Variables.LLCount = LLCount + 1;
     GUI_Variables.RLCount = RLCount + 1;
     if(data(2)==9)||(data(7)==9)
-        disp("Torque value problem    Trq > 25Nm");
-        set(handles.statusText,'String','Problem Trq Ctrl, Trq > 25 Nm');
+        disp("Torque value problem    Trq > 35Nm");
+        set(handles.statusText,'String','Problem Trq Ctrl, Trq > 35 Nm');
 
     end
   case '`'
