@@ -26,6 +26,8 @@ class ExoControlPlugin(Plugin):
         ui_file = os.path.join(self.rp.get_path('biomech_gui'), 'resource', 'gui_widget.ui')
         loadUi(ui_file, self._widget)
 
+        self._widget.exoVersionLabel.setText("4.0.0")
+        
         data = {}
         sub_topic = 'exo_data'
         pub_topic = 'command_exo'
@@ -45,7 +47,7 @@ class ExoControlPlugin(Plugin):
         def _add_torque_widget(widget,row,col):
             widget.getTorqueButton.clicked.connect(self._sender.get_torque(widget,self._sender))
             widget.setTorqueButton.clicked.connect(self._sender.set_torque(widget))
-            self._receiver.register(CommandCode.SET_LEFT_ANKLE_SETPOINT, self._receiver.get_torque(widget))
+            self._receiver.register(CommandCode.GET_LEFT_ANKLE_SETPOINT, self._receiver.get_torque(widget))
 
         layout = QGridLayout()
         parent.setLayout(layout)

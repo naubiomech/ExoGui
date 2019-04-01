@@ -25,7 +25,6 @@ class ExoGuiReceiver():
         self._callbacks = {}
 
         self.register(CommandCode.CHECK_BLUETOOTH, self.check_bluetooth)
-        self.register(CommandCode.SET_LEFT_ANKLE_SETPOINT, self.get_torque)
 
     def register(self, exo_command, func):
         self._callbacks[exo_command] = func
@@ -49,7 +48,8 @@ class ExoGuiReceiver():
         pass
 
     def get_torque(self, widget):
-        def _get_torque(self, pfx, dfx,):
-            widget.PFXLabel.setText(pfx)
-            widget.DFXLabel.setText(dfx)
+        def _get_torque(torque):
+            torque = str(torque)
+            widget.PFXLabel.setText(torque)
+            widget.DFXLabel.setText(torque)
         return _get_torque
