@@ -3625,6 +3625,7 @@ function SSID_Input_Callback(hObject, ~, handles)
     GUI_Variables = handles.GUI_Variables;
 
     GUI_Variables.SSID = get(hObject,'String');
+    set(handles.statusText,'String',['Subject ID entered: ',GUI_Variables.SSID]);
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
 
