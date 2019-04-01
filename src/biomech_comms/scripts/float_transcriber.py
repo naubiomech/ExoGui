@@ -49,7 +49,7 @@ def send_command_message(pub):
     def _send_command_message(command):
         command_code = command.command_code
         data = command.data
-        cmd_format = '<c' + "f"*len(data)
+        cmd_format = '<c' + "d"*len(data)
         cmd_bytes = struct.pack(cmd_format, chr(command_code).encode('utf-8'), *data)
         out = np.array([ord(c) for c in cmd_bytes],dtype=np.byte)
         byteArray.data = out
