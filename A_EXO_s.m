@@ -3354,13 +3354,13 @@ function IP_list_Callback(hObject, ~, handles)
     GUI_Variables = handles.GUI_Variables;
     selectMode = get(handles.IP_list,'Value');
     if selectMode == 1
-        GUI_Variables.IP = '134.114.52.219';
+        GUI_Variables.IP = '10.18.48.77';
     elseif selectMode == 2
         GUI_Variables.IP = '10.18.48.128';
     elseif selectMode == 3
-        GUI_Variables.IP = '10.18.48.166';
-    elseif selectMode == 4
         GUI_Variables.IP = '10.18.48.160';
+    elseif selectMode == 4
+        GUI_Variables.IP = '10.18.48.166';
     end
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
