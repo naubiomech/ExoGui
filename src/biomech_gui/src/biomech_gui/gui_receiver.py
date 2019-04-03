@@ -14,12 +14,13 @@ from biomech_comms.comm_codes import CommandCode
 from biomech_comms.joint_select import JointSelect
 
 class ExoGuiReceiver():
-    def __init__(self, widget, sub_topic, data):
+    def __init__(self, handler, sub_topic, data):
         """
         :param context: plugin context hook to enable adding widgets as a ROS_GUI pane, ''PluginContext''
         """
         subscriber = rospy.Subscriber(sub_topic, ExoCommand, self.process_data)
-        self._widget = widget
+        self._handler = handler
+        self._widget = handler.widget
         self._data = data
         self._command_sub = subscriber;
         self._callbacks = {}

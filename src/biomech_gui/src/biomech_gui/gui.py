@@ -23,8 +23,9 @@ class ExoControlPlugin(Plugin):
         sub_topic = 'exo_data'
         pub_topic = 'command_exo'
         self._handler = ExoGuiHandler(self._widget)
-        self._sender = ExoGuiSender(self._widget, pub_topic, data)
-        self._receiver = ExoGuiReceiver(self._widget, sub_topic, data)
+        self._sender = ExoGuiSender(self._handler, pub_topic, data)
+        self._receiver = ExoGuiReceiver(self._handler, sub_topic, data)
+
         left_leg_count = 2
         right_leg_count = 2
         self._handler.add_torque_widget(left_leg_count, right_leg_count,self._widget.torqueTab, self._receiver.register,

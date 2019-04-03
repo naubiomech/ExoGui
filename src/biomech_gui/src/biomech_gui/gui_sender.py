@@ -8,13 +8,13 @@ from biomech_comms.msg import ExoCommand
 from biomech_comms.comm_codes import CommandCode
 
 class ExoGuiSender():
-    def __init__(self, widget, pub_topic, data):
+    def __init__(self, handler, pub_topic, data):
         """
         :param context: plugin context hook to enable adding widgets as a ROS_GUI pane, ''PluginContext''
         """
         publisher = rospy.Publisher(pub_topic, ExoCommand, queue_size=10)
-
-        self._widget = widget
+        self._handler = handler
+        self._widget = handler.widget
         self._data = data
         self._command_pub = publisher;
         self._command = ExoCommand()
