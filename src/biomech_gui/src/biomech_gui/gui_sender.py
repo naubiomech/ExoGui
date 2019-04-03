@@ -65,8 +65,8 @@ class ExoGuiSender():
     def set_torque(self, widget):
         def _set_torque():
             try:
-                pfx = float(widget.PFXLine.text())
-                dfx = float(widget.DFXLine.text())
+                pfx = float(widget.pfxLine.text())
+                dfx = float(widget.dfxLine.text())
                 self.send_command(CommandCode.SET_LEFT_ANKLE_SETPOINT, pfx,dfx)
             except ValueError:
                 self.report_info("Bad Torque Setpoint")
