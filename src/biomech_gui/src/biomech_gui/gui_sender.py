@@ -72,7 +72,7 @@ class ExoGuiSender():
                 self.report_info("Bad Torque Setpoint")
         return _set_torque
 
-    def get_torque(self, widget, sender):
+    def get_torque(self, widget):
         def _get_torque():
             self.send_command(CommandCode.GET_LEFT_ANKLE_SETPOINT)
         return _get_torque
