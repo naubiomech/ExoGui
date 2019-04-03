@@ -2,6 +2,8 @@ import os
 import time
 import rospkg
 
+from biomech_comms.comm_codes import CommandCode
+
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QGridLayout
 

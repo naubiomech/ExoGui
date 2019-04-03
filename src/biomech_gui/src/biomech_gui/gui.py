@@ -7,7 +7,6 @@ from python_qt_binding.QtWidgets import QWidget, QGridLayout
 from rqt_plot.data_plot import DataPlot
 from biomech_gui.gui_sender import ExoGuiSender
 from biomech_gui.gui_receiver import ExoGuiReceiver
-from biomech_comms.comm_codes import CommandCode
 from biomech_gui.gui_handler import ExoGuiHandler
 
 class ExoControlPlugin(Plugin):
