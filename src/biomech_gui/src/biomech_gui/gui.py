@@ -28,8 +28,8 @@ class ExoControlPlugin(Plugin):
 
         left_leg_count = 2
         right_leg_count = 2
-        self._handler.add_torque_widget(left_leg_count, right_leg_count,self._widget.torqueTab, self._receiver.register,
-                                        self._sender.get_torque, self._sender.set_torque, self._receiver.get_torque)
+        self._handler.add_torque_widgets(self._widget.torqueTab, left_leg_count, right_leg_count, self._sender, self._receiver)
+        self._handler.add_pid_widgets(self._widget.pidTab, left_leg_count, right_leg_count, self._sender, self._receiver)
 
         context.add_widget(self._widget)
 

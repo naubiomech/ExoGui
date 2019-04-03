@@ -30,11 +30,22 @@ class ExoGuiReceiver():
     def register(self, exo_command, func):
         self._callbacks[exo_command] = func
 
+    def register_multi_widget(self, exo_command, identifier, func):
+        if exo_command not in self._callbacks:
+            self._callbacks[exo_command] = {}
+        self._callbacks[exo_command][identifier] = func
+
     def report_info(self, info):
         self._widget.exoReportLabel.setText(info)
         
     def process_data(self, exo_command):
-        self._callbacks[exo_command.command_code](*exo_command.data)
+        call = self._callbacks[exo_command.command_code](*exo_command.data)
+        try:
+            call(*exo_command.data)
+        except TypeError:
+            data = exo_command.data
+            raw_identifier = data[0]
+            call[raw_identifier](*data[1:])
 
     def check_bluetooth(self, *data):
         valid_comm = data[0] == 0 and data[1] == 1 and data[2] == 2 
@@ -45,12 +56,16 @@ class ExoGuiReceiver():
         else:
             self.report_info("Bluetooth failed")
 
-    def get_pid(self, p,i,d):
-        pass
+    def receive_pid(self,widget):
+        def _receive_pid(p,i,d):
+            widget.pidPLabel.setText(str(p))
+            widget.pidILabel.setText(str(i))
+            widget.pidDLabel.setText(str(d))
+        return _receive_pid
 
-    def get_torque(self, widget):
-        def _get_torque(torque):
+    def receive_torque(self, widget):
+        def _receive_torque(torque):
             torque = str(torque)
             widget.PFXLabel.setText(torque)
             widget.DFXLabel.setText(torque)
-        return _get_torque
+        return _receive_torque

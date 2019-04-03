@@ -56,23 +56,37 @@ class ExoGuiSender():
         if self._data["check_bluetooth_fail"]:
             self.report_info("Bluetooth failed")
 
-    def get_left_pid(self):
-        self.send_command(CommandCode.GET_LEFT_ANKLE_PID_PARAMS)
+    def get_pid(self, widget, row, col):
+        identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+        def _get_pid():
+            self.send_command(CommandCode.GET_PID_PARAMS, identifier)
+        return _get_pid
 
-    def set_left_pid(self):
-        self.send_command(CommandCode.SET_LEFT_RIGHT_ANKLE_PID_PARAMS, p,i,d)
+    def set_pid(self, widget, row, col):
+        def _set_pid():
+            try:
+                p = float(widget.pidPLine.text())
+                i = float(widget.pidILine.text())
+                d = float(widget.pidDLine.text())
+                identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+                self.send_command(CommandCode.SET_PID_PARAMS, identifier, p,i,d)
+            except ValueError:
+                self.report_info("Bad Pid")
+        return _set_pid
 
-    def set_torque(self, widget):
+    def set_torque(self, widget, row, col):
         def _set_torque():
             try:
                 pfx = float(widget.pfxLine.text())
                 dfx = float(widget.dfxLine.text())
-                self.send_command(CommandCode.SET_LEFT_ANKLE_SETPOINT, pfx,dfx)
+                identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+                self.send_command(CommandCode.SET_TORQUE_SETPOINT, identifier, pfx,dfx)
             except ValueError:
                 self.report_info("Bad Torque Setpoint")
         return _set_torque
 
-    def get_torque(self, widget):
+    def get_torque(self, widget, row, col):
+        identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_torque():
-            self.send_command(CommandCode.GET_LEFT_ANKLE_SETPOINT)
+            self.send_command(CommandCode.GET_TORQUE_SETPOINT, identifier)
         return _get_torque
