@@ -17,7 +17,6 @@ class ExoGuiHandler:
         loadUi(ui_file, self.widget)
 
         self.widget.exoVersionLabel.setText("4.0.0")
-        pass
 
     def add_pid_widgets(self, parent, left_leg, right_leg, sender, receiver):
         widgetCount = (left_leg, right_leg)
