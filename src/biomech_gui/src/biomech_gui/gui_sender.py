@@ -72,6 +72,22 @@ class ExoGuiSender():
                 self.report_info("Bad Kf")
         return _set_kf
 
+    def get_prop_gain(self, widget, row, col):
+        identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+        def _get_gain():
+            self.send_command(CommandCode.GET_GAIN, identifier)
+        return _get_gain
+
+    def set_prop_gain(self, widget, row, col):
+        def _set_gain():
+            try:
+                gain = float(widget.propGainLine.text())
+                identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+                self.send_command(CommandCode.SET_GAIN, identifier, gain)
+            except ValueError:
+                self.report_info("Bad Gain")
+        return _set_gain
+
     def get_fsr_thresh(self, widget, row, col):
         identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_fsr_thresh():

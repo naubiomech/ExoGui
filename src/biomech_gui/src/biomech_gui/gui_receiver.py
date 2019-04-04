@@ -70,6 +70,12 @@ class ExoGuiReceiver():
             widget.DFXLabel.setText(torque)
         return _receive_torque
 
+    def receive_prop_gain(self, widget):
+        def _receive_prop_gain(gain):
+            gain = str(gain)
+            widget.propGainLabel.setText(gain)
+        return _receive_prop_gain
+
     def receive_kf(self, widget):
         def _receive_kf(kf):
             kf = str(kf)

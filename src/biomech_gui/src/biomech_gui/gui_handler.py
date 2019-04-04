@@ -49,6 +49,20 @@ class ExoGuiHandler:
         receiving = [receiveData]
 
         self.add_set_get_receive_widget(parent, widgetCount, widgetData, receiver.register_multi_widget, sending, receiving) 
+
+    def add_prop_widgets(self, parent, left_leg, right_leg, sender, receiver):
+        self.widget.prop_widgets = {}
+        widgetCount = (left_leg, right_leg)
+        widgetData = (self.widget.prop_widgets, "proportional_control_gui.ui")
+
+        getData = ("propGetGainButton", sender.get_prop_gain)
+        setData = ("propSetGainButton", sender.set_prop_gain)
+        sending = [getData, setData]
+
+        receiveData = (CommandCode.GET_GAIN, receiver.receive_prop_gain)
+        receiving = [receiveData]
+
+        self.add_set_get_receive_widget(parent, widgetCount, widgetData, receiver.register_multi_widget, sending, receiving) 
     
     def add_torque_widgets(self, parent, left_leg, right_leg, sender, receiver):
         self.widget.torque_widgets = {}
