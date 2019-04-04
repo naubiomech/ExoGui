@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 12-Mar-2019 15:26:30
+% Last Modified by GUIDE v2.5 03-Apr-2019 18:43:03
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -3685,3 +3685,42 @@ function Motor_Error_Callback(hObject, ~, handles)
     end
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
+    
+    
+
+
+% --- Executes on button press in Activate_Pro_ID.
+function Activate_Pro_ID_Callback(hObject, eventdata, handles)
+% hObject    handle to Activate_Pro_ID (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of Activate_Pro_ID
+  GUI_Variables = handles.GUI_Variables;
+    bt = GUI_Variables.BT;
+
+    if (bt.Status=="open")
+
+        PP=get(hObject,'Value');
+        try
+
+            if PP
+                %activate prop control
+                GUI_Variables.PropOn = 1;
+                fwrite(bt,'c');
+                disp('Activate Prop Pivot Ctrl');
+                axes(handles.PROP_FUNCTION_axes);
+                x=0.4:0.01:1.2;
+                plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
+            else
+                %deactivate prop control
+                GUI_Variables.PropOn = 0;
+                fwrite(bt,'^');
+                disp('Deactivate Prop Pivot Ctrl');
+                axes(handles.PROP_FUNCTION_axes);
+                x=0.4:0.01:1.2;
+                plot(x,x*0);
+            end
+        catch
+        end
+    end
