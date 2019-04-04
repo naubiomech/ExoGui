@@ -19,30 +19,41 @@ class ExoGuiHandler:
         self.widget.exoVersionLabel.setText("4.0.0")
 
     def add_pid_widgets(self, parent, left_leg, right_leg, sender, receiver):
+        self.widget.pid_widgets = {}
         widgetCount = (left_leg, right_leg)
+        widgetData = (self.widget.pid_widgets, "pid_gui.ui")
+
         getData = ("pidGetButton", sender.get_pid)
         setData = ("pidSetButton", sender.set_pid)
-        self.widget.pid_widgets = {}
-        widgetData = (self.widget.pid_widgets, "pid_gui.ui")
-        receiveData = (receiver.register_multi_widget, CommandCode.GET_PID_PARAMS, receiver.receive_pid)
-        self.add_set_get_receive_widget(parent, widgetCount, widgetData, getData, setData, receiveData) 
+        sending = [getData, setData]
+
+        receiveData = (CommandCode.GET_PID_PARAMS, receiver.receive_pid)
+        receiving = [receiveData]
+
+        self.add_set_get_receive_widget(parent, widgetCount, widgetData, receiver.register_multi_widget, sending, receiving) 
     
     def add_torque_widgets(self, parent, left_leg, right_leg, sender, receiver):
+        self.widget.torque_widgets = {}
         widgetCount = (left_leg, right_leg)
+        widgetData = (self.widget.torque_widgets, "torque_gui.ui")
+
         getData = ("getTorqueButton", sender.get_torque)
         setData = ("setTorqueButton", sender.set_torque)
-        self.widget.torque_widgets = {}
-        widgetData = (self.widget.torque_widgets, "torque_gui.ui")
-        receiveData = (receiver.register_multi_widget, CommandCode.GET_TORQUE_SETPOINT, receiver.receive_torque)
-        self.add_set_get_receive_widget(parent, widgetCount, widgetData, getData, setData, receiveData) 
+        sending = [getData, setData]
+
+        receiveData = (CommandCode.GET_TORQUE_SETPOINT, receiver.receive_torque)
+        receiving = [receiveData]
+
+        self.add_set_get_receive_widget(parent, widgetCount, widgetData, receiver.register_multi_widget, sending, receiving) 
     
-    def add_set_get_receive_widget(self, parent, widgetCounts, widgetData, getData, setData, receiveData):
+    def add_set_get_receive_widget(self, parent, widgetCounts, widgetData, receiver_register, sendingData, receivingData):
 
         def _add_widget(widget,row,col):
             identifier = self.decode_widget_to_joint_select_msg(row, col)
-            getattr(widget,getData[0]).clicked.connect(getData[1](widget,row,col))
-            getattr(widget,setData[0]).clicked.connect(setData[1](widget,row,col))
-            receiveData[0](receiveData[1], identifier, receiveData[2](widget))
+            for data in sendingData:
+                getattr(widget,data[0]).clicked.connect(data[1](widget,row,col))
+            for data in receivingData:
+                receiver_register(data[0], identifier, data[1](widget))
 
         layout, ui_file = self.prepare_widget_parent_grid(parent, widgetData[1])
         self.add_widgets(layout, ui_file, widgetData[0],widgetCounts,_add_widget)
