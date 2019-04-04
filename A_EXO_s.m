@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 03-Apr-2019 18:43:03
+% Last Modified by GUIDE v2.5 04-Apr-2019 13:41:47
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -3724,3 +3724,85 @@ function Activate_Pro_ID_Callback(hObject, eventdata, handles)
         catch
         end
     end
+
+
+% --- Executes on button press in Torque.
+function Torque_Callback(hObject, eventdata, handles)
+% hObject    handle to Torque (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+        
+        set(handles.L_Torque,'Visible','on');
+        set(handles.L_PID,'Visible','off');
+        set(handles.L_Adj,'Visible','off');
+        set(handles.L_Proportional_Ctrl,'Visible','off');
+        set(handles.Optimization_Panel,'Visible','off');
+        set(handles.Balance_panel,'Visible','off');        
+        
+        set(handles.R_Torque,'Visible','on');
+        set(handles.R_PID,'Visible','off');
+        set(handles.R_Adj,'Visible','off');
+        set(handles.R_Smoothing,'Visible','off');
+        set(handles.R_Proportional_Ctrl,'Visible','off');
+        set(handles.Bio_Feedback_panel,'Visible','off');
+        
+        
+% --- Executes on button press in PID.
+function PID_Callback(hObject, eventdata, handles)
+% hObject    handle to PID (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+        set(handles.L_Torque,'Visible','off');
+        set(handles.L_PID,'Visible','on');
+        set(handles.L_Adj,'Visible','off');
+        set(handles.L_Proportional_Ctrl,'Visible','off');
+        set(handles.Optimization_Panel,'Visible','off');
+        set(handles.Balance_panel,'Visible','off');
+        
+        set(handles.R_Torque,'Visible','off');
+        set(handles.R_PID,'Visible','on');
+        set(handles.R_Adj,'Visible','off');
+        set(handles.R_Smoothing,'Visible','off');
+        set(handles.R_Proportional_Ctrl,'Visible','off');
+        set(handles.Bio_Feedback_panel,'Visible','off');
+        
+% --- Executes on button press in Adj.
+function Adj_Callback(hObject, eventdata, handles)
+% hObject    handle to Adj (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+        set(handles.L_Torque,'Visible','off');
+        set(handles.L_PID,'Visible','off');
+        set(handles.L_Adj,'Visible','on');
+        set(handles.L_Proportional_Ctrl,'Visible','off');
+        set(handles.Optimization_Panel,'Visible','off');
+        set(handles.Balance_panel,'Visible','off');
+        
+        set(handles.R_Torque,'Visible','off');
+        set(handles.R_PID,'Visible','off');
+        set(handles.R_Adj,'Visible','on');
+        set(handles.R_Smoothing,'Visible','off');
+        set(handles.R_Proportional_Ctrl,'Visible','off');
+        set(handles.Bio_Feedback_panel,'Visible','off');
+        
+% --- Executes on button press in pushbutton111.
+function pushbutton111_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton111 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in Smoothing.
+function Smoothing_Callback(hObject, eventdata, handles)
+% hObject    handle to Smoothing (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in Pro_Ctrl.
+function Pro_Ctrl_Callback(hObject, eventdata, handles)
+% hObject    handle to Pro_Ctrl (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
