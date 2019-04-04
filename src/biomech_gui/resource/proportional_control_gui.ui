@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="propBox">
      <property name="title">
       <string>GroupBox</string>
      </property>
@@ -23,7 +23,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,1">
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="propGetGainButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -41,7 +41,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="propGainLabel">
           <property name="font">
            <font>
             <pointsize>10</pointsize>
@@ -60,7 +60,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,1">
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="propSetGainButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -78,7 +78,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit">
+         <widget class="QLineEdit" name="propGainLine">
           <property name="font">
            <font>
             <pointsize>10</pointsize>
