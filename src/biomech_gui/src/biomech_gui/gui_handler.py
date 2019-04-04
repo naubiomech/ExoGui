@@ -19,19 +19,6 @@ class ExoGuiHandler:
         self.widget.exoVersionLabel.setText("4.0.0")
         pass
 
-    def add_pid_widget(self, left_leg, right_leg, parent, receive_register,
-                          get_pid, set_pid, receive_pid):
-
-        def _add_pid_widget(widget,row,col):
-            widget.pidGetButton.clicked.connect(get_pid(widget, identifier))
-            widget.pidSetButton.clicked.connect(set_pid(widget, identifier))
-            receive_register(CommandCode.GET_PID, identifier, receive_pid(widget))
-
-        pid_widgets = {}
-        self.widget.pid_widgets = pid_widgets
-        layout, ui_file = self.prepare_widget_parent_grid(parent, 'pid_gui.ui')
-        self.add_widgets(layout, ui_file, pid_widgets,left_leg,right_leg,_add_pid_widget)
-
     def add_pid_widgets(self, parent, left_leg, right_leg, sender, receiver):
         widgetCount = (left_leg, right_leg)
         getData = ("pidGetButton", sender.get_pid)
@@ -41,7 +28,6 @@ class ExoGuiHandler:
         receiveData = (receiver.register_multi_widget, CommandCode.GET_PID_PARAMS, receiver.receive_pid)
         self.add_set_get_receive_widget(parent, widgetCount, widgetData, getData, setData, receiveData) 
     
-
     def add_torque_widgets(self, parent, left_leg, right_leg, sender, receiver):
         widgetCount = (left_leg, right_leg)
         getData = ("getTorqueButton", sender.get_torque)
