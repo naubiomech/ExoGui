@@ -21,7 +21,7 @@ class ExoGuiHandler:
     def add_adjust_widgets(self, parent, left_leg, right_leg, sender, receiver):
         self.widget.pid_widgets = {}
         widgetCount = (left_leg, right_leg)
-        widgetData = (self.widget.pid_widgets, "adjust_gui.ui")
+        widgetData = (self.widget.pid_widgets, "adjust_gui.ui", "adjustBox")
 
         getKFData = ("adjustGetKFButton", sender.get_kf)
         setKFData = ("adjustSetKFButton", sender.set_kf)
@@ -39,7 +39,7 @@ class ExoGuiHandler:
     def add_pid_widgets(self, parent, left_leg, right_leg, sender, receiver):
         self.widget.pid_widgets = {}
         widgetCount = (left_leg, right_leg)
-        widgetData = (self.widget.pid_widgets, "pid_gui.ui")
+        widgetData = (self.widget.pid_widgets, "pid_gui.ui", "pidBox")
 
         getData = ("pidGetButton", sender.get_pid)
         setData = ("pidSetButton", sender.set_pid)
@@ -53,7 +53,7 @@ class ExoGuiHandler:
     def add_prop_widgets(self, parent, left_leg, right_leg, sender, receiver):
         self.widget.prop_widgets = {}
         widgetCount = (left_leg, right_leg)
-        widgetData = (self.widget.prop_widgets, "proportional_control_gui.ui")
+        widgetData = (self.widget.prop_widgets, "proportional_control_gui.ui", "propBox")
 
         getData = ("propGetGainButton", sender.get_prop_gain)
         setData = ("propSetGainButton", sender.set_prop_gain)
@@ -67,7 +67,7 @@ class ExoGuiHandler:
     def add_smoothing_widgets(self, parent, left_leg, right_leg, sender, receiver):
         self.widget.prop_widgets = {}
         widgetCount = (left_leg, right_leg)
-        widgetData = (self.widget.prop_widgets, "smoothing_gui.ui")
+        widgetData = (self.widget.prop_widgets, "smoothing_gui.ui", "smoothingBox")
 
         getData = ("getSmoothing", sender.get_smoothing)
         setData = ("setSmoothing", sender.set_smoothing)
@@ -81,7 +81,7 @@ class ExoGuiHandler:
     def add_torque_widgets(self, parent, left_leg, right_leg, sender, receiver):
         self.widget.torque_widgets = {}
         widgetCount = (left_leg, right_leg)
-        widgetData = (self.widget.torque_widgets, "torque_gui.ui")
+        widgetData = (self.widget.torque_widgets, "torque_gui.ui", "torqueBox")
 
         getData = ("getTorqueButton", sender.get_torque)
         setData = ("setTorqueButton", sender.set_torque)
@@ -93,9 +93,12 @@ class ExoGuiHandler:
         self.add_set_get_receive_widget(parent, widgetCount, widgetData, receiver.register_multi_widget, sending, receiving) 
     
     def add_set_get_receive_widget(self, parent, widgetCounts, widgetData, receiver_register, sendingData, receivingData):
-
+        area_name = ["Left","Right"]
+        joint_name = ["Ankle", "Knee"]
         def _add_widget(widget,row,col):
             identifier = self.decode_widget_to_joint_select_msg(row, col)
+            title = "{} {}".format(area_name[col], joint_name[row])
+            getattr(widget,widgetData[2]).setTitle(title)
             for data in sendingData:
                 getattr(widget,data[0]).clicked.connect(data[1](widget,row,col))
             for data in receivingData:
