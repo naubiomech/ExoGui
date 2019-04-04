@@ -63,6 +63,13 @@ class ExoGuiReceiver():
             widget.pidDLabel.setText(str(d))
         return _receive_pid
 
+    def receive_smoothing(self,widget):
+        def _receive_smoothing(n1,n2,n3):
+            widget.n1Label.setText(str(n1))
+            widget.n2Label.setText(str(n2))
+            widget.n3Label.setText(str(n3))
+        return _receive_smoothing
+
     def receive_torque(self, widget):
         def _receive_torque(torque):
             torque = str(torque)

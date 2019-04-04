@@ -88,6 +88,24 @@ class ExoGuiSender():
                 self.report_info("Bad Gain")
         return _set_gain
 
+    def get_smoothing(self, widget, row, col):
+        identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+        def _get_smoothing():
+            self.send_command(CommandCode.GET_SMOOTHING_PARAMS, identifier)
+        return _get_smoothing
+
+    def set_smoothing(self, widget, row, col):
+        def _set_smoothing():
+            try:
+                n1 = float(widget.n1setLine.text())
+                n2 = float(widget.n2setLine.text())
+                n3 = float(widget.n3setLine.text())
+                identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+                self.send_command(CommandCode.SET_SMOOTHING_PARAMS, identifier, n1, n2, n3)
+            except ValueError:
+                self.report_info("Bad Smoothing")
+        return _set_smoothing
+
     def get_fsr_thresh(self, widget, row, col):
         identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_fsr_thresh():

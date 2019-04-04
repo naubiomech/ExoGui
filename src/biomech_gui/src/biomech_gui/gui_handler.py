@@ -63,6 +63,20 @@ class ExoGuiHandler:
         receiving = [receiveData]
 
         self.add_set_get_receive_widget(parent, widgetCount, widgetData, receiver.register_multi_widget, sending, receiving) 
+
+    def add_smoothing_widgets(self, parent, left_leg, right_leg, sender, receiver):
+        self.widget.prop_widgets = {}
+        widgetCount = (left_leg, right_leg)
+        widgetData = (self.widget.prop_widgets, "smoothing_gui.ui")
+
+        getData = ("getSmoothing", sender.get_smoothing)
+        setData = ("setSmoothing", sender.set_smoothing)
+        sending = [getData, setData]
+
+        receiveData = (CommandCode.GET_SMOOTHING_PARAMS, receiver.receive_smoothing)
+        receiving = [receiveData]
+
+        self.add_set_get_receive_widget(parent, widgetCount, widgetData, receiver.register_multi_widget, sending, receiving) 
     
     def add_torque_widgets(self, parent, left_leg, right_leg, sender, receiver):
         self.widget.torque_widgets = {}

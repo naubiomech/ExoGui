@@ -36,6 +36,8 @@ class ExoControlPlugin(Plugin):
                                       self._sender, self._receiver)
         self._handler.add_prop_widgets(self._widget.propBox, left_leg_count, right_leg_count,
                                       self._sender, self._receiver)
+        self._handler.add_smoothing_widgets(self._widget.smoothingTab, left_leg_count,
+                                            right_leg_count, self._sender, self._receiver)
 
         context.add_widget(self._widget)
 
