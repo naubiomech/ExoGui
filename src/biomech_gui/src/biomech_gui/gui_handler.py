@@ -18,6 +18,24 @@ class ExoGuiHandler:
 
         self.widget.exoVersionLabel.setText("4.0.0")
 
+    def add_adjust_widgets(self, parent, left_leg, right_leg, sender, receiver):
+        self.widget.pid_widgets = {}
+        widgetCount = (left_leg, right_leg)
+        widgetData = (self.widget.pid_widgets, "adjust_gui.ui")
+
+        getKFData = ("adjustGetKFButton", sender.get_kf)
+        setKFData = ("adjustSetKFButton", sender.set_kf)
+        getFSRThData = ("adjustFSRThGetButton", sender.get_kf)
+        setFSRThData = ("adjustFSRThSetButton", sender.set_kf)
+        sending = [getKFData, setKFData, getFSRThData, setFSRThData]
+
+        receiveKFData = (CommandCode.GET_KF, receiver.receive_pid)
+        receiveFSRThData = (CommandCode.GET_FSR_THRESHOLD, receiver.receive_fsr_thresh)
+        receiving = [receiveKFData, receiveFSRThData]
+
+        self.add_set_get_receive_widget(parent, widgetCount, widgetData,
+                                        receiver.register_multi_widget, sending, receiving) 
+    
     def add_pid_widgets(self, parent, left_leg, right_leg, sender, receiver):
         self.widget.pid_widgets = {}
         widgetCount = (left_leg, right_leg)

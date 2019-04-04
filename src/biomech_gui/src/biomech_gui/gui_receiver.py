@@ -69,3 +69,15 @@ class ExoGuiReceiver():
             widget.PFXLabel.setText(torque)
             widget.DFXLabel.setText(torque)
         return _receive_torque
+
+    def receive_kf(self, widget):
+        def _receive_kf(kf):
+            kf = str(kf)
+            widget.adjustKFLabel.setText(kf)
+        return _receive_kf
+
+    def receive_fsr_thresh(self, widget):
+        def _receive_fsr_thresh(fsr_thresh):
+            fsr_thresh = str(fsr_thresh)
+            widget.adjustFSRThLabel.setText(fsr_thresh)
+        return _receive_fsr_thresh

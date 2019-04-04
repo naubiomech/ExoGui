@@ -56,6 +56,38 @@ class ExoGuiSender():
         if self._data["check_bluetooth_fail"]:
             self.report_info("Bluetooth failed")
 
+    def get_kf(self, widget, row, col):
+        identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+        def _get_kf():
+            self.send_command(CommandCode.GET_KF, identifier)
+        return _get_kf
+
+    def set_kf(self, widget, row, col):
+        def _set_kf():
+            try:
+                kf = float(widget.adjustKFLine.text())
+                identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+                self.send_command(CommandCode.SET_KF, identifier, kf)
+            except ValueError:
+                self.report_info("Bad Kf")
+        return _set_kf
+
+    def get_fsr_thresh(self, widget, row, col):
+        identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+        def _get_fsr_thresh():
+            self.send_command(CommandCode.GET_FSR_THRESHOLD, identifier)
+        return _get_fsr_thresh
+
+    def set_fsr_thresh(self, widget, row, col):
+        def _set_fsr_thresh():
+            try:
+                fsr_thresh = float(widget.adjustFSRThLine.text())
+                identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
+                self.send_command(CommandCode.SET_FSR_THRESHOLD, identifier, fsr_thresh)
+            except ValueError:
+                self.report_info("Bad Fsr_Thresh")
+        return _set_fsr_thresh
+
     def get_pid(self, widget, row, col):
         identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_pid():
