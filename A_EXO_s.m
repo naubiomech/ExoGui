@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 04-Apr-2019 20:52:15
+% Last Modified by GUIDE v2.5 05-Apr-2019 12:16:47
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -138,6 +138,7 @@ function figure1_CloseRequestFcn(hObject, ~, handles) %#ok<*DEFNU>
 function Start_Trial_Callback(hObject, eventdata, handles)
 %Make a further check of the connection before starting
 
+    global GUI_Variables
     GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
@@ -2712,7 +2713,7 @@ function Activate_Prop_Pivot_Callback(hObject, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of Activate_Prop_Pivot
-
+    
     GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
@@ -2734,6 +2735,44 @@ function Activate_Prop_Pivot_Callback(hObject, ~, handles)
                 GUI_Variables.PropOn = 0;
                 fwrite(bt,'^');
                 disp('Deactivate Prop Pivot Ctrl');
+                axes(handles.PROP_FUNCTION_axes);
+                x=0.4:0.01:1.2;
+                plot(x,x*0);
+            end
+        catch
+        end
+    end
+
+    
+% --- Executes on button press in Activate_Prop_ID.
+function Activate_Prop_ID_Callback(hObject, eventdata, handles)
+% hObject    handle to Activate_Prop_ID (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of Activate_Pro_ID
+
+  GUI_Variables = handles.GUI_Variables;
+    bt = GUI_Variables.BT;
+
+    if (bt.Status=="open")
+
+        PP=get(hObject,'Value');
+        try
+
+            if PP
+                %activate prop control
+                GUI_Variables.PropOn = 1;
+                fwrite(bt,'c');
+                disp('Activate Prop ID Ctrl');
+                axes(handles.PROP_FUNCTION_axes);
+                x=0.4:0.01:1.2;
+                plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
+            else
+                %deactivate prop control
+                GUI_Variables.PropOn = 0;
+                fwrite(bt,'^');
+                disp('Deactivate Prop ID Ctrl');
                 axes(handles.PROP_FUNCTION_axes);
                 x=0.4:0.01:1.2;
                 plot(x,x*0);
@@ -3688,44 +3727,6 @@ function Motor_Error_Callback(hObject, ~, handles)
     
     
 
-
-% --- Executes on button press in Activate_Pro_ID.
-function Activate_Pro_ID_Callback(hObject, eventdata, handles)
-% hObject    handle to Activate_Pro_ID (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of Activate_Pro_ID
-  GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if (bt.Status=="open")
-
-        PP=get(hObject,'Value');
-        try
-
-            if PP
-                %activate prop control
-                GUI_Variables.PropOn = 1;
-                fwrite(bt,'c');
-                disp('Activate Prop Pivot Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
-            else
-                %deactivate prop control
-                GUI_Variables.PropOn = 0;
-                fwrite(bt,'^');
-                disp('Deactivate Prop Pivot Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,x*0);
-            end
-        catch
-        end
-    end
-
-
 % --- Executes on button press in Torque.
 function Torque_Callback(hObject, eventdata, handles)
 % hObject    handle to Torque (see GCBO)
@@ -3894,3 +3895,111 @@ function Bio_Feedback_Callback(hObject, eventdata, handles)
         set(handles.R_Smoothing,'Visible','off');
         set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','on');
+
+
+% --- Executes on button press in Save_Prop_Prm.
+function Save_Prop_Prm_Callback(hObject, eventdata, handles)
+% hObject    handle to Save_Prop_Prm (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global GUI_Variables
+
+bt = GUI_Variables.BT; 
+left_plant_peak_mean = 0; 
+right_plant_peak_mean = 0; 
+left_leg_Curr_Combined = 0;
+right_leg_Curr_Combined = 0;
+left_leg_fsr_Combined_peak_ref = 0;
+right_leg_fsr_Combined_peak_ref = 0;
+left_leg_fsr_Toe_peak_ref = 0;
+right_leg_fsr_Toe_peak_ref = 0;
+left_leg_fsr_Heel_peak_ref = 0;
+right_leg_fsr_Heel_peak_ref = 0;
+left_leg_torque_calibration_value = 0;
+right_leg_torque_calibration_value = 0;
+
+if(bt.Status=="open")
+    fwrite(bt,'e');
+    if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
+        message = fgetl(bt);
+        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
+            indexes = find(message==44);
+        left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
+        right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
+        left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
+        right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
+        left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
+        right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
+        left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
+        right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
+        left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
+        right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
+        left_leg_torque_calibration_value = str2double(message((indexes(11)+1):(indexes(12)-1)));
+        right_leg_torque_calibration_value = str2double(message((indexes(12)+1):(indexes(13)-1)));
+
+        
+        end
+      
+        
+    currDir = cd;       % Current directory
+saveDir = [currDir,'\',GUI_Variables.SSID,'_',date,'_Proportional_Parameters'];    % Save directory specific to subject and date
+mkdir(currDir,[GUI_Variables.SSID,'_',date,'_Proportional_Parameters']);           % Make a save directory
+Filename_P = sprintf('%s_%d',fullfile(saveDir,[GUI_Variables.SSID,'_',date,'_','Proportional_Parameters_']),...
+    bt.UserData);               %Creates a new filename called "Torque_#"
+                                                                           %Where # is the trial number                                                                           
+fileID_P = fopen(Filename_P,'w');                                      %Actually creates that file
+pause(.01);
+fprintf(fileID_P,['left_plant_peak_mean = ', num2str(left_plant_peak_mean),'\n']);
+fprintf(fileID_P,['right_plant_peak_mean = ', num2str(right_plant_peak_mean),'\n']);
+fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\n']);
+fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\n']);
+fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\n']);
+fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\n']);
+fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\n']);
+fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\n']);
+fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\n']);
+fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\n']);
+fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\n']);
+fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\n']);
+fclose(fileID_P);
+    end
+end
+
+
+% --- Executes on button press in Load_Prop_Prm.
+function Load_Prop_Prm_Callback(hObject, eventdata, handles)
+% hObject    handle to Load_Prop_Prm (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global GUI_Variables
+bt = GUI_Variables.BT; 
+
+if (bt.Status=="open")
+   
+    try
+       
+    [filename, pathname] = uigetfile({'*.mat', 'Matlab Files (*.mat)'; ...
+                '*.*',                   'All Files (*.*)'});
+
+%This code checks if the user pressed cancel on the dialog.
+        if isequal(filename,0) || isequal(pathname,0)
+             disp('User pressed cancel')
+        else
+             disp(['User selected ', fullfile(pathname, filename)])
+
+        end
+Old_Pro_Prm = importdata(fullfile(pathname, filename));
+
+fwrite(bt,'g'); %send the character "%"
+
+for i=1:length(Old_Pro_Prm.data)
+    fwrite(bt,Old_Pro_Prm.data(i),'double');
+    disp(['Old Proportional Parameters ','[',num2str(i),'] ',num2str(Old_Pro_Prm.data(i))]);
+   % pause(0.1);
+end
+    catch
+
+    end
+end
