@@ -96,13 +96,14 @@ class ExoGuiHandler:
         area_name = ["Left","Right"]
         joint_name = ["Ankle", "Knee"]
         def _add_widget(widget,row,col):
+            selects = self.decode_widget_to_joint_select(row, col)
             identifier = self.decode_widget_to_joint_select_msg(row, col)
             title = "{} {}".format(area_name[col], joint_name[row])
             getattr(widget,widgetData[2]).setTitle(title)
             for data in sendingData:
                 getattr(widget,data[0]).clicked.connect(data[1](widget,row,col))
             for data in receivingData:
-                receiver_register(data[0], identifier, data[1](widget))
+                receiver_register(data[0], selects, data[1](widget))
 
         layout, ui_file = self.prepare_widget_parent_grid(parent, widgetData[1])
         self.add_widgets(layout, ui_file, widgetData[0],widgetCounts,_add_widget)
@@ -137,7 +138,7 @@ class ExoGuiHandler:
         area = col
         joint = row
         state = 3
-        return area, joint, state
+        return (area, joint, state)
         
 
     def decode_widget_to_joint_select_msg(self, row, col):
@@ -145,3 +146,6 @@ class ExoGuiHandler:
         int_identifer = JointSelect.select_joint(area,joint,state)
         return JointSelect.encode_select_to_msg_double(int_identifer)
 
+    def decode_msg_to_joint_select(self, msg):
+        int_identifier = JointSelect.decode_msg_to_joint_select(msg)
+        return JointSelect.unselect_joint(int_identifier)
