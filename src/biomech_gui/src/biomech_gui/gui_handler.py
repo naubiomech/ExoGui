@@ -29,7 +29,7 @@ class ExoGuiHandler:
         setFSRThData = ("adjustFSRThSetButton", sender.set_kf)
         sending = [getKFData, setKFData, getFSRThData, setFSRThData]
 
-        receiveKFData = (CommandCode.GET_KF, receiver.receive_pid)
+        receiveKFData = (CommandCode.GET_KF, receiver.receive_kf)
         receiveFSRThData = (CommandCode.GET_FSR_THRESHOLD, receiver.receive_fsr_thresh)
         receiving = [receiveKFData, receiveFSRThData]
 
