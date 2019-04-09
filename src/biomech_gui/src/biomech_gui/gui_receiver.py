@@ -74,8 +74,8 @@ class ExoGuiReceiver():
     def receive_torque(self, widget):
         def _receive_torque(torque):
             torque = str(torque)
-            widget.PFXLabel.setText(torque)
-            widget.DFXLabel.setText(torque)
+            widget.pfxLabel.setText(torque)
+            widget.dfxLabel.setText(torque)
         return _receive_torque
 
     def receive_prop_gain(self, widget):
