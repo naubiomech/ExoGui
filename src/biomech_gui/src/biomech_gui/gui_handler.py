@@ -97,7 +97,6 @@ class ExoGuiHandler:
         joint_name = ["Ankle", "Knee"]
         def _add_widget(widget,row,col):
             selects = self.decode_widget_to_joint_select(row, col)
-            identifier = self.decode_widget_to_joint_select_msg(row, col)
             title = "{} {}".format(area_name[col], joint_name[row])
             getattr(widget,widgetData[2]).setTitle(title)
             for data in sendingData:

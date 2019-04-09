@@ -39,14 +39,20 @@ class ExoGuiReceiver():
         self._widget.exoReportLabel.setText(info)
         
     def process_data(self, exo_command):
+        print(exo_command.command_code)
         call = self._callbacks[exo_command.command_code]
         try:
             call(*exo_command.data)
         except TypeError:
             data = exo_command.data
-            raw_identifier = self._handler.decode_msg_to_joint_select(data[0])
+            raw_identifier = self._handler.decode_msg_to_joint_select(data[0:3])
             print(call)
-            call[raw_identifier](*data[1:])
+            call[raw_identifier](*data[3:])
+
+    def updateLabel(self, label, num):
+        label.setText("{:.2f}".format(num))
+
+
 
     def check_bluetooth(self, *data):
         valid_comm = data[0] == 0 and data[1] == 1 and data[2] == 2 
@@ -59,39 +65,35 @@ class ExoGuiReceiver():
 
     def receive_pid(self,widget):
         def _receive_pid(p,i,d):
-            widget.pidPLabel.setText(str(p))
-            widget.pidILabel.setText(str(i))
-            widget.pidDLabel.setText(str(d))
+            self.updateLabel(widget.pidPLabel,p)
+            self.updateLabel(widget.pidILabel,i)
+            self.updateLabel(widget.pidDLabel,d)
         return _receive_pid
 
     def receive_smoothing(self,widget):
         def _receive_smoothing(n1,n2,n3):
-            widget.n1Label.setText(str(n1))
-            widget.n2Label.setText(str(n2))
-            widget.n3Label.setText(str(n3))
+            self.updateLabel(widget.n1Label,n1)
+            self.updateLabel(widget.n2Label,n2)
+            self.updateLabel(widget.n3Label,n3)
         return _receive_smoothing
 
     def receive_torque(self, widget):
         def _receive_torque(torque):
-            torque = str(torque)
-            widget.pfxLabel.setText(torque)
-            widget.dfxLabel.setText(torque)
+            self.updateLabel(widget.pfxLabel,torque)
+            self.updateLabel(widget.dfxLabel,torque)
         return _receive_torque
 
     def receive_prop_gain(self, widget):
         def _receive_prop_gain(gain):
-            gain = str(gain)
-            widget.propGainLabel.setText(gain)
+            self.updateLabel(widget.propGainLabel,gain)
         return _receive_prop_gain
 
     def receive_kf(self, widget):
         def _receive_kf(kf):
-            kf = str(kf)
-            widget.adjustKFLabel.setText(kf)
+            self.updateLabel(widget.adjustKFLabel,kf)
         return _receive_kf
 
     def receive_fsr_thresh(self, widget):
         def _receive_fsr_thresh(fsr_thresh):
-            fsr_thresh = str(fsr_thresh)
-            widget.adjustFSRThLabel.setText(fsr_thresh)
+            self.updateLabel(widget.adjustFSRThLabel,fsr_thresh)
         return _receive_fsr_thresh

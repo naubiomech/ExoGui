@@ -20,7 +20,7 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, "ArduinoInterface");
 	ros::NodeHandle n;
 	node_handle = &n;
-	ros::Rate loop_rate(2000);
+	ros::Rate loop_rate(2);
 	Serial = SoftwareSerial(100,101);
 
 	exo = setupSystem();

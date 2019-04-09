@@ -59,7 +59,7 @@ class ExoGuiSender():
     def get_kf(self, widget, row, col):
         identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_kf():
-            self.send_command(CommandCode.GET_KF, identifier)
+            self.send_command(CommandCode.GET_KF, *identifier)
         return _get_kf
 
     def set_kf(self, widget, row, col):
@@ -75,7 +75,7 @@ class ExoGuiSender():
     def get_prop_gain(self, widget, row, col):
         identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_gain():
-            self.send_command(CommandCode.GET_GAIN, identifier)
+            self.send_command(CommandCode.GET_GAIN, *identifier)
         return _get_gain
 
     def set_prop_gain(self, widget, row, col):
@@ -83,7 +83,7 @@ class ExoGuiSender():
             try:
                 gain = float(widget.propGainLine.text())
                 identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
-                self.send_command(CommandCode.SET_GAIN, identifier, gain)
+                self.send_command(CommandCode.SET_GAIN, identifier[0], identifier[1], identifier[2], gain)
             except ValueError:
                 self.report_info("Bad Gain")
         return _set_gain
@@ -91,7 +91,7 @@ class ExoGuiSender():
     def get_smoothing(self, widget, row, col):
         identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_smoothing():
-            self.send_command(CommandCode.GET_SMOOTHING_PARAMS, identifier)
+            self.send_command(CommandCode.GET_SMOOTHING_PARAMS, identifier[0], identifier[1], identifier[2])
         return _get_smoothing
 
     def set_smoothing(self, widget, row, col):
@@ -101,7 +101,7 @@ class ExoGuiSender():
                 n2 = float(widget.n2setLine.text())
                 n3 = float(widget.n3setLine.text())
                 identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
-                self.send_command(CommandCode.SET_SMOOTHING_PARAMS, identifier, n1, n2, n3)
+                self.send_command(CommandCode.SET_SMOOTHING_PARAMS, identifier[0], identifier[1], identifier[2], n1, n2, n3)
             except ValueError:
                 self.report_info("Bad Smoothing")
         return _set_smoothing
@@ -109,7 +109,7 @@ class ExoGuiSender():
     def get_fsr_thresh(self, widget, row, col):
         identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_fsr_thresh():
-            self.send_command(CommandCode.GET_FSR_THRESHOLD, identifier)
+            self.send_command(CommandCode.GET_FSR_THRESHOLD, identifier[0], identifier[1], identifier[2])
         return _get_fsr_thresh
 
     def set_fsr_thresh(self, widget, row, col):
@@ -117,7 +117,7 @@ class ExoGuiSender():
             try:
                 fsr_thresh = float(widget.adjustFSRThLine.text())
                 identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
-                self.send_command(CommandCode.SET_FSR_THRESHOLD, identifier, fsr_thresh)
+                self.send_command(CommandCode.SET_FSR_THRESHOLD, identifier[0], identifier[1], identifier[2], fsr_thresh)
             except ValueError:
                 self.report_info("Bad Fsr_Thresh")
         return _set_fsr_thresh
@@ -125,7 +125,7 @@ class ExoGuiSender():
     def get_pid(self, widget, row, col):
         identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_pid():
-            self.send_command(CommandCode.GET_PID_PARAMS, identifier)
+            self.send_command(CommandCode.GET_PID_PARAMS, identifier[0], identifier[1], identifier[2])
         return _get_pid
 
     def set_pid(self, widget, row, col):
@@ -135,7 +135,7 @@ class ExoGuiSender():
                 i = float(widget.pidILine.text())
                 d = float(widget.pidDLine.text())
                 identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
-                self.send_command(CommandCode.SET_PID_PARAMS, identifier, p,i,d)
+                self.send_command(CommandCode.SET_PID_PARAMS, identifier[0], identifier[1], identifier[2], p,i,d)
             except ValueError:
                 self.report_info("Bad Pid")
         return _set_pid
@@ -146,7 +146,7 @@ class ExoGuiSender():
                 pfx = float(widget.pfxLine.text())
                 dfx = float(widget.dfxLine.text())
                 identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
-                self.send_command(CommandCode.SET_TORQUE_SETPOINT, identifier, pfx,dfx)
+                self.send_command(CommandCode.SET_TORQUE_SETPOINT, identifier[0], identifier[1], identifier[2], pfx,dfx)
             except ValueError:
                 self.report_info("Bad Torque Setpoint")
         return _set_torque
@@ -154,5 +154,5 @@ class ExoGuiSender():
     def get_torque(self, widget, row, col):
         identifier = self._handler.decode_widget_to_joint_select_msg(row=row, col=col)
         def _get_torque():
-            self.send_command(CommandCode.GET_TORQUE_SETPOINT, identifier)
+            self.send_command(CommandCode.GET_TORQUE_SETPOINT, identifier[0], identifier[1], identifier[2])
         return _get_torque
