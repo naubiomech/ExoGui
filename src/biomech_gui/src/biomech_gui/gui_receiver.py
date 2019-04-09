@@ -39,14 +39,12 @@ class ExoGuiReceiver():
         self._widget.exoReportLabel.setText(info)
         
     def process_data(self, exo_command):
-        print(exo_command.command_code)
         call = self._callbacks[exo_command.command_code]
         try:
             call(*exo_command.data)
         except TypeError:
             data = exo_command.data
             raw_identifier = self._handler.decode_msg_to_joint_select(data[0:3])
-            print(call)
             call[raw_identifier](*data[3:])
 
     def updateLabel(self, label, num):
