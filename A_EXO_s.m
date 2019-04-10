@@ -3552,7 +3552,7 @@ function IP_list_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in BioFeedback_Baseline.
-function BioFeedback_Baseline_Callback(~, ~, ~)
+function BioFeedback_Baseline_Callback(~, ~, handles)
 % hObject    handle to BioFeedback_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3564,9 +3564,10 @@ function BioFeedback_Baseline_Callback(~, ~, ~)
 
             fwrite(bt,':');
 
-            disp('BioFeedback Baseline for 4 steps (Default)');
-
-
+            disp('BioFeedback Baseline for 3 steps (Default)');
+            set(handles.statusText,'String','BioFeedback Baseline for 3 steps');
+            pause(4)
+            set(handles.statusText,'String','Taking BioFeedback Baseline Finished');
         catch
         end
     end
