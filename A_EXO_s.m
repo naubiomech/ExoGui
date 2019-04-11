@@ -4077,4 +4077,25 @@ set(handles.Lap_Timer,'string',num2str(c));
 set(handles.Timer_Value,'string',sprintf('%.3f',a));
 tic;
 
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
 
+if c == 1
+    bt.UserData = bt.UserData + 1;
+end
+
+
+
+currDir = cd;       % Current directory
+        saveDir = [GUI_Variables.SSID,'_',date];
+        savePath = [currDir,'\',saveDir];    % Save directory specific to subject and date
+        if ~exist(saveDir, 'dir')
+            mkdir(currDir, saveDir);           % Make a save directory
+        end
+        Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',GUI_Variables.TimeStamp,'_',...
+            'Timer_']),bt.UserData); 
+        
+fileID = fopen(Filename,'a');
+
+fprintf(fileID,'Lap %d: %4.1f s\n',c,a);
+fclose(fileID);
