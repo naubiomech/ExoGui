@@ -193,9 +193,12 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     GUI_Variables.start_count = 0;
     set(handles.statusText,'String','Trial has been started');
     tic
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject,handles);
     if state == 1 % both connected
         disp('both connected')
         while strcmp(get(handles.Start_Trial,'Enable'), 'off')
+            handles=guidata(hObject);
             GUI_Variables = handles.GUI_Variables;
             GUI_Variables = Update_GUI(GUI_Variables, handles);
             GUI_Variables = accept_message(bt,handles, GUI_Variables);
