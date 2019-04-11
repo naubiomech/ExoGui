@@ -177,6 +177,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.Clean_Memory,'Enable','off');
     set(handles.Start_Trial,'Enable','off');
     set(handles.End_Trial,'Enable','on');
+    set(handles.Start_Timer,'Enable','on');
 
     GUI_Variables.flag_start=1;
 
@@ -824,6 +825,9 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
+        set(handles.Start_Timer,'Enable','Off');
+        set(handles.Reset_Timer,'Enable','Off');
+        set(handles.Split_Timer,'Enable','Off');
 
     else
         set(handles.L_Get_Setpoint,'Enable','on');
@@ -845,6 +849,10 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
+        set(handles.Start_Timer,'Enable','Off');
+        set(handles.Reset_Timer,'Enable','Off');
+        set(handles.Split_Timer,'Enable','Off');
+
     end
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
@@ -4033,18 +4041,22 @@ function Start_Timer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
  
- 
-str = get(handles.Start_Timer,'string');
 
-if strcmp(str,'Start')
-    set(handles.Start_Timer,'string','Pause');
-    set(handles.Split_Timer,'enable','on');
-    set(handles.Reset_Timer,'enable','off');
-    tic;
-else
-    set(handles.Start_Timer,'string','Start');
-    set(handles.Reset_Timer,'enable','on');
-    set(handles.Split_Timer,'enable','off');
+if strcmp(get(handles.Start_Trial,'Enable'), 'off')
+ 
+    str = get(handles.Start_Timer,'string');
+
+    if strcmp(str,'Start')
+        set(handles.Start_Timer,'string','Pause');
+        set(handles.Split_Timer,'enable','on');
+        set(handles.Reset_Timer,'enable','off');
+        tic;
+    else
+        set(handles.Start_Timer,'string','Start');
+        set(handles.Reset_Timer,'enable','on');
+        set(handles.Split_Timer,'enable','off');
+    end
+    
 end
  
 % --- Executes on button press in Reset_Timer.
