@@ -153,13 +153,13 @@ switch(msg)
     version = round(data(1));
     board = data(2);
     if board == 1
-        boardStr = 'Two Leg Board (Analog motor control)';
+        boardStr = 'Two Leg Board (Analog)';
     elseif board == 2
-        boardStr = 'Quad Board (PWM motor control)';
+        boardStr = 'Quad Board (PWM)';
     elseif board == 3
-        boardStr = 'IMU Board (Analog motor control)';
+        boardStr = 'IMU Board (Analog)';
     elseif board == 4
-        boardStr = 'Dual Board (PWM motor control)';
+        boardStr = 'Dual Board (PWM)';
     else
         boardStr = 'Board not properly defined';
     end
