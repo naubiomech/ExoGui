@@ -381,7 +381,6 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
         RLCount = GUI_Variables.RLCount;
         LLCount = GUI_Variables.LLCount;
 
-
         draw_graphs(handles, GUI_Variables)
     end
 
@@ -805,7 +804,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables = Reset_GUI_Variables(GUI_Variables);
         bt.UserData = bt.UserData + 1; % Increments the trial number
 
-
+        Reset_Timer_Callback(0,0,handles);
         set(handles.L_Get_Setpoint,'Enable','on');
         set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
@@ -826,10 +825,9 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
         set(handles.Start_Timer,'Enable','Off');
-        set(handles.Reset_Timer,'Enable','Off');
-        set(handles.Split_Timer,'Enable','Off');
 
     else
+        Reset_Timer_Callback(0,0,handles);
         set(handles.L_Get_Setpoint,'Enable','on');
         set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
@@ -850,10 +848,9 @@ function End_Trial_Callback(hObject, eventdata, handles)
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
         set(handles.Start_Timer,'Enable','Off');
-        set(handles.Reset_Timer,'Enable','Off');
-        set(handles.Split_Timer,'Enable','Off');
 
     end
+    
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
 
