@@ -1151,6 +1151,8 @@ function Connect_BT_Callback(hObject, ~, handles)
         set(handles.EXP_Params_axes,'Color',[0 0 1])
         fprintf("Made a connection to the Right Ankle bluetooth!\n");
         set(handles.statusText,'String',"Made a Connection to the Right Ankle Bluetooth!");
+        pause(1);
+        Version_Button_Callback(hObject,' ',handles);
     end
 
     if(bt.status == "closed")
