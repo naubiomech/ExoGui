@@ -151,10 +151,23 @@ switch(msg)
     GUI_Variables.MEM = mem;
   case 'U'
     version = round(data(1));
+    board = data(2);
+    if board == 1
+        boardStr = 'Two Leg Board (Analog motor control)';
+    elseif board == 2
+        boardStr = 'Quad Board (PWM motor control)';
+    elseif board == 3
+        boardStr = 'IMU Board (Analog motor control)';
+    elseif board == 4
+        boardStr = 'Dual Board (PWM motor control)';
+    else
+        boardStr = 'Board not properly defined';
+    end
     major = mod(floor(version/100),10);
     minor = mod(floor(version/10),10);
     sub_minor = mod(floor(version/1),10);
     str = sprintf("Reported code version %d.%d.%d", major, minor, sub_minor);
+    str = {str; ['Reported board definition: ', boardStr]};
     set(handles.statusText,'String',str);
     
   case 'z'
