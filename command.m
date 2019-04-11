@@ -46,13 +46,13 @@ switch(msg)
 
     end
   case '`'
-    KF_LL = data(1);                                          %Gets the Current Arduino Torque Setpoint
+    KF_LL = round(data(1),3);                                          %Gets the Current Arduino Torque Setpoint
     set(handles.L_Check_KF_Text,'String',KF_LL);
     disp("Left Current KF ");
     disp(KF_LL);
 
   case '~'
-    KF_RL = data(1);                                            %Gets the Current Arduino Torque Setpoint
+    KF_RL = round(data(1),3);                                          %Gets the Current Arduino Torque Setpoint
     set(handles.R_Check_KF_Text,'String',KF_RL);
     disp("Right Current KF ");
     disp(KF_RL);

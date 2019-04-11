@@ -202,6 +202,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
             handles=guidata(hObject);
             GUI_Variables = handles.GUI_Variables;
             GUI_Variables = Update_GUI(GUI_Variables, handles);
+            checkValues(hObject,0,handles);
             GUI_Variables = accept_message(bt,handles, GUI_Variables);
             handles.GUI_Variables = GUI_Variables;
             guidata(hObject, handles);
@@ -209,6 +210,15 @@ function Start_Trial_Callback(hObject, eventdata, handles)
         end
     end
     guidata(hObject, handles);
+    
+function [] = checkValues(hObject,~,handles)
+Get_Smoothing_Callback(hObject, 0, handles);
+L_Check_FSR_Th_Callback(hObject, 0, handles);
+R_Check_FSR_Th_Callback(hObject, 0, handles);
+L_Check_KF_Callback(hObject, 0, handles);
+R_Check_KF_Callback(hObject, 0, handles);
+L_Get_PID_Callback(hObject, 0, handles);
+R_Get_PID_Callback(hObject, 0, handles);
     
 function GUI_Variables = accept_message(bt, handles, GUI_Variables)
     while bt.bytesAvailable() > 0
@@ -4066,6 +4076,7 @@ set(handles.Start_Timer,'enable','on');
 set(handles.Reset_Timer,'enable','off');
 set(handles.Lap_Timer,'string','0');
 set(handles.Timer_Value,'string','0');
+set(handles.Start_Timer,'String','Start');
 
 % --- Executes on button press in Split_Timer.
 function Split_Timer_Callback(hObject, eventdata, handles)
