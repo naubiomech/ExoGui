@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 05-Apr-2019 12:16:47
+% Last Modified by GUIDE v2.5 10-Apr-2019 19:24:13
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -2705,81 +2705,7 @@ function L_Auto_KF_Callback(hObject, ~, handles)
         catch
         end
     end
-
-% --- Executes on button press in Activate_Prop_Pivot.
-function Activate_Prop_Pivot_Callback(hObject, ~, handles)
-% hObject    handle to Activate_Prop_Pivot (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of Activate_Prop_Pivot
-    
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if (bt.Status=="open")
-
-        PP=get(hObject,'Value');
-        try
-
-            if PP
-                %activate prop control
-                GUI_Variables.PropOn = 1;
-                fwrite(bt,'#');
-                disp('Activate Prop Pivot Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
-            else
-                %deactivate prop control
-                GUI_Variables.PropOn = 0;
-                fwrite(bt,'^');
-                disp('Deactivate Prop Pivot Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,x*0);
-            end
-        catch
-        end
-    end
-
-    
-% --- Executes on button press in Activate_Prop_ID.
-function Activate_Prop_ID_Callback(hObject, eventdata, handles)
-% hObject    handle to Activate_Prop_ID (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of Activate_Pro_ID
-
-  GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if (bt.Status=="open")
-
-        PP=get(hObject,'Value');
-        try
-
-            if PP
-                %activate prop control
-                GUI_Variables.PropOn = 1;
-                fwrite(bt,'c');
-                disp('Activate Prop ID Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
-            else
-                %deactivate prop control
-                GUI_Variables.PropOn = 0;
-                fwrite(bt,'^');
-                disp('Deactivate Prop ID Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,x*0);
-            end
-        catch
-        end
-    end
+   
 
 % --- Executes on button press in Fast_0_Trq.
 function Fast_0_Trq_Callback(~, ~, handles)
@@ -3904,7 +3830,7 @@ function Save_Prop_Prm_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global GUI_Variables
+GUI_Variables = handles.GUI_Variables;
 
 bt = GUI_Variables.BT; 
 left_plant_peak_mean = 0; 
@@ -4004,3 +3930,151 @@ end
 
     end
 end
+
+
+% --- Executes when selected object is changed in Prop_Ctrl_Panel.
+function Prop_Ctrl_Panel_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in Prop_Ctrl_Panel 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+GUI_Variables = handles.GUI_Variables;
+    bt = GUI_Variables.BT;
+
+
+value_Pivot = get(handles.Activate_Prop_Pivot,'value');
+value_ID = get(handles.Activate_Prop_ID,'value');
+
+if (bt.Status=="open")
+
+    try
+     
+
+        if (value_Pivot == 1)         
+                fwrite(bt,'#');
+                disp('Activate Prop Pivot Ctrl');
+               
+        elseif (value_ID == 1)
+                fwrite(bt,'c');
+                disp('Activate Prop ID Ctrl');
+            
+        end
+            
+            axes(handles.PROP_FUNCTION_axes);
+            x=0.4:0.01:1.2;
+            plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
+
+        
+               
+    catch
+       
+    end
+end
+
+
+
+% --- Executes on button press in Activate_Prop_Ctrl.
+function Activate_Prop_Ctrl_Callback(hObject, eventdata, handles)
+% hObject    handle to Activate_Prop_Ctrl (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+GUI_Variables = handles.GUI_Variables;
+    bt = GUI_Variables.BT;
+
+str = get(handles.Activate_Prop_Ctrl,'string');
+
+if (bt.Status=="open")
+
+    try  
+     
+
+        if strcmp( str, 'Activate Prop Control' )
+            GUI_Variables.PropOn = 1; 
+            disp( 'Activate Prop Control' );
+            set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
+            set(handles.Prop_Ctrl_Panel,'visible','on');
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
+        else
+            GUI_Variables.PropOn = 0;
+            disp( 'Deactivate Prop Control' );
+            fwrite(bt,'^');
+            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+            set(handles.Prop_Ctrl_Panel,'visible','off');
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
+            
+            
+            axes(handles.PROP_FUNCTION_axes);
+            clf(h);
+            x=0.4:0.01:1.2;
+            plot(x,x*0);
+        
+        
+    
+        end
+    
+    end
+end
+
+
+
+
+
+% --- Executes on button press in Start_Timer.
+function Start_Timer_Callback(hObject, eventdata, handles)
+% hObject    handle to Start_Timer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+ 
+ 
+str = get(handles.Start_Timer,'string');
+
+if strcmp(str,'Start')
+    set(handles.Start_Timer,'string','Pause');
+    set(handles.Split_Timer,'enable','on');
+    set(handles.Reset_Timer,'enable','off');
+    tic;
+else
+    set(handles.Start_Timer,'string','Start');
+    set(handles.Reset_Timer,'enable','on');
+    set(handles.Split_Timer,'enable','off');
+end
+
+
+
+    
+    
+
+
+
+
+
+% --- Executes on button press in Reset_Timer.
+function Reset_Timer_Callback(hObject, eventdata, handles)
+% hObject    handle to Reset_Timer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.Split_Timer,'enable','off');
+set(handles.Start_Timer,'enable','on');
+set(handles.Reset_Timer,'enable','off');
+set(handles.Lap_Timer,'string','0');
+set(handles.Timer_Value,'string','0');
+
+% --- Executes on button press in Split_Timer.
+function Split_Timer_Callback(hObject, eventdata, handles)
+% hObject    handle to Split_Timer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+a = toc;
+b = get(handles.Lap_Timer,'string');
+c = str2double(b);
+c = c + 1;
+set(handles.Lap_Timer,'string',num2str(c));
+set(handles.Timer_Value,'string',sprintf('%.3f',a));
+tic;
+
+
