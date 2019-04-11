@@ -138,7 +138,6 @@ function figure1_CloseRequestFcn(hObject, ~, handles) %#ok<*DEFNU>
 function Start_Trial_Callback(hObject, eventdata, handles)
 %Make a further check of the connection before starting
 
-    global GUI_Variables
     GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
@@ -2741,26 +2740,26 @@ function Slow_0_Trq_Callback(~, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
 
 
-    disp('goes to 0 Slow')
+disp('goes to 0 Slow')
 
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'F');
-        end
-        fwrite(bt,0,'double');
-        pause(0.2);
-        if(bt.Status=="open")
-            fwrite(bt,'f');
-        end
-        fwrite(bt,0,'double');
-
-    catch
-
+try
+    if(bt.Status=="open")
+        fwrite(bt,'F');
     end
+    fwrite(bt,0,'double');
+    pause(0.2);
+    if(bt.Status=="open")
+        fwrite(bt,'f');
+    end
+    fwrite(bt,0,'double');
+
+catch
+
+end
 
 
 % --- Executes on button press in Take_Baseline.
@@ -2769,18 +2768,18 @@ function Take_Baseline_Callback(~, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
 
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'b');
-        end
-
-
-
-    catch
+try
+    if(bt.Status=="open")
+        fwrite(bt,'b');
     end
+
+
+
+catch
+end
 
 
 % --- Executes on button press in Check_Baseline.
@@ -2788,25 +2787,25 @@ function Check_Baseline_Callback(hObject, ~, handles)
 % hObject    handle to Check_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
 
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'B');
-        end
-
-        val=get(handles.Activate_Balance,'Value');
-        val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
-
-
-        disp('Check Baseline');
-        
-        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
-    catch
+try
+    if(bt.Status=="open")
+        fwrite(bt,'B');
     end
-    handles.GUI_Variables = GUI_Variables;
-    guidata(hObject, handles);
+
+    val=get(handles.Activate_Balance,'Value');
+    val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
+
+
+    disp('Check Baseline');
+
+    GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+catch
+end
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
 
 
 
@@ -3939,7 +3938,7 @@ function Prop_Ctrl_Panel_SelectionChangedFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+bt = GUI_Variables.BT;
 
 
 value_Pivot = get(handles.Activate_Prop_Pivot,'value');
@@ -3982,7 +3981,7 @@ function Activate_Prop_Ctrl_Callback(hObject, eventdata, handles)
 
 
 GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+bt = GUI_Variables.BT;
 
 str = get(handles.Activate_Prop_Ctrl,'string');
 
@@ -4016,13 +4015,11 @@ if (bt.Status=="open")
         
     
         end
-    
+    catch
     end
 end
-
-
-
-
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
 
 % --- Executes on button press in Start_Timer.
 function Start_Timer_Callback(hObject, eventdata, handles)
@@ -4043,16 +4040,7 @@ else
     set(handles.Reset_Timer,'enable','on');
     set(handles.Split_Timer,'enable','off');
 end
-
-
-
-    
-    
-
-
-
-
-
+ 
 % --- Executes on button press in Reset_Timer.
 function Reset_Timer_Callback(hObject, eventdata, handles)
 % hObject    handle to Reset_Timer (see GCBO)
@@ -4084,16 +4072,14 @@ if c == 1
     bt.UserData = bt.UserData + 1;
 end
 
-
-
 currDir = cd;       % Current directory
-        saveDir = [GUI_Variables.SSID,'_',date];
-        savePath = [currDir,'\',saveDir];    % Save directory specific to subject and date
-        if ~exist(saveDir, 'dir')
-            mkdir(currDir, saveDir);           % Make a save directory
-        end
-        Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',GUI_Variables.TimeStamp,'_',...
-            'Timer_']),bt.UserData); 
+saveDir = [GUI_Variables.SSID,'_',date];
+savePath = [currDir,'\',saveDir];    % Save directory specific to subject and date
+if ~exist(saveDir, 'dir')
+    mkdir(currDir, saveDir);           % Make a save directory
+end
+Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',GUI_Variables.TimeStamp,'_',...
+    'Timer_']),bt.UserData); 
         
 fileID = fopen(Filename,'a');
 
