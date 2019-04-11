@@ -196,6 +196,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     if state == 1 % both connected
         disp('both connected')
         while strcmp(get(handles.Start_Trial,'Enable'), 'off')
+            GUI_Variables = handles.GUI_Variables;
             GUI_Variables = Update_GUI(GUI_Variables, handles);
             GUI_Variables = accept_message(bt,handles, GUI_Variables);
             handles.GUI_Variables = GUI_Variables;
