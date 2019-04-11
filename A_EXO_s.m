@@ -3974,7 +3974,7 @@ function Load_Prop_Prm_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global GUI_Variables
+GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT; 
 
 if (bt.Status=="open")
