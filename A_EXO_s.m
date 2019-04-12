@@ -804,6 +804,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables = Reset_GUI_Variables(GUI_Variables);
         bt.UserData = bt.UserData + 1; % Increments the trial number
 
+        Reset_Timer_Callback(0, 0, handles);
         set(handles.L_Get_Setpoint,'Enable','on');
         set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
@@ -823,10 +824,12 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
+        set(handles.Start_Timer,'enable','Off');
         
 
     else
 
+        Reset_Timer_Callback(0, 0, handles);
         set(handles.L_Get_Setpoint,'Enable','on');
         set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
@@ -846,6 +849,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
+        set(handles.Start_Timer,'enable','Off');
         
 
     end
@@ -4050,33 +4054,18 @@ str = get(handles.Start_Timer,'string');
 a = clock;
 time = a(4)*360+a(5)*60+a(6);
 
-if strcmp(str,'Start')
-    set(handles.Start_Timer,'string','Pause');
-    set(handles.Split_Timer,'enable','on');
-    set(handles.Reset_Timer,'enable','off');
-    start_time = time;
-    setappdata(handles.Start_Timer,'start_time',start_time);
-else
-    set(handles.Start_Timer,'string','Start');
-    set(handles.Reset_Timer,'enable','on');
-    set(handles.Split_Timer,'enable','off');
-end
-
 if strcmp(get(handles.Start_Trial,'Enable'), 'off')
- 
-    str = get(handles.Start_Timer,'string');
-
     if strcmp(str,'Start')
         set(handles.Start_Timer,'string','Pause');
         set(handles.Split_Timer,'enable','on');
         set(handles.Reset_Timer,'enable','off');
-        tic;
+        start_time = time;
+        setappdata(handles.Start_Timer,'start_time',start_time);
     else
         set(handles.Start_Timer,'string','Start');
         set(handles.Reset_Timer,'enable','on');
         set(handles.Split_Timer,'enable','off');
     end
-    
 end
  
 % --- Executes on button press in Reset_Timer.
