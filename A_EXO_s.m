@@ -416,13 +416,69 @@ function draw_graphs(handles, GUI_Variables)
               "SIG1","SIG2","SIG3","SIG4"};
     
     RLCount = GUI_Variables.RLCount;
-    
     whichPlotLeft = get(handles.Bottom_Graph,'Value');
     whichPlotRight = get(handles.Top_Graph,'Value');
     draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
     draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
+   
+    if (strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')==1)
+        draw_graph_BF(plots, RLCount);
+    end
     drawnow nocallbacks;
 
+% function draw_graph_BF(whichPlot, plots, RLCount,location)
+function draw_graph_BF(plots, RLCount)
+    figure(1)
+    
+    ax=axes('XLim',[-10 10],'YLim',[0,100],'Zlim',[-1,1]);
+    view(2);
+    grid on;
+%     axis equal;
+    ylabel('Stride length (cm)')
+    
+    [x1, y1, z1]=cylinder([0.2 0],4);
+    [x2, y2, z2]=cylinder([0.6 0],4);
+    
+    h(1)=surface(x1,z1*6-0.5,y1,'FaceAlpha',0.5);
+    h(2)=surface(x2,z2*6,y2,'FaceAlpha',0.2);
+    
+    t1=hgtransform('Parent',ax);
+    t2=hgtransform('Parent',ax);
+    t3=hgtransform('Parent',ax);
+    t4=hgtransform('Parent',ax);
+    
+    set(h,'Parent',t1)
+    h2=copyobj(h,t2);h3=copyobj(h,t3);h4=copyobj(h,t4);
+    set(h,'FaceColor',[0.144 0.852 0.850])%blue(update)
+    set(h2,'FaceColor',[0.988 0.093 0.156])%red(target)
+    set(h3,'FaceColor',[0.144 0.852 0.850])%blue
+    set(h4,'FaceColor',[0.988 0.093 0.156])%red
+    
+    set(gcf,'Renderer','opengl')
+
+    plotData1 = plots{10}; plotData2 = plots{12};%left leg
+    plotData3 = plots{9}; plotData4 = plots{11};%right leg
+    
+    dataLength = max(1, RLCount-1000):RLCount-1;
+    data1 = cellfun(@(x) x(dataLength), plotData1', 'UniformOutput', false);
+    data1 = cat(1,data1{:});
+    data2 = cellfun(@(x) x(dataLength), plotData2', 'UniformOutput', false);
+    data2 = cat(1,data2{:});
+    data3 = cellfun(@(x) x(dataLength), plotData3', 'UniformOutput', false);
+    data3 = cat(1,data3{:});
+    data4 = cellfun(@(x) x(dataLength), plotData4', 'UniformOutput', false);
+    data4 = cat(1,data4{:});
+    
+    trans1=makehgtform('translate',[-8, data1(end), 0]);
+    set(t1,'Matrix',trans1);
+    trans2=makehgtform('translate',[-3, data2(end), 0]);
+    set(t2,'Matrix',trans2);
+    trans3=makehgtform('translate',[3, data3(end), 0]);
+    set(t3,'Matrix',trans3);
+    trans4=makehgtform('translate',[8, data4(end), 0]);
+    set(t4,'Matrix',trans4);
+    hold on
+    plot3([0 0],[0,100],[0,0],'Linewidth',2,'Color','black')
     
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
