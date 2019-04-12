@@ -4055,6 +4055,7 @@ function Start_Timer_Callback(hObject, eventdata, handles)
 str = get(handles.Start_Timer,'string');
 a = clock;
 time = a(4)*360+a(5)*60+a(6);
+Send_Trig_Callback(hObject, 0, handles);
 
 if strcmp(get(handles.Start_Trial,'Enable'), 'off')
     if strcmp(str,'Start')
@@ -4093,6 +4094,7 @@ stop_time = a(4)*360 + a(5)*60 + a(6);
 start_time = getappdata(handles.Start_Timer,'start_time');
 setappdata(handles.Start_Timer,'start_time',stop_time);
 split_time = stop_time - start_time;
+Send_Trig_Callback(hObject, 0, handles);
 
 b = get(handles.Lap_Timer,'string');
 c = str2double(b);
