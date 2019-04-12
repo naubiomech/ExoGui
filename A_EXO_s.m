@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 10-Apr-2019 19:24:13
+% Last Modified by GUIDE v2.5 11-Apr-2019 11:58:18
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -804,7 +804,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables = Reset_GUI_Variables(GUI_Variables);
         bt.UserData = bt.UserData + 1; % Increments the trial number
 
-        Reset_Timer_Callback(0,0,handles);
         set(handles.L_Get_Setpoint,'Enable','on');
         set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
@@ -824,10 +823,10 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
-        set(handles.Start_Timer,'Enable','Off');
+        
 
     else
-        Reset_Timer_Callback(0,0,handles);
+
         set(handles.L_Get_Setpoint,'Enable','on');
         set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
@@ -847,7 +846,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
-        set(handles.Start_Timer,'Enable','Off');
+        
 
     end
     
@@ -4047,6 +4046,21 @@ function Start_Timer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
  
+str = get(handles.Start_Timer,'string');
+a = clock;
+time = a(4)*360+a(5)*60+a(6);
+
+if strcmp(str,'Start')
+    set(handles.Start_Timer,'string','Pause');
+    set(handles.Split_Timer,'enable','on');
+    set(handles.Reset_Timer,'enable','off');
+    start_time = time;
+    setappdata(handles.Start_Timer,'start_time',start_time);
+else
+    set(handles.Start_Timer,'string','Start');
+    set(handles.Reset_Timer,'enable','on');
+    set(handles.Split_Timer,'enable','off');
+end
 
 if strcmp(get(handles.Start_Trial,'Enable'), 'off')
  
@@ -4082,13 +4096,19 @@ function Split_Timer_Callback(hObject, eventdata, handles)
 % hObject    handle to Split_Timer (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-a = toc;
+a = clock;
+stop_time = a(4)*360 + a(5)*60 + a(6);
+%guidata(handles.Split_Timer,stop_time);
+start_time = getappdata(handles.Start_Timer,'start_time');
+setappdata(handles.Start_Timer,'start_time',stop_time);
+split_time = stop_time - start_time;
+
 b = get(handles.Lap_Timer,'string');
 c = str2double(b);
 c = c + 1;
 set(handles.Lap_Timer,'string',num2str(c));
-set(handles.Timer_Value,'string',sprintf('%.3f',a));
-tic;
+set(handles.Timer_Value,'string',sprintf('%.3f',split_time));
+
 
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
@@ -4110,3 +4130,52 @@ fileID = fopen(Filename,'a');
 
 fprintf(fileID,'Lap %d: %4.1f s\n',c,a);
 fclose(fileID);
+
+
+% --- Executes on button press in Start_ATP.
+function Start_ATP_Callback(hObject, eventdata, handles)
+% hObject    handle to Start_ATP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+str = get(handles.Start_ATP,'string');
+
+
+GUI_Variables = handles.GUI_Variables;
+        
+if strcmp(str,'Start')
+    set(handles.Start_ATP,'String','Stop');
+      
+    RLCount_start = GUI_Variables.RLCount;
+    LLCount_start = GUI_Variables.LLCount;
+    GUI_Variables.Start_Window = min(RLCount_start,LLCount_start);
+    disp('Start');
+    disp(num2str(RLCount_start));
+else
+    set(handles.Start_ATP,'String','Start');
+    RLCount_stop = GUI_Variables.RLCount;
+    LLCount_stop = GUI_Variables.LLCount;
+    GUI_Variables.Stop_Window = max(RLCount_stop,LLCount_stop);
+    disp('Stop');
+    disp(num2str(LLCount_stop));
+end
+disp('Start');
+disp(num2str(GUI_Variables.Start_Window));
+disp('Stop');
+disp(num2str(GUI_Variables.Stop_Window));
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
+    
+% --- Executes on button press in Stop_ATP.
+function Stop_ATP_Callback(hObject, eventdata, handles)
+% hObject    handle to Stop_ATP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in Send_ATP.
+function Send_ATP_Callback(hObject, eventdata, handles)
+% hObject    handle to Send_ATP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
