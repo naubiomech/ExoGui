@@ -2927,7 +2927,7 @@ function Check_Baseline_Callback(hObject, ~, handles)
         end
 
         val=get(handles.Activate_Balance,'Value');
-        val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
+       % val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
 
 
         disp('Check Baseline');
