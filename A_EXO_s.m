@@ -202,7 +202,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
             handles=guidata(hObject);
             GUI_Variables = handles.GUI_Variables;
             GUI_Variables = Update_GUI(GUI_Variables, handles);
-            checkValues(hObject,0,handles);
             GUI_Variables = accept_message(bt,handles, GUI_Variables);
             handles.GUI_Variables = GUI_Variables;
             guidata(hObject, handles);
@@ -210,15 +209,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
         end
     end
     guidata(hObject, handles);
-    
-function [] = checkValues(hObject,~,handles)
-Get_Smoothing_Callback(hObject, 0, handles);
-L_Check_FSR_Th_Callback(hObject, 0, handles);
-R_Check_FSR_Th_Callback(hObject, 0, handles);
-L_Check_KF_Callback(hObject, 0, handles);
-R_Check_KF_Callback(hObject, 0, handles);
-L_Get_PID_Callback(hObject, 0, handles);
-R_Get_PID_Callback(hObject, 0, handles);
     
 function GUI_Variables = accept_message(bt, handles, GUI_Variables)
     while bt.bytesAvailable() > 0
@@ -976,7 +966,7 @@ function lkf=L_Check_KF_Callback(hObject, ~, handles)
     guidata(hObject, handles);
 
 % --- Executes on button press in L_Send_KF.
-function L_Send_KF_Callback(~, ~, handles)
+function L_Send_KF_Callback(hObject, ~, handles)
 % hObject    handle to L_Send_KF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -993,8 +983,8 @@ function L_Send_KF_Callback(~, ~, handles)
             fwrite(bt,new_KF,'double');
             disp("Send new Left KF ");
             disp(new_KF);
-
-        catch
+            L_Check_KF_Callback(hObject,0,handles);
+        catch 
             disp("Impossible to write on bt the new KF");
         end
     end
@@ -1483,6 +1473,7 @@ function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
     lkp = get(handles.L_Kp_text,'String');
     lkd = get(handles.L_Kd_text,'String');
     lki = get(handles.L_Ki_text,'String');
+    
 
 
 % --- Executes on button press in L_Set_PID.
@@ -1644,6 +1635,7 @@ function R_Get_Setpoint_Callback(hObject, ~, handles)
     end
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
+    
 % --- Executes on button press in L_Get_Setpoint.
 function L_Get_Setpoint_Callback(hObject, ~, handles)
 % SEND 'D'
@@ -1713,9 +1705,10 @@ function L_Set_Setpoint_Callback(hObject, ~, handles)
     plot(xlim,[NewSetpoint NewSetpoint],'-.k')
 
     pause(0.3);
+    L_Get_Setpoint_Callback(hObject,0,handles);
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
-    L_Get_Setpoint_Callback(hObject,0,handles);
+    
 
 % --- Executes on button press in Get_Smoothing.
 function [n1,n2,n3]=Get_Smoothing_Callback(hObject, ~, handles)
@@ -1765,10 +1758,13 @@ function Set_Smoothing_Callback(~, ~, handles)
             fwrite(bt,N1,'double'); % Sends the new Torque Value to Arduino
             fwrite(bt,N2,'double');
             fwrite(bt,N3,'double');
+            pause(0.3);
+            Get_Smoothing_Callback(0,0,handles);
         catch
             disp("Impossible to set shaping parameters for BTRL");
         end
     end
+    
 
 function N1_Edit_Callback(~, ~, ~)
 % hObject    handle to N1_Edit (see GCBO)
@@ -1935,6 +1931,7 @@ function R_Send_KF_Callback(hObject, ~, handles)
             disp("Impossible to write on bt the new KF");
         end
     end
+    R_Check_KF_Callback(hObject, 0, handles);
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
 
@@ -2023,6 +2020,7 @@ function L_Send_FSR_Th_Callback(~, ~, handles)
             fwrite(bt,'R'); % char 35 -> #, 36 -> $, 74-> J
             LFSRTH = str2double(get(handles.L_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
             fwrite(bt,LFSRTH,'double'); %Sends the new Torque Value to Arduino
+            L_Check_FSR_Th_Callback(hObject, 0, handles);
         catch
             disp("Impossible to set FSR th parameters for Left");
         end
@@ -2097,6 +2095,7 @@ function R_Send_FSR_Th_Callback(~, ~, handles)
             fwrite(bt,'r'); % char 35 -> #, 36 -> $, 74-> J
             RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
             fwrite(bt,RFSRTH,'double'); % Sends the new Torque Value to Arduino
+            L_Check_FSR_Th_Callback(hObject, 0, handles);
         catch
             disp("Impossible to set FSR th parameters for Right");
         end
