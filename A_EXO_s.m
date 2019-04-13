@@ -211,8 +211,9 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     guidata(hObject, handles);
     
 function GUI_Variables = accept_message(bt, handles, GUI_Variables)
-    
+    while bt.BytesAvailable>0
         GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+    end
     
 
 function GUI_Variables = Update_GUI(GUI_Variables, handles)
@@ -381,9 +382,9 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
         RLCount = GUI_Variables.RLCount;
         LLCount = GUI_Variables.LLCount;
         
-        if mod(RLCount,100) == 0
-            draw_graphs(handles, GUI_Variables)
-        end
+        
+        draw_graphs(handles, GUI_Variables)
+        
     end
 
     GUI_Variables.RLCount = RLCount;
