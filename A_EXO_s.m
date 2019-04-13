@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 05-Apr-2019 12:16:47
+% Last Modified by GUIDE v2.5 11-Apr-2019 11:58:18
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -138,7 +138,6 @@ function figure1_CloseRequestFcn(hObject, ~, handles) %#ok<*DEFNU>
 function Start_Trial_Callback(hObject, eventdata, handles)
 %Make a further check of the connection before starting
 
-    global GUI_Variables
     GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
@@ -422,24 +421,22 @@ function draw_graphs(handles, GUI_Variables)
               "SIG1","SIG2","SIG3","SIG4"};
     
     RLCount = GUI_Variables.RLCount;
+    
     whichPlotLeft = get(handles.Bottom_Graph,'Value');
     whichPlotRight = get(handles.Top_Graph,'Value');
     draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
     draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
-   
-    if (strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')==1)
+    if (strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')==1)%if biofeedback is on
         draw_graph_BF(plots, RLCount);
     end
     drawnow nocallbacks;
 
-% function draw_graph_BF(whichPlot, plots, RLCount,location)
 function draw_graph_BF(plots, RLCount)
     figure(1)
     
     ax=axes('XLim',[-10 10],'YLim',[0,100],'Zlim',[-1,1]);
     view(2);
     grid on;
-%     axis equal;
     ylabel('Stride length (cm)')
     
     [x1, y1, z1]=cylinder([0.2 0],4);
@@ -484,7 +481,7 @@ function draw_graph_BF(plots, RLCount)
     trans4=makehgtform('translate',[8, data4(end), 0]);
     set(t4,'Matrix',trans4);
     hold on
-    plot3([0 0],[0,100],[0,0],'Linewidth',2,'Color','black')
+    plot3([0 0],[0,100],[0,0],'Linewidth',2,'Color','black')    
     
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
@@ -2877,13 +2874,7 @@ try
         fwrite(bt,'B');
     end
 
-<<<<<<< HEAD
-        val=get(handles.Activate_Balance,'Value');
-       % val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
-=======
     val=get(handles.Activate_Balance,'Value');
-    val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
->>>>>>> 3212d3c0dda2733f7746283c06fae9cb169e8abd
 
 
     disp('Check Baseline');
