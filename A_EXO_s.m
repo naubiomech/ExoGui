@@ -178,6 +178,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.Clean_Memory,'Enable','off');
     set(handles.Start_Trial,'Enable','off');
     set(handles.End_Trial,'Enable','on');
+    set(handles.Start_Timer,'Enable','on');
 
     GUI_Variables.flag_start=1;
 
@@ -194,9 +195,13 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     GUI_Variables.start_count = 0;
     set(handles.statusText,'String','Trial has been started');
     tic
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject,handles);
     if state == 1 % both connected
         disp('both connected')
         while strcmp(get(handles.Start_Trial,'Enable'), 'off')
+            handles=guidata(hObject);
+            GUI_Variables = handles.GUI_Variables;
             GUI_Variables = Update_GUI(GUI_Variables, handles);
             GUI_Variables = accept_message(bt,handles, GUI_Variables);
             handles.GUI_Variables = GUI_Variables;
@@ -207,9 +212,9 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     guidata(hObject, handles);
     
 function GUI_Variables = accept_message(bt, handles, GUI_Variables)
-    while bt.bytesAvailable() > 0
+    
         GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
-    end
+    
 
 function GUI_Variables = Update_GUI(GUI_Variables, handles)
     RLCount = GUI_Variables.RLCount;
@@ -376,9 +381,10 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
         
         RLCount = GUI_Variables.RLCount;
         LLCount = GUI_Variables.LLCount;
-
-
-        draw_graphs(handles, GUI_Variables)
+        
+        if mod(RLCount,100) == 0
+            draw_graphs(handles, GUI_Variables)
+        end
     end
 
     GUI_Variables.RLCount = RLCount;
@@ -857,7 +863,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables = Reset_GUI_Variables(GUI_Variables);
         bt.UserData = bt.UserData + 1; % Increments the trial number
 
-
+        Reset_Timer_Callback(0, 0, handles);
         set(handles.L_Get_Setpoint,'Enable','on');
         set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
@@ -877,8 +883,12 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
+        set(handles.Start_Timer,'enable','Off');
+        
 
     else
+
+        Reset_Timer_Callback(0, 0, handles);
         set(handles.L_Get_Setpoint,'Enable','on');
         set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
@@ -898,7 +908,11 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
+        set(handles.Start_Timer,'enable','Off');
+        
+
     end
+    
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
 
@@ -1014,7 +1028,7 @@ function lkf=L_Check_KF_Callback(hObject, ~, handles)
     guidata(hObject, handles);
 
 % --- Executes on button press in L_Send_KF.
-function L_Send_KF_Callback(~, ~, handles)
+function L_Send_KF_Callback(hObject, ~, handles)
 % hObject    handle to L_Send_KF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1031,8 +1045,8 @@ function L_Send_KF_Callback(~, ~, handles)
             fwrite(bt,new_KF,'double');
             disp("Send new Left KF ");
             disp(new_KF);
-
-        catch
+            L_Check_KF_Callback(hObject,0,handles);
+        catch 
             disp("Impossible to write on bt the new KF");
         end
     end
@@ -1207,6 +1221,8 @@ function Connect_BT_Callback(hObject, ~, handles)
         set(handles.EXP_Params_axes,'Color',[0 0 1])
         fprintf("Made a connection to the Right Ankle bluetooth!\n");
         set(handles.statusText,'String',"Made a Connection to the Right Ankle Bluetooth!");
+        pause(1);
+        Version_Button_Callback(hObject,' ',handles);
     end
 
     if(bt.status == "closed")
@@ -1519,6 +1535,7 @@ function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
     lkp = get(handles.L_Kp_text,'String');
     lkd = get(handles.L_Kd_text,'String');
     lki = get(handles.L_Ki_text,'String');
+    
 
 
 % --- Executes on button press in L_Set_PID.
@@ -1680,6 +1697,7 @@ function R_Get_Setpoint_Callback(hObject, ~, handles)
     end
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
+    
 % --- Executes on button press in L_Get_Setpoint.
 function L_Get_Setpoint_Callback(hObject, ~, handles)
 % SEND 'D'
@@ -1749,9 +1767,10 @@ function L_Set_Setpoint_Callback(hObject, ~, handles)
     plot(xlim,[NewSetpoint NewSetpoint],'-.k')
 
     pause(0.3);
+    L_Get_Setpoint_Callback(hObject,0,handles);
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
-    L_Get_Setpoint_Callback(hObject,0,handles);
+    
 
 % --- Executes on button press in Get_Smoothing.
 function [n1,n2,n3]=Get_Smoothing_Callback(hObject, ~, handles)
@@ -1801,10 +1820,13 @@ function Set_Smoothing_Callback(~, ~, handles)
             fwrite(bt,N1,'double'); % Sends the new Torque Value to Arduino
             fwrite(bt,N2,'double');
             fwrite(bt,N3,'double');
+            pause(0.3);
+            Get_Smoothing_Callback(0,0,handles);
         catch
             disp("Impossible to set shaping parameters for BTRL");
         end
     end
+    
 
 function N1_Edit_Callback(~, ~, ~)
 % hObject    handle to N1_Edit (see GCBO)
@@ -1971,6 +1993,7 @@ function R_Send_KF_Callback(hObject, ~, handles)
             disp("Impossible to write on bt the new KF");
         end
     end
+    R_Check_KF_Callback(hObject, 0, handles);
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
 
@@ -2059,6 +2082,7 @@ function L_Send_FSR_Th_Callback(~, ~, handles)
             fwrite(bt,'R'); % char 35 -> #, 36 -> $, 74-> J
             LFSRTH = str2double(get(handles.L_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
             fwrite(bt,LFSRTH,'double'); %Sends the new Torque Value to Arduino
+            L_Check_FSR_Th_Callback(hObject, 0, handles);
         catch
             disp("Impossible to set FSR th parameters for Left");
         end
@@ -2133,6 +2157,7 @@ function R_Send_FSR_Th_Callback(~, ~, handles)
             fwrite(bt,'r'); % char 35 -> #, 36 -> $, 74-> J
             RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
             fwrite(bt,RFSRTH,'double'); % Sends the new Torque Value to Arduino
+            L_Check_FSR_Th_Callback(hObject, 0, handles);
         catch
             disp("Impossible to set FSR th parameters for Right");
         end
@@ -2761,81 +2786,7 @@ function L_Auto_KF_Callback(hObject, ~, handles)
         catch
         end
     end
-
-% --- Executes on button press in Activate_Prop_Pivot.
-function Activate_Prop_Pivot_Callback(hObject, ~, handles)
-% hObject    handle to Activate_Prop_Pivot (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of Activate_Prop_Pivot
-    
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if (bt.Status=="open")
-
-        PP=get(hObject,'Value');
-        try
-
-            if PP
-                %activate prop control
-                GUI_Variables.PropOn = 1;
-                fwrite(bt,'#');
-                disp('Activate Prop Pivot Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
-            else
-                %deactivate prop control
-                GUI_Variables.PropOn = 0;
-                fwrite(bt,'^');
-                disp('Deactivate Prop Pivot Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,x*0);
-            end
-        catch
-        end
-    end
-
-    
-% --- Executes on button press in Activate_Prop_ID.
-function Activate_Prop_ID_Callback(hObject, eventdata, handles)
-% hObject    handle to Activate_Prop_ID (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of Activate_Pro_ID
-
-  GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if (bt.Status=="open")
-
-        PP=get(hObject,'Value');
-        try
-
-            if PP
-                %activate prop control
-                GUI_Variables.PropOn = 1;
-                fwrite(bt,'c');
-                disp('Activate Prop ID Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
-            else
-                %deactivate prop control
-                GUI_Variables.PropOn = 0;
-                fwrite(bt,'^');
-                disp('Deactivate Prop ID Ctrl');
-                axes(handles.PROP_FUNCTION_axes);
-                x=0.4:0.01:1.2;
-                plot(x,x*0);
-            end
-        catch
-        end
-    end
+   
 
 % --- Executes on button press in Fast_0_Trq.
 function Fast_0_Trq_Callback(~, ~, handles)
@@ -2871,26 +2822,26 @@ function Slow_0_Trq_Callback(~, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
 
 
-    disp('goes to 0 Slow')
+disp('goes to 0 Slow')
 
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'F');
-        end
-        fwrite(bt,0,'double');
-        pause(0.2);
-        if(bt.Status=="open")
-            fwrite(bt,'f');
-        end
-        fwrite(bt,0,'double');
-
-    catch
-
+try
+    if(bt.Status=="open")
+        fwrite(bt,'F');
     end
+    fwrite(bt,0,'double');
+    pause(0.2);
+    if(bt.Status=="open")
+        fwrite(bt,'f');
+    end
+    fwrite(bt,0,'double');
+
+catch
+
+end
 
 
 % --- Executes on button press in Take_Baseline.
@@ -2899,18 +2850,18 @@ function Take_Baseline_Callback(~, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
 
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'b');
-        end
-
-
-
-    catch
+try
+    if(bt.Status=="open")
+        fwrite(bt,'b');
     end
+
+
+
+catch
+end
 
 
 % --- Executes on button press in Check_Baseline.
@@ -2918,25 +2869,30 @@ function Check_Baseline_Callback(hObject, ~, handles)
 % hObject    handle to Check_Baseline (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
 
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'B');
-        end
+try
+    if(bt.Status=="open")
+        fwrite(bt,'B');
+    end
 
+<<<<<<< HEAD
         val=get(handles.Activate_Balance,'Value');
        % val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
+=======
+    val=get(handles.Activate_Balance,'Value');
+    val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
+>>>>>>> 3212d3c0dda2733f7746283c06fae9cb169e8abd
 
 
-        disp('Check Baseline');
-        
-        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
-    catch
-    end
-    handles.GUI_Variables = GUI_Variables;
-    guidata(hObject, handles);
+    disp('Check Baseline');
+
+    GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+catch
+end
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
 
 
 
@@ -3960,7 +3916,7 @@ function Save_Prop_Prm_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global GUI_Variables
+GUI_Variables = handles.GUI_Variables;
 
 bt = GUI_Variables.BT; 
 left_plant_peak_mean = 0; 
@@ -4030,7 +3986,7 @@ function Load_Prop_Prm_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global GUI_Variables
+GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT; 
 
 if (bt.Status=="open")
@@ -4060,3 +4016,221 @@ end
 
     end
 end
+
+
+% --- Executes when selected object is changed in Prop_Ctrl_Panel.
+function Prop_Ctrl_Panel_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in Prop_Ctrl_Panel 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+
+value_Pivot = get(handles.Activate_Prop_Pivot,'value');
+value_ID = get(handles.Activate_Prop_ID,'value');
+
+if (bt.Status=="open")
+
+    try
+     
+
+        if (value_Pivot == 1)         
+                fwrite(bt,'#');
+                disp('Activate Prop Pivot Ctrl');
+               
+        elseif (value_ID == 1)
+                fwrite(bt,'c');
+                disp('Activate Prop ID Ctrl');
+            
+        end
+            
+            axes(handles.PROP_FUNCTION_axes);
+            x=0.4:0.01:1.2;
+            plot(x,GUI_Variables.Setpoint*(128.1*x.^2-50.82*x+22.06)/(128.1-50.82+22.06));
+
+        
+               
+    catch
+       
+    end
+end
+
+
+
+% --- Executes on button press in Activate_Prop_Ctrl.
+function Activate_Prop_Ctrl_Callback(hObject, eventdata, handles)
+% hObject    handle to Activate_Prop_Ctrl (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+str = get(handles.Activate_Prop_Ctrl,'string');
+
+if (bt.Status=="open")
+
+    try  
+     
+
+        if strcmp( str, 'Activate Prop Control' )
+            GUI_Variables.PropOn = 1; 
+            disp( 'Activate Prop Control' );
+            set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
+            set(handles.Prop_Ctrl_Panel,'visible','on');
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
+        else
+            GUI_Variables.PropOn = 0;
+            disp( 'Deactivate Prop Control' );
+            fwrite(bt,'^');
+            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+            set(handles.Prop_Ctrl_Panel,'visible','off');
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
+            
+            
+            axes(handles.PROP_FUNCTION_axes);
+            clf(h);
+            x=0.4:0.01:1.2;
+            plot(x,x*0);
+        
+        
+    
+        end
+    catch
+    end
+end
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
+
+% --- Executes on button press in Start_Timer.
+function Start_Timer_Callback(hObject, eventdata, handles)
+% hObject    handle to Start_Timer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+ 
+str = get(handles.Start_Timer,'string');
+a = clock;
+time = a(4)*360+a(5)*60+a(6);
+Send_Trig_Callback(hObject, 0, handles);
+
+if strcmp(get(handles.Start_Trial,'Enable'), 'off')
+    if strcmp(str,'Start')
+        set(handles.Start_Timer,'string','Pause');
+        set(handles.Split_Timer,'enable','on');
+        set(handles.Reset_Timer,'enable','off');
+        start_time = time;
+        setappdata(handles.Start_Timer,'start_time',start_time);
+    else
+        set(handles.Start_Timer,'string','Start');
+        set(handles.Reset_Timer,'enable','on');
+        set(handles.Split_Timer,'enable','off');
+    end
+end
+ 
+% --- Executes on button press in Reset_Timer.
+function Reset_Timer_Callback(hObject, eventdata, handles)
+% hObject    handle to Reset_Timer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.Split_Timer,'enable','off');
+set(handles.Start_Timer,'enable','on');
+set(handles.Reset_Timer,'enable','off');
+set(handles.Lap_Timer,'string','0');
+set(handles.Timer_Value,'string','0');
+set(handles.Start_Timer,'String','Start');
+
+% --- Executes on button press in Split_Timer.
+function Split_Timer_Callback(hObject, eventdata, handles)
+% hObject    handle to Split_Timer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+a = clock;
+stop_time = a(4)*360 + a(5)*60 + a(6);
+%guidata(handles.Split_Timer,stop_time);
+start_time = getappdata(handles.Start_Timer,'start_time');
+setappdata(handles.Start_Timer,'start_time',stop_time);
+split_time = stop_time - start_time;
+Send_Trig_Callback(hObject, 0, handles);
+
+b = get(handles.Lap_Timer,'string');
+c = str2double(b);
+c = c + 1;
+set(handles.Lap_Timer,'string',num2str(c));
+set(handles.Timer_Value,'string',sprintf('%.3f',split_time));
+
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+if c == 1
+    bt.UserData = bt.UserData + 1;
+end
+
+currDir = cd;       % Current directory
+saveDir = [GUI_Variables.SSID,'_',date];
+savePath = [currDir,'\',saveDir];    % Save directory specific to subject and date
+if ~exist(saveDir, 'dir')
+    mkdir(currDir, saveDir);           % Make a save directory
+end
+Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',GUI_Variables.TimeStamp,'_',...
+    'Timer_']),bt.UserData); 
+        
+fileID = fopen(Filename,'a');
+
+fprintf(fileID,'Lap %d: %4.1f s\n',c,a);
+fclose(fileID);
+
+
+% --- Executes on button press in Start_ATP.
+function Start_ATP_Callback(hObject, eventdata, handles)
+% hObject    handle to Start_ATP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+str = get(handles.Start_ATP,'string');
+
+
+GUI_Variables = handles.GUI_Variables;
+        
+if strcmp(str,'Start')
+    set(handles.Start_ATP,'String','Stop');
+      
+    RLCount_start = GUI_Variables.RLCount;
+    LLCount_start = GUI_Variables.LLCount;
+    GUI_Variables.Start_Window = min(RLCount_start,LLCount_start);
+    disp('Start');
+    disp(num2str(RLCount_start));
+else
+    set(handles.Start_ATP,'String','Start');
+    RLCount_stop = GUI_Variables.RLCount;
+    LLCount_stop = GUI_Variables.LLCount;
+    GUI_Variables.Stop_Window = max(RLCount_stop,LLCount_stop);
+    disp('Stop');
+    disp(num2str(LLCount_stop));
+end
+disp('Start');
+disp(num2str(GUI_Variables.Start_Window));
+disp('Stop');
+disp(num2str(GUI_Variables.Stop_Window));
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
+    
+% --- Executes on button press in Stop_ATP.
+function Stop_ATP_Callback(hObject, eventdata, handles)
+% hObject    handle to Stop_ATP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in Send_ATP.
+function Send_ATP_Callback(hObject, eventdata, handles)
+% hObject    handle to Send_ATP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
