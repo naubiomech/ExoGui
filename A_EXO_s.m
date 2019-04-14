@@ -2800,6 +2800,7 @@ bt = GUI_Variables.BT;
 try
     if(bt.Status=="open")
         fwrite(bt,'b');
+        set(handles.statusText,'String','Taking baseline for proportional...');
     end
 
 
