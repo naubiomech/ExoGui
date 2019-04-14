@@ -304,7 +304,7 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                         if ~contains(char(Setpoints'),'_')
                             Trq_Setpoint = str2double(char(Setpoints'));  %Torque Setpoint
                             if GUI_Variables.BT.Status == "open"
-                                fwrite(GUI_Variables.BT,'"');   %Need new symbol for prop optimization
+                                fwrite(GUI_Variables.BT,'"');   
                                 fwrite(GUI_Variables.BT,Trq_Setpoint,'double');
                                 disp(['Sent Data: ',num2str(Trq_Setpoint)]);
                             end
