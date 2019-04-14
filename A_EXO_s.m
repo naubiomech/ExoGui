@@ -1977,7 +1977,7 @@ function lfsr=L_Check_FSR_Th_Callback(hObject, ~, handles)
             fwrite(bt,char('Q')); % send the character "Q"
             GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
         catch
-            disp("Impossible to know R FSR TH");
+            disp("Impossible to know L FSR TH");
             set(handles.R_Check_FSR_Text,'String',"NaN");
         end
     end
@@ -2040,7 +2040,7 @@ function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
     if (bt.Status=="open")
         try
             fwrite(bt,char('q')); % send the character "Q"
-            message,data = get_message(bt);
+            [message,data] = get_message(bt);
             if message == 'q'
                 Curr_TH_R = data(1);
                 set(handles.R_Check_FSR_Text,'String',Curr_TH_R);
