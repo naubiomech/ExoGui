@@ -1744,7 +1744,7 @@ function [n1,n2,n3]=Get_Smoothing_Callback(hObject, ~, handles)
     guidata(hObject, handles);
 
 % --- Executes on button press in Set_Smoothing.
-function Set_Smoothing_Callback(~, ~, handles)
+function Set_Smoothing_Callback(hObject, ~, handles)
 % hObject    handle to Set_Smoothing (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1765,7 +1765,7 @@ function Set_Smoothing_Callback(~, ~, handles)
             fwrite(bt,N2,'double');
             fwrite(bt,N3,'double');
             pause(0.3);
-            Get_Smoothing_Callback(0,0,handles);
+            Get_Smoothing_Callback(hObject,0,handles);
         catch
             disp("Impossible to set shaping parameters for BTRL");
         end
