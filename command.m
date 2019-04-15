@@ -46,13 +46,13 @@ switch(msg)
 
     end
   case '`'
-    KF_LL = data(1);                                          %Gets the Current Arduino Torque Setpoint
+    KF_LL = round(data(1),3);                                          %Gets the Current Arduino Torque Setpoint
     set(handles.L_Check_KF_Text,'String',KF_LL);
     disp("Left Current KF ");
     disp(KF_LL);
 
   case '~'
-    KF_RL = data(1);                                            %Gets the Current Arduino Torque Setpoint
+    KF_RL = round(data(1),3);                                          %Gets the Current Arduino Torque Setpoint
     set(handles.R_Check_KF_Text,'String',KF_RL);
     disp("Right Current KF ");
     disp(KF_RL);
@@ -151,10 +151,23 @@ switch(msg)
     GUI_Variables.MEM = mem;
   case 'U'
     version = round(data(1));
+    board = data(2);
+    if board == 1
+        boardStr = 'Two Leg Board (Analog)';
+    elseif board == 2
+        boardStr = 'Quad Board (PWM)';
+    elseif board == 3
+        boardStr = 'IMU Board (Analog)';
+    elseif board == 4
+        boardStr = 'Dual Board (PWM)';
+    else
+        boardStr = 'Board not properly defined';
+    end
     major = mod(floor(version/100),10);
     minor = mod(floor(version/10),10);
     sub_minor = mod(floor(version/1),10);
     str = sprintf("Reported code version %d.%d.%d", major, minor, sub_minor);
+    str = {str; ['Reported board definition: ', boardStr]};
     set(handles.statusText,'String',str);
     
   case 'z'
