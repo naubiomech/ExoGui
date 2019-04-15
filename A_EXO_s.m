@@ -2013,7 +2013,7 @@ function L_Send_FSR_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in L_Send_FSR_Th.
-function L_Send_FSR_Th_Callback(~, ~, handles)
+function L_Send_FSR_Th_Callback(hObject, ~, handles)
 % hObject    handle to L_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2088,7 +2088,7 @@ function R_Send_FSR_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in R_Send_FSR_Th.
-function R_Send_FSR_Th_Callback(~, ~, handles)
+function R_Send_FSR_Th_Callback(hObject, ~, handles)
 % hObject    handle to R_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2101,7 +2101,7 @@ function R_Send_FSR_Th_Callback(~, ~, handles)
             fwrite(bt,'r'); % char 35 -> #, 36 -> $, 74-> J
             RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
             fwrite(bt,RFSRTH,'double'); % Sends the new Torque Value to Arduino
-            L_Check_FSR_Th_Callback(hObject, 0, handles);
+            R_Check_FSR_Th_Callback(hObject, 0, handles);
         catch
             disp("Impossible to set FSR th parameters for Right");
         end
