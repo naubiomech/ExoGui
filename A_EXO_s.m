@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 11-Apr-2019 11:58:18
+% Last Modified by GUIDE v2.5 15-Apr-2019 10:45:22
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 6;
+    BT_INDEX = 4;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -178,6 +178,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.Clean_Memory,'Enable','off');
     set(handles.Start_Trial,'Enable','off');
     set(handles.End_Trial,'Enable','on');
+    set(handles.ATP_Mode,'Enable','on');
 
     GUI_Variables.flag_start=1;
 
@@ -821,8 +822,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
-        set(handles.Start_ATP,'Enable','off');
-        set(handles.Start_ATP,'String','Start');
+       
 
     else
         set(handles.L_Get_Setpoint,'Enable','on');
@@ -844,8 +844,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_BioFeedback_Text,'String','Off');
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
-        set(handles.Start_ATP,'Enable','off');
-        set(handles.Start_ATP,'String','Start');
+      
     end
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
@@ -4002,6 +4001,9 @@ if (bt.Status=="open")
             set(handles.Prop_Ctrl_Panel,'visible','on');
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
+            set(handles.Take_Baseline,'enable','on');
+            set(handles.Start_ATP,'Enable','on');
+            set(handles.Stop_ATP,'Enable','on');
         else
             GUI_Variables.PropOn = 0;
             disp( 'Deactivate Prop Control' );
@@ -4010,8 +4012,10 @@ if (bt.Status=="open")
             set(handles.Prop_Ctrl_Panel,'visible','off');
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
-            
-            
+            set(handles.Take_Baseline,'enable','off');
+            set(handles.Start_ATP,'Enable','off');
+            set(handles.Stop_ATP,'Enable','off');
+        
             axes(handles.PROP_FUNCTION_axes);
             clf(h);
             x=0.4:0.01:1.2;
@@ -4114,77 +4118,87 @@ fprintf(fileID,'Lap %d: %4.1f s\n',c,a);
 fclose(fileID);
 
 
+
 % --- Executes on button press in Start_ATP.
 function Start_ATP_Callback(hObject, eventdata, handles)
 % hObject    handle to Start_ATP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
-str = get(handles.Start_ATP,'string');
-
-
 GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT; 
 % 
-% bt = GUI_Variables.BT;
-% 
+if bt.Status=="open"
 
-        
-if strcmp(str,'Start')
-    set(handles.Start_ATP,'String','Stop');
+ 
       
     RLCount_start = GUI_Variables.RLCount;
     LLCount_start = GUI_Variables.LLCount;
-    GUI_Variables.Start_Window = min(RLCount_start,LLCount_start);
-    disp('Start');
-disp(num2str(RLCount_start));
-    
-else
-    set(handles.Start_ATP,'String','Start');
-    RLCount_stop = GUI_Variables.RLCount;
-    LLCount_stop = GUI_Variables.LLCount;
-    GUI_Variables.Stop_Window = max(RLCount_stop,LLCount_stop);
-        disp('Stop');
-disp(num2str(LLCount_stop));
-%     if bt.Status=="open"
-%         LLTRQ = GUI_Variables.LLTRQ;
-%         LLFSR = GUI_Variables.LLFSR;
-%         RLTRQ = GUI_Variables.RLTRQ;
-%         RLFSR = GUI_Variables.RLFSR;
-%         
-%         dt = .01; % Since the Arduino is set to send values every 10 ms, dt is .01 S
-%         t = 1:length(RLTRQ);                                                %Creates a time Vector equal in length to the number of Torque Values Recieved
-%         t = t .* dt; % Scales the time Vector, knowing how often Arduino sends values,
-%     
-%     %data = [t,LLTRQ,LLFSR,RLTRQ,RLFSR];
-%     
-%          currDir = cd;       % Current directory
-%         saveDir = [GUI_Variables.SSID,'_',date];
-%         savePath = [currDir,'\',saveDir];    % Save directory specific to subject and date
-%         if ~exist(saveDir, 'dir')
-%             mkdir(currDir, saveDir);           % Make a save directory
-%         end
-%         Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',GUI_Variables.TimeStamp,'_',...
-%             'ATP_']),bt.UserData); 
-%         
-%         fileID = fopen(Filename,'w');
-%         fprintf(fileID,'%6.2f %6.2f %6.2f %6.2f %6.2f\n',t,LLTRQ,LLFSR,RLTRQ,RLFSR);
-%         fclose(fileID);
-%         
-%     end
+    start_time = min(RLCount_start,LLCount_start);
+    setappdata(handles.Start_ATP,'start_time',start_time);
+%     disp('Start');
+%     disp(num2str(start_time));
+    set(handles.Start_ATP,'enable','off');
+    set(handles.Stop_ATP,'enable','on');
 end
-disp('Start');
-disp(num2str(GUI_Variables.Start_Window));
-disp('Stop');
-disp(num2str(GUI_Variables.Stop_Window));
-handles.GUI_Variables = GUI_Variables;
-            guidata(hObject, handles);
-    
+
+
+
+
 % --- Executes on button press in Stop_ATP.
 function Stop_ATP_Callback(hObject, eventdata, handles)
 % hObject    handle to Stop_ATP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT; 
+
+if bt.Status=="open"
+    GUI_Variables = handles.GUI_Variables;
+    RLCount_stop = GUI_Variables.RLCount;
+    LLCount_stop = GUI_Variables.LLCount;
+    stop_time = max(RLCount_stop,LLCount_stop);
+%    setappdata(handles.Start_ATP,'stop_time',stop_time); 
+    start_time = getappdata(handles.Start_ATP,'start_time');
+  
+if stop_time > start_time
+    
+        LLTRQ = GUI_Variables.LLTRQ;
+        LLFSR = GUI_Variables.LLFSR;
+        RLTRQ = GUI_Variables.RLTRQ;
+        RLFSR = GUI_Variables.RLFSR;
+        
+        LLTRQ = LLTRQ(start_time:stop_time - 1);
+        LLFSR = LLFSR(start_time:stop_time - 1); 
+        RLTRQ = RLTRQ(start_time:stop_time - 1);
+        RLFSR = RLFSR(start_time:stop_time - 1);
+        
+        dt = .01; % Since the Arduino is set to send values every 10 ms, dt is .01 S
+        t = 1: length(RLTRQ);                                                %Creates a time Vector equal in length to the number of Torque Values Recieved
+        t = t .* dt; % Scales the time Vector, knowing how often Arduino sends values,
+    
+    %data = [t,LLTRQ,LLFSR,RLTRQ,RLFSR];
+    
+        currDir = cd;       % Current directory
+        saveDir = [GUI_Variables.SSID,'_',date];
+        savePath = [currDir,'\',saveDir];    % Save directory specific to subject and date
+        if ~exist(saveDir, 'dir')
+            mkdir(currDir, saveDir);           % Make a save directory
+        end
+        Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',GUI_Variables.TimeStamp,'_',...
+            'ATP_']),bt.UserData); 
+        
+        fileID = fopen(Filename,'w');
+        fprintf(fileID,'%6.2f %6.2f %6.2f %6.2f %6.2f \n',[t; RLTRQ; RLFSR; LLTRQ; LLFSR]);
+        fclose(fileID);
+        bt.UserData = bt.UserData + 1;
+end
+    
+    set(handles.Start_ATP,'enable','on');
+    set(handles.Stop_ATP,'enable','off');
+end
+
 
 
 % --- Executes on button press in Send_ATP.
@@ -4192,3 +4206,85 @@ function Send_ATP_Callback(hObject, eventdata, handles)
 % hObject    handle to Send_ATP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT; 
+
+if (bt.Status=="open")
+   
+       
+    [filename, pathname] = uigetfile({'*.mat', 'Matlab Files (*.mat)'; ...
+                '*.*',                   'All Files (*.*)'});
+
+%This code checks if the user pressed cancel on the dialog.
+        if isequal(filename,0) || isequal(pathname,0)
+             disp('User pressed cancel')
+        else
+             disp(['User selected ', fullfile(pathname, filename)])
+
+        end
+        
+ATP_file = fullfile(pathname, filename);
+
+%fwrite(bt,'g'); %send the character "%"
+
+[right_torque,left_torque]=averaging_torque(ATP_file);
+% for i=1:101
+% if left_torque(i) < 0
+%     left_torque(i) = 0;
+% end
+% end
+% 
+% for i=1:101
+% if right_torque(i) > 0
+%     right_torque(i) = 0;
+% end
+% end
+
+%close all;
+figure();
+subplot(2,1,1)
+plot(0:100,left_torque);title('Averaged left torque profile');
+subplot(2,1,2)
+plot(0:100,right_torque);title('Averaged right torque profile');
+   
+ATP = [right_torque,left_torque];
+% Arrange it to comma-separated string
+str = num2str(ATP);
+str = regexprep(str,'\s+',',');
+% Save as 'sample.h' file
+fid = fopen('C:\Users\ttn75\Documents\Biomech\Exo\ATP.h','w');
+fprintf(fid,'double ATP[202] = {%s};\n',str);
+fclose(fid);
+
+
+
+
+end
+
+
+
+% --- Executes on button press in ATP_Mode.
+function ATP_Mode_Callback(hObject, eventdata, handles)
+% hObject    handle to ATP_Mode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT; 
+
+if (bt.Status=="open")
+   
+fwrite(bt,'h');
+
+            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+            set(handles.Prop_Ctrl_Panel,'visible','off');
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
+            set(handles.Take_Baseline,'enable','off');
+            set(handles.Start_ATP,'Enable','off');
+            set(handles.Stop_ATP,'Enable','off');
+end
+
+
+
