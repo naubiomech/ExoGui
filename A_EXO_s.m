@@ -258,7 +258,7 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                 if GUI_Variables.t.BytesAvailable>0
                     Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
                     if char(Setpoints') == "done"
-                        fwrite(GUI_Variables.BT,',');           %Optimization done
+                        fwrite(GUI_Variables.BT,'h');           %Optimization done
                         set(handles.statusText,'String',"Optimization generation complete.")
                     else
                         if ~contains(char(Setpoints'),'_') %One parameter bang-bang optimization (sigmoid)
@@ -298,7 +298,7 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                 if GUI_Variables.t.BytesAvailable>0
                     Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
                     if char(Setpoints') == "done"
-                        fwrite(GUI_Variables.BT,',');
+                        fwrite(GUI_Variables.BT,'h');
                         set(handles.statusText,'String',"Optimization generation complete.")
                     else
                         if ~contains(char(Setpoints'),'_')
@@ -3478,7 +3478,7 @@ function Stop_Optimization_Callback(~, ~, handles)
     if exist('t','var')
         if t.Status == "open" && bt.Status == "open"
             fwrite(t,"end")
-            fwrite(bt,',')
+            fwrite(bt,'h')
             set(handles.statusText,'String',"Stopping optimization...")
         elseif (t.Status == "closed")
             set(handles.statusText,'String',"TCP port is not open! Re-open connection.")
