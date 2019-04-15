@@ -258,6 +258,12 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                 if GUI_Variables.t.BytesAvailable>0
                     Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
                     if char(Setpoints') == "done"
+                        fwrite(GUI_Variables.BT,'F');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,'f');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,0,'double');
                         fwrite(GUI_Variables.BT,'h');           %Optimization done
                         set(handles.statusText,'String',"Optimization generation complete.")
                     else
@@ -298,6 +304,8 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                 if GUI_Variables.t.BytesAvailable>0
                     Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
                     if char(Setpoints') == "done"
+                        fwrite(GUI_Variables.BT,'"');
+                        fwrite(GUI_Variables.BT,0,'double');
                         fwrite(GUI_Variables.BT,'h');
                         set(handles.statusText,'String',"Optimization generation complete.")
                     else
