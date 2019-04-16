@@ -426,11 +426,13 @@ function draw_graphs(handles, GUI_Variables)
     whichPlotRight = get(handles.Top_Graph,'Value');
     draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
     draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
+%YF    
     if (strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')==1)%if biofeedback is on
         draw_graph_BF(plots, RLCount);
     end
     drawnow nocallbacks;
 
+%YF
 function draw_graph_BF(plots, RLCount)
     figure(1)
     
@@ -447,20 +449,20 @@ function draw_graph_BF(plots, RLCount)
     
     t1=hgtransform('Parent',ax);
     t2=hgtransform('Parent',ax);
-    t3=hgtransform('Parent',ax);
-    t4=hgtransform('Parent',ax);
     
     set(h,'Parent',t1)
-    h2=copyobj(h,t2);h3=copyobj(h,t3);h4=copyobj(h,t4);
-    set(h,'FaceColor',[0.144 0.852 0.850])%blue(update)
-    set(h2,'FaceColor',[0.988 0.093 0.156])%red(target)
-    set(h3,'FaceColor',[0.144 0.852 0.850])%blue
-    set(h4,'FaceColor',[0.988 0.093 0.156])%red
+    h2=copyobj(h,t2);
+    set(h,'FaceColor',[0.144 0.852 0.850])%left update
+    set(h2,'FaceColor',[0.988 0.093 0.156])%right update
     
     set(gcf,'Renderer','opengl')
 
-    plotData1 = plots{10}; plotData2 = plots{12};%left leg
-    plotData3 = plots{9}; plotData4 = plots{11};%right leg
+    plotData1 = plots{10};%left leg update 
+    plotData2 = plots{12};%left leg target
+    plotData3 = plots{9}; %right leg update
+    plotData4 = plots{11};%right leg target
+    plotData5=plots{1};%right leg score
+    plotData6=plots{5};%left leg score
     
     dataLength = max(1, RLCount-1000):RLCount-1;
     data1 = cellfun(@(x) x(dataLength), plotData1', 'UniformOutput', false);
@@ -471,17 +473,47 @@ function draw_graph_BF(plots, RLCount)
     data3 = cat(1,data3{:});
     data4 = cellfun(@(x) x(dataLength), plotData4', 'UniformOutput', false);
     data4 = cat(1,data4{:});
+    data5 = cellfun(@(x) x(dataLength), plotData5', 'UniformOutput', false);
+    data5 = cat(1,data5{:});
+    data6 = cellfun(@(x) x(dataLength), plotData6', 'UniformOutput', false);
+    data6 = cat(1,data6{:});
     
-    trans1=makehgtform('translate',[-8, data1(end), 0]);
+    trans1=makehgtform('translate',[-5, data1(end), 0]);
     set(t1,'Matrix',trans1);
-    trans2=makehgtform('translate',[-3, data2(end), 0]);
+    trans2=makehgtform('translate',[5, data3(end), 0]);
     set(t2,'Matrix',trans2);
-    trans3=makehgtform('translate',[3, data3(end), 0]);
-    set(t3,'Matrix',trans3);
-    trans4=makehgtform('translate',[8, data4(end), 0]);
-    set(t4,'Matrix',trans4);
+
     hold on
-    plot3([0 0],[0,100],[0,0],'Linewidth',2,'Color','black')    
+    plot3([0 0],[0,100],[0,0],'Linewidth',2,'Color','black')
+    
+    %left side text
+    if data2(end)~=0
+       if data2(end)>data1(end)
+           plot3([-10 0],[data2(end),data2(end)],[0,0],'Linewidth',10,'Color','red')
+           text(-9,5,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
+       else
+           plot3([-10 0],[data2(end),data2(end)],[0,0],'Linewidth',10,'Color','green')
+           patch([-10 0 0 -10],[0 0 100 100],'green','FaceAlpha',0.1)
+           text(-9,5,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
+       end
+    else
+        text(-9,5,0,'Left score: 0','fontsize',40);
+    end
+    
+    %right side text
+    if data4(end)~=0
+       if data4(end)>data3(end)
+           plot3([0 10],[data4(end),data4(end)],[0,0],'Linewidth',10,'Color','red')
+           text(5,5,0,['Right score: ' num2str(data5(2,end))],'fontsize',40);
+       else
+           plot3([0 10],[data4(end),data4(end)],[0,0],'Linewidth',10,'Color','green')
+           patch([0 10 10 0],[0 0 100 100],'green','FaceAlpha',0.1)
+           text(5,5,0,['Right score: ' num2str(data5(2,end))],'fontsize',40);
+       end
+    else
+        text(5,5,0,'Right score: 0','fontsize',40);
+    end
+     
     
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
