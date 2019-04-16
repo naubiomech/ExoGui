@@ -4166,9 +4166,9 @@ set(handles.Timer_Value,'string',sprintf('%.3f',split_time));
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
 
-if c == 1
-    bt.UserData = bt.UserData + 1;
-end
+% if c == 1
+%     bt.UserData = bt.UserData + 1;
+% end
 
 currDir = cd;       % Current directory
 saveDir = [GUI_Variables.SSID,'_',date];
