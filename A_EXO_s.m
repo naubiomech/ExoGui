@@ -4131,7 +4131,7 @@ Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_
         
 fileID = fopen(Filename,'a');
 
-fprintf(fileID,'Lap %d: %4.1f s\n',c,a);
+fprintf(fileID,'Lap %d: %4.1f s\n',c,split_time);
 fclose(fileID);
 
 
