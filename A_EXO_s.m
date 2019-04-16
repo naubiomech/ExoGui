@@ -498,6 +498,8 @@ function draw_graph_BF(plots, RLCount)
            plot3([-10 0],[data2(end),data2(end)],[0,0],'Linewidth',10,'Color','green')
            patch([-10 0 0 -10],[0 0 100 100],'green','FaceAlpha',0.1)
            text(-9,5,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
+           [y,Fs]=audioread('dragon-coin.wav');
+           sound(y,Fs)
        end
     else
         text(-9,5,0,'Left score: 0','fontsize',40);
@@ -512,6 +514,8 @@ function draw_graph_BF(plots, RLCount)
            plot3([0 10],[data4(end),data4(end)],[0,0],'Linewidth',10,'Color','green')
            patch([0 10 10 0],[0 0 100 100],'green','FaceAlpha',0.1)
            text(5,5,0,['Right score: ' num2str(data5(2,end))],'fontsize',40);
+           [y,Fs]=audioread('dragon-coin.wav');
+           sound(y,Fs)
        end
     else
         text(5,5,0,'Right score: 0','fontsize',40);
