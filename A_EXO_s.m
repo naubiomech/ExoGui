@@ -4210,29 +4210,6 @@ if bt.Status=="open"
 end
 
 
-        
-if strcmp(str,'Start')
-    set(handles.Start_ATP,'String','Stop');
-      
-    RLCount_start = GUI_Variables.RLCount;
-    LLCount_start = GUI_Variables.LLCount;
-    GUI_Variables.Start_Window = min(RLCount_start,LLCount_start);
-    disp('Start');
-    disp(num2str(RLCount_start));
-else
-    set(handles.Start_ATP,'String','Start');
-    RLCount_stop = GUI_Variables.RLCount;
-    LLCount_stop = GUI_Variables.LLCount;
-    GUI_Variables.Stop_Window = max(RLCount_stop,LLCount_stop);
-    disp('Stop');
-    disp(num2str(LLCount_stop));
-end
-disp('Start');
-disp(num2str(GUI_Variables.Start_Window));
-disp('Stop');
-disp(num2str(GUI_Variables.Stop_Window));
-handles.GUI_Variables = GUI_Variables;
-guidata(hObject, handles);
    
 % --- Executes on button press in Stop_ATP.
 function Stop_ATP_Callback(hObject, eventdata, handles)
@@ -4343,12 +4320,11 @@ ATP = [right_torque,left_torque];
 str = num2str(ATP);
 str = regexprep(str,'\s+',',');
 % Save as 'sample.h' file
-fid = fopen('C:\Users\ttn75\Documents\Biomech\Exo\ATP.h','w');
+cur_d = cd;
+new_file = strrep(cur_d,'Gui','Exo\ATP.h');
+fid = fopen(new_file,'w');
 fprintf(fid,'double ATP[202] = {%s};\n',str);
 fclose(fid);
-
-
-
 
 end
 
