@@ -105,13 +105,13 @@ switch(msg)
     set(handles.R_Check_Gain_Text,'String',R_Gain);
   case 'B'
     val=strcmp(get(handles.Balance_Text,'String'),'On');
-    get(handles.Activate_BioFeedback_Text,'String')
+    get(handles.Activate_BioFeedback_Text,'String');
     val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
     
     if (val_biofb==1)
         disp('biofeedback baseline');
         GUI_Variables.basel_biofb=data(1);
-        disp(GUI_Variables.basel_biofb)
+        disp(GUI_Variables.basel_biofb);
     elseif (val==1)
         disp('balance baseline');
         GUI_Variables.L_Bal_steady_Toe= data(1);

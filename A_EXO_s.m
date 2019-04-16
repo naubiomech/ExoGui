@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 4;
+    BT_INDEX = 3;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -4122,6 +4122,7 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
             set(handles.Take_Baseline,'enable','on');
+            set(handles.Check_Baseline,'enable','on');
             set(handles.Start_ATP,'Enable','on');
             set(handles.Stop_ATP,'Enable','on');
         else
@@ -4133,6 +4134,7 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
             set(handles.Take_Baseline,'enable','off');
+            set(handles.Check_Baseline,'enable','off');
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
         
