@@ -195,7 +195,7 @@ switch(msg)
         set(handles.axes10,'Color',[0 0 0])
         set(handles.EXP_Params_axes,'Color',[0 0 0])
         valBT=0;
-        fclose(bt);
+        fclose(GUI_Variables.BT);
     end
   otherwise
     %Do nothing
