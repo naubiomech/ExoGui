@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 4;
+    BT_INDEX = 3;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -213,13 +213,15 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     guidata(hObject, handles);
     
 function GUI_Variables = accept_message(bt, handles, GUI_Variables)
-    
+    while bt.BytesAvailable>0
         GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+    end
     
 
 function GUI_Variables = Update_GUI(GUI_Variables, handles)
     RLCount = GUI_Variables.RLCount;
     LLCount = GUI_Variables.LLCount;
+    
     bt = GUI_Variables.BT;
     start_count = GUI_Variables.start_count;
     BT_Was_Disconnected = GUI_Variables.BT_Was_Disconnected;
@@ -259,7 +261,13 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                 if GUI_Variables.t.BytesAvailable>0
                     Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
                     if char(Setpoints') == "done"
-                        fwrite(GUI_Variables.BT,',');           %Optimization done
+                        fwrite(GUI_Variables.BT,'F');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,'f');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,'h');           %Optimization done
                         set(handles.statusText,'String',"Optimization generation complete.")
                     else
                         if ~contains(char(Setpoints'),'_') %One parameter bang-bang optimization (sigmoid)
@@ -299,13 +307,15 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                 if GUI_Variables.t.BytesAvailable>0
                     Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
                     if char(Setpoints') == "done"
-                        fwrite(GUI_Variables.BT,',');
+                        fwrite(GUI_Variables.BT,'"');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,'h');
                         set(handles.statusText,'String',"Optimization generation complete.")
                     else
                         if ~contains(char(Setpoints'),'_')
                             Trq_Setpoint = str2double(char(Setpoints'));  %Torque Setpoint
                             if GUI_Variables.BT.Status == "open"
-                                fwrite(GUI_Variables.BT,'"');   %Need new symbol for prop optimization
+                                fwrite(GUI_Variables.BT,'"');   
                                 fwrite(GUI_Variables.BT,Trq_Setpoint,'double');
                                 disp(['Sent Data: ',num2str(Trq_Setpoint)]);
                             end
@@ -383,9 +393,9 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
         RLCount = GUI_Variables.RLCount;
         LLCount = GUI_Variables.LLCount;
         
-        if mod(RLCount,100) == 0
-            draw_graphs(handles, GUI_Variables)
-        end
+        
+        draw_graphs(handles, GUI_Variables)
+        
     end
 
     GUI_Variables.RLCount = RLCount;
@@ -428,11 +438,13 @@ function draw_graphs(handles, GUI_Variables)
     whichPlotRight = get(handles.Top_Graph,'Value');
     draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
     draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
+%YF    
     if (strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')==1)%if biofeedback is on
         draw_graph_BF(plots, RLCount);
     end
     drawnow nocallbacks;
 
+%YF
 function draw_graph_BF(plots, RLCount)
     figure(1)
     
@@ -449,20 +461,20 @@ function draw_graph_BF(plots, RLCount)
     
     t1=hgtransform('Parent',ax);
     t2=hgtransform('Parent',ax);
-    t3=hgtransform('Parent',ax);
-    t4=hgtransform('Parent',ax);
     
     set(h,'Parent',t1)
-    h2=copyobj(h,t2);h3=copyobj(h,t3);h4=copyobj(h,t4);
-    set(h,'FaceColor',[0.144 0.852 0.850])%blue(update)
-    set(h2,'FaceColor',[0.988 0.093 0.156])%red(target)
-    set(h3,'FaceColor',[0.144 0.852 0.850])%blue
-    set(h4,'FaceColor',[0.988 0.093 0.156])%red
+    h2=copyobj(h,t2);
+    set(h,'FaceColor',[0.144 0.852 0.850])%left update
+    set(h2,'FaceColor',[0.988 0.093 0.156])%right update
     
     set(gcf,'Renderer','opengl')
 
-    plotData1 = plots{10}; plotData2 = plots{12};%left leg
-    plotData3 = plots{9}; plotData4 = plots{11};%right leg
+    plotData1 = plots{10};%left leg update 
+    plotData2 = plots{12};%left leg target
+    plotData3 = plots{9}; %right leg update
+    plotData4 = plots{11};%right leg target
+    plotData5=plots{1};%right leg score
+    plotData6=plots{5};%left leg score
     
     dataLength = max(1, RLCount-1000):RLCount-1;
     data1 = cellfun(@(x) x(dataLength), plotData1', 'UniformOutput', false);
@@ -473,17 +485,47 @@ function draw_graph_BF(plots, RLCount)
     data3 = cat(1,data3{:});
     data4 = cellfun(@(x) x(dataLength), plotData4', 'UniformOutput', false);
     data4 = cat(1,data4{:});
+    data5 = cellfun(@(x) x(dataLength), plotData5', 'UniformOutput', false);
+    data5 = cat(1,data5{:});
+    data6 = cellfun(@(x) x(dataLength), plotData6', 'UniformOutput', false);
+    data6 = cat(1,data6{:});
     
-    trans1=makehgtform('translate',[-8, data1(end), 0]);
+    trans1=makehgtform('translate',[-5, data1(end), 0]);
     set(t1,'Matrix',trans1);
-    trans2=makehgtform('translate',[-3, data2(end), 0]);
+    trans2=makehgtform('translate',[5, data3(end), 0]);
     set(t2,'Matrix',trans2);
-    trans3=makehgtform('translate',[3, data3(end), 0]);
-    set(t3,'Matrix',trans3);
-    trans4=makehgtform('translate',[8, data4(end), 0]);
-    set(t4,'Matrix',trans4);
+
     hold on
-    plot3([0 0],[0,100],[0,0],'Linewidth',2,'Color','black')    
+    plot3([0 0],[0,100],[0,0],'Linewidth',2,'Color','black')
+    
+    %left side text
+    if data2(end)~=0
+       if data2(end)>data1(end)
+           plot3([-10 0],[data2(end),data2(end)],[0,0],'Linewidth',10,'Color','red')
+           text(-9,5,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
+       else
+           plot3([-10 0],[data2(end),data2(end)],[0,0],'Linewidth',10,'Color','green')
+           patch([-10 0 0 -10],[0 0 100 100],'green','FaceAlpha',0.1)
+           text(-9,5,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
+       end
+    else
+        text(-9,5,0,'Left score: 0','fontsize',40);
+    end
+    
+    %right side text
+    if data4(end)~=0
+       if data4(end)>data3(end)
+           plot3([0 10],[data4(end),data4(end)],[0,0],'Linewidth',10,'Color','red')
+           text(5,5,0,['Right score: ' num2str(data5(2,end))],'fontsize',40);
+       else
+           plot3([0 10],[data4(end),data4(end)],[0,0],'Linewidth',10,'Color','green')
+           patch([0 10 10 0],[0 0 100 100],'green','FaceAlpha',0.1)
+           text(5,5,0,['Right score: ' num2str(data5(2,end))],'fontsize',40);
+       end
+    else
+        text(5,5,0,'Right score: 0','fontsize',40);
+    end
+     
     
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
@@ -1799,7 +1841,7 @@ function [n1,n2,n3]=Get_Smoothing_Callback(hObject, ~, handles)
     guidata(hObject, handles);
 
 % --- Executes on button press in Set_Smoothing.
-function Set_Smoothing_Callback(~, ~, handles)
+function Set_Smoothing_Callback(hObject, ~, handles)
 % hObject    handle to Set_Smoothing (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1820,7 +1862,7 @@ function Set_Smoothing_Callback(~, ~, handles)
             fwrite(bt,N2,'double');
             fwrite(bt,N3,'double');
             pause(0.3);
-            Get_Smoothing_Callback(0,0,handles);
+            Get_Smoothing_Callback(hObject,0,handles);
         catch
             disp("Impossible to set shaping parameters for BTRL");
         end
@@ -2032,7 +2074,7 @@ function lfsr=L_Check_FSR_Th_Callback(hObject, ~, handles)
             fwrite(bt,char('Q')); % send the character "Q"
             GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
         catch
-            disp("Impossible to know R FSR TH");
+            disp("Impossible to know L FSR TH");
             set(handles.R_Check_FSR_Text,'String',"NaN");
         end
     end
@@ -2068,7 +2110,7 @@ function L_Send_FSR_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in L_Send_FSR_Th.
-function L_Send_FSR_Th_Callback(~, ~, handles)
+function L_Send_FSR_Th_Callback(hObject, ~, handles)
 % hObject    handle to L_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2095,7 +2137,7 @@ function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
     if (bt.Status=="open")
         try
             fwrite(bt,char('q')); % send the character "Q"
-            message,data = get_message(bt);
+            [message,data] = get_message(bt);
             if message == 'q'
                 Curr_TH_R = data(1);
                 set(handles.R_Check_FSR_Text,'String',Curr_TH_R);
@@ -2143,7 +2185,7 @@ function R_Send_FSR_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in R_Send_FSR_Th.
-function R_Send_FSR_Th_Callback(~, ~, handles)
+function R_Send_FSR_Th_Callback(hObject, ~, handles)
 % hObject    handle to R_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2156,7 +2198,7 @@ function R_Send_FSR_Th_Callback(~, ~, handles)
             fwrite(bt,'r'); % char 35 -> #, 36 -> $, 74-> J
             RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
             fwrite(bt,RFSRTH,'double'); % Sends the new Torque Value to Arduino
-            L_Check_FSR_Th_Callback(hObject, 0, handles);
+            R_Check_FSR_Th_Callback(hObject, 0, handles);
         catch
             disp("Impossible to set FSR th parameters for Right");
         end
@@ -2855,6 +2897,7 @@ bt = GUI_Variables.BT;
 try
     if(bt.Status=="open")
         fwrite(bt,'b');
+        set(handles.statusText,'String','Taking baseline for proportional...');
     end
 
 
@@ -3313,7 +3356,7 @@ function Set_Bias_Callback(~, ~, handles)
             if not(isempty(bias))
                 fwrite(bt,'*');
                 fwrite(bt,bias,'double');
-                disp(['BioFeedback Bias ',num2str(bias)]);
+                disp(['treadmill speed ',num2str(bias), 'm/s']);
             end
 
         catch
@@ -3531,7 +3574,7 @@ function Stop_Optimization_Callback(~, ~, handles)
     if exist('t','var')
         if t.Status == "open" && bt.Status == "open"
             fwrite(t,"end")
-            fwrite(bt,',')
+            fwrite(bt,'h')
             set(handles.statusText,'String',"Stopping optimization...")
         elseif (t.Status == "closed")
             set(handles.statusText,'String',"TCP port is not open! Re-open connection.")
@@ -3571,6 +3614,7 @@ function BioFeedback_Baseline_Callback(~, ~, handles)
 
             disp('BioFeedback Baseline for 3 steps (Default)');
             set(handles.statusText,'String','BioFeedback Baseline for 3 steps');
+            
             pause(4)
             set(handles.statusText,'String','Taking BioFeedback Baseline Finished');
         catch
@@ -4078,6 +4122,7 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
             set(handles.Take_Baseline,'enable','on');
+            set(handles.Check_Baseline,'enable','on');
             set(handles.Start_ATP,'Enable','on');
             set(handles.Stop_ATP,'Enable','on');
         else
@@ -4089,6 +4134,7 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
             set(handles.Take_Baseline,'enable','off');
+            set(handles.Check_Baseline,'enable','off');
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
         
@@ -4181,7 +4227,7 @@ Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_
         
 fileID = fopen(Filename,'a');
 
-fprintf(fileID,'Lap %d: %4.1f s\n',c,a);
+fprintf(fileID,'Lap %d: %4.1f s\n',c,split_time);
 fclose(fileID);
 
 
