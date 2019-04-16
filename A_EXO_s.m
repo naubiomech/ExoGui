@@ -213,8 +213,9 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     guidata(hObject, handles);
     
 function GUI_Variables = accept_message(bt, handles, GUI_Variables)
-    
+    while bt.BytesAvailable>0
         GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+    end
     
 
 function GUI_Variables = Update_GUI(GUI_Variables, handles)
@@ -260,7 +261,13 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                 if GUI_Variables.t.BytesAvailable>0
                     Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
                     if char(Setpoints') == "done"
-                        fwrite(GUI_Variables.BT,',');           %Optimization done
+                        fwrite(GUI_Variables.BT,'F');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,'f');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,'h');           %Optimization done
                         set(handles.statusText,'String',"Optimization generation complete.")
                     else
                         if ~contains(char(Setpoints'),'_') %One parameter bang-bang optimization (sigmoid)
@@ -300,13 +307,15 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                 if GUI_Variables.t.BytesAvailable>0
                     Setpoints = fread(GUI_Variables.t,GUI_Variables.t.BytesAvailable);
                     if char(Setpoints') == "done"
-                        fwrite(GUI_Variables.BT,',');
+                        fwrite(GUI_Variables.BT,'"');
+                        fwrite(GUI_Variables.BT,0,'double');
+                        fwrite(GUI_Variables.BT,'h');
                         set(handles.statusText,'String',"Optimization generation complete.")
                     else
                         if ~contains(char(Setpoints'),'_')
                             Trq_Setpoint = str2double(char(Setpoints'));  %Torque Setpoint
                             if GUI_Variables.BT.Status == "open"
-                                fwrite(GUI_Variables.BT,'"');   %Need new symbol for prop optimization
+                                fwrite(GUI_Variables.BT,'"');   
                                 fwrite(GUI_Variables.BT,Trq_Setpoint,'double');
                                 disp(['Sent Data: ',num2str(Trq_Setpoint)]);
                             end
@@ -384,9 +393,9 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
         RLCount = GUI_Variables.RLCount;
         LLCount = GUI_Variables.LLCount;
         
-        if mod(RLCount,100) == 0
-            draw_graphs(handles, GUI_Variables)
-        end
+        
+        draw_graphs(handles, GUI_Variables)
+        
     end
 
     GUI_Variables.RLCount = RLCount;
@@ -1836,7 +1845,7 @@ function [n1,n2,n3]=Get_Smoothing_Callback(hObject, ~, handles)
     guidata(hObject, handles);
 
 % --- Executes on button press in Set_Smoothing.
-function Set_Smoothing_Callback(~, ~, handles)
+function Set_Smoothing_Callback(hObject, ~, handles)
 % hObject    handle to Set_Smoothing (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1857,7 +1866,7 @@ function Set_Smoothing_Callback(~, ~, handles)
             fwrite(bt,N2,'double');
             fwrite(bt,N3,'double');
             pause(0.3);
-            Get_Smoothing_Callback(0,0,handles);
+            Get_Smoothing_Callback(hObject,0,handles);
         catch
             disp("Impossible to set shaping parameters for BTRL");
         end
@@ -2069,7 +2078,7 @@ function lfsr=L_Check_FSR_Th_Callback(hObject, ~, handles)
             fwrite(bt,char('Q')); % send the character "Q"
             GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
         catch
-            disp("Impossible to know R FSR TH");
+            disp("Impossible to know L FSR TH");
             set(handles.R_Check_FSR_Text,'String',"NaN");
         end
     end
@@ -2105,7 +2114,7 @@ function L_Send_FSR_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in L_Send_FSR_Th.
-function L_Send_FSR_Th_Callback(~, ~, handles)
+function L_Send_FSR_Th_Callback(hObject, ~, handles)
 % hObject    handle to L_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2132,7 +2141,7 @@ function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
     if (bt.Status=="open")
         try
             fwrite(bt,char('q')); % send the character "Q"
-            message,data = get_message(bt);
+            [message,data] = get_message(bt);
             if message == 'q'
                 Curr_TH_R = data(1);
                 set(handles.R_Check_FSR_Text,'String',Curr_TH_R);
@@ -2180,7 +2189,7 @@ function R_Send_FSR_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in R_Send_FSR_Th.
-function R_Send_FSR_Th_Callback(~, ~, handles)
+function R_Send_FSR_Th_Callback(hObject, ~, handles)
 % hObject    handle to R_Send_FSR_Th (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2193,7 +2202,7 @@ function R_Send_FSR_Th_Callback(~, ~, handles)
             fwrite(bt,'r'); % char 35 -> #, 36 -> $, 74-> J
             RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
             fwrite(bt,RFSRTH,'double'); % Sends the new Torque Value to Arduino
-            L_Check_FSR_Th_Callback(hObject, 0, handles);
+            R_Check_FSR_Th_Callback(hObject, 0, handles);
         catch
             disp("Impossible to set FSR th parameters for Right");
         end
@@ -2892,6 +2901,7 @@ bt = GUI_Variables.BT;
 try
     if(bt.Status=="open")
         fwrite(bt,'b');
+        set(handles.statusText,'String','Taking baseline for proportional...');
     end
 
 
@@ -3568,7 +3578,7 @@ function Stop_Optimization_Callback(~, ~, handles)
     if exist('t','var')
         if t.Status == "open" && bt.Status == "open"
             fwrite(t,"end")
-            fwrite(bt,',')
+            fwrite(bt,'h')
             set(handles.statusText,'String',"Stopping optimization...")
         elseif (t.Status == "closed")
             set(handles.statusText,'String',"TCP port is not open! Re-open connection.")
@@ -4116,6 +4126,7 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
             set(handles.Take_Baseline,'enable','on');
+            set(handles.Check_Baseline,'enable','on');
             set(handles.Start_ATP,'Enable','on');
             set(handles.Stop_ATP,'Enable','on');
         else
@@ -4127,6 +4138,7 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
             set(handles.Take_Baseline,'enable','off');
+            set(handles.Check_Baseline,'enable','off');
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
         
@@ -4204,9 +4216,9 @@ set(handles.Timer_Value,'string',sprintf('%.3f',split_time));
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
 
-if c == 1
-    bt.UserData = bt.UserData + 1;
-end
+% if c == 1
+%     bt.UserData = bt.UserData + 1;
+% end
 
 currDir = cd;       % Current directory
 saveDir = [GUI_Variables.SSID,'_',date];
@@ -4219,7 +4231,7 @@ Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_
         
 fileID = fopen(Filename,'a');
 
-fprintf(fileID,'Lap %d: %4.1f s\n',c,a);
+fprintf(fileID,'Lap %d: %4.1f s\n',c,split_time);
 fclose(fileID);
 
 
@@ -4248,29 +4260,6 @@ if bt.Status=="open"
 end
 
 
-        
-if strcmp(str,'Start')
-    set(handles.Start_ATP,'String','Stop');
-      
-    RLCount_start = GUI_Variables.RLCount;
-    LLCount_start = GUI_Variables.LLCount;
-    GUI_Variables.Start_Window = min(RLCount_start,LLCount_start);
-    disp('Start');
-    disp(num2str(RLCount_start));
-else
-    set(handles.Start_ATP,'String','Start');
-    RLCount_stop = GUI_Variables.RLCount;
-    LLCount_stop = GUI_Variables.LLCount;
-    GUI_Variables.Stop_Window = max(RLCount_stop,LLCount_stop);
-    disp('Stop');
-    disp(num2str(LLCount_stop));
-end
-disp('Start');
-disp(num2str(GUI_Variables.Start_Window));
-disp('Stop');
-disp(num2str(GUI_Variables.Stop_Window));
-handles.GUI_Variables = GUI_Variables;
-guidata(hObject, handles);
    
 % --- Executes on button press in Stop_ATP.
 function Stop_ATP_Callback(hObject, eventdata, handles)
@@ -4319,7 +4308,7 @@ if stop_time > start_time
         fileID = fopen(Filename,'w');
         fprintf(fileID,'%6.2f %6.2f %6.2f %6.2f %6.2f \n',[t; RLTRQ; RLFSR; LLTRQ; LLFSR]);
         fclose(fileID);
-        bt.UserData = bt.UserData + 1;
+%        bt.UserData = bt.UserData + 1;
 end
     
     set(handles.Start_ATP,'enable','on');
@@ -4381,12 +4370,11 @@ ATP = [right_torque,left_torque];
 str = num2str(ATP);
 str = regexprep(str,'\s+',',');
 % Save as 'sample.h' file
-fid = fopen('C:\Users\ttn75\Documents\Biomech\Exo\ATP.h','w');
+cur_d = cd;
+new_file = strrep(cur_d,'Gui','Exo\ATP.h');
+fid = fopen(new_file,'w');
 fprintf(fid,'double ATP[202] = {%s};\n',str);
 fclose(fid);
-
-
-
 
 end
 
@@ -4402,7 +4390,7 @@ bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
    
-fwrite(bt,'h');
+fwrite(bt,'j');        %TN
 
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
             set(handles.Prop_Ctrl_Panel,'visible','off');
