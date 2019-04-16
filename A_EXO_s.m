@@ -3343,7 +3343,7 @@ function Set_Bias_Callback(~, ~, handles)
             if not(isempty(bias))
                 fwrite(bt,'*');
                 fwrite(bt,bias,'double');
-                disp(['BioFeedback Bias ',num2str(bias)]);
+                disp(['treadmill speed ',num2str(bias), 'm/s']);
             end
 
         catch
