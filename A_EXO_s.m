@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 3;
+    BT_INDEX = 4;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -4304,7 +4304,7 @@ if stop_time > start_time
         fileID = fopen(Filename,'w');
         fprintf(fileID,'%6.2f %6.2f %6.2f %6.2f %6.2f \n',[t; RLTRQ; RLFSR; LLTRQ; LLFSR]);
         fclose(fileID);
-        bt.UserData = bt.UserData + 1;
+%        bt.UserData = bt.UserData + 1;
 end
     
     set(handles.Start_ATP,'enable','on');
@@ -4386,7 +4386,7 @@ bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
    
-fwrite(bt,'h');
+fwrite(bt,'j');        %TN
 
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
             set(handles.Prop_Ctrl_Panel,'visible','off');
