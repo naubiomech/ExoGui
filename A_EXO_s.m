@@ -218,6 +218,7 @@ function GUI_Variables = accept_message(bt, handles, GUI_Variables)
 function GUI_Variables = Update_GUI(GUI_Variables, handles)
     RLCount = GUI_Variables.RLCount;
     LLCount = GUI_Variables.LLCount;
+    
     bt = GUI_Variables.BT;
     start_count = GUI_Variables.start_count;
     BT_Was_Disconnected = GUI_Variables.BT_Was_Disconnected;
@@ -3601,6 +3602,7 @@ function BioFeedback_Baseline_Callback(~, ~, handles)
 
             disp('BioFeedback Baseline for 3 steps (Default)');
             set(handles.statusText,'String','BioFeedback Baseline for 3 steps');
+            
             pause(4)
             set(handles.statusText,'String','Taking BioFeedback Baseline Finished');
         catch
