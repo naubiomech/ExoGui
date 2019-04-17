@@ -448,7 +448,7 @@ function draw_graphs(handles, GUI_Variables)
 function draw_graph_BF(plots, RLCount)
     figure(1)
     
-    ax=axes('XLim',[-10 10],'YLim',[0,100],'Zlim',[-1,1]);
+    ax=axes('XLim',[-10 10],'YLim',[0,200],'Zlim',[-1,1]);
     view(2);
     grid on;
     ylabel('Stride length (cm)')
@@ -473,8 +473,8 @@ function draw_graph_BF(plots, RLCount)
     plotData2 = plots{12};%left leg target
     plotData3 = plots{9}; %right leg update
     plotData4 = plots{11};%right leg target
-    plotData5=plots{1};%right leg score
-    plotData6=plots{5};%left leg score
+    plotData5=plots{3};%right leg score
+    plotData6=plots{3};%left leg score
     
     dataLength = max(1, RLCount-1000):RLCount-1;
     data1 = cellfun(@(x) x(dataLength), plotData1', 'UniformOutput', false);
@@ -496,38 +496,38 @@ function draw_graph_BF(plots, RLCount)
     set(t2,'Matrix',trans2);
 
     hold on
-    plot3([0 0],[0,100],[0,0],'Linewidth',2,'Color','black')
+    plot3([0 0],[0,200],[0,0],'Linewidth',2,'Color','black')
     
     %left side text
     if data2(end)~=0
        if data2(end)>data1(end)
            plot3([-10 0],[data2(end),data2(end)],[0,0],'Linewidth',10,'Color','red')
-           text(-9,5,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
+           text(-9,180,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
        else
            plot3([-10 0],[data2(end),data2(end)],[0,0],'Linewidth',10,'Color','green')
-           patch([-10 0 0 -10],[0 0 100 100],'green','FaceAlpha',0.1)
-           text(-9,5,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
+           patch([-10 0 0 -10],[0 0 200 200],'green','FaceAlpha',0.1)
+           text(-9,180,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
            [y,Fs]=audioread('dragon-coin.wav');
            sound(y,Fs)
        end
     else
-        text(-9,5,0,'Left score: 0','fontsize',40);
+        text(-9,180,0,'Left score: 0','fontsize',40);
     end
     
     %right side text
     if data4(end)~=0
        if data4(end)>data3(end)
            plot3([0 10],[data4(end),data4(end)],[0,0],'Linewidth',10,'Color','red')
-           text(5,5,0,['Right score: ' num2str(data5(2,end))],'fontsize',40);
+           text(5,180,0,['Right score: ' num2str(data5(1,end))],'fontsize',40);
        else
            plot3([0 10],[data4(end),data4(end)],[0,0],'Linewidth',10,'Color','green')
-           patch([0 10 10 0],[0 0 100 100],'green','FaceAlpha',0.1)
-           text(5,5,0,['Right score: ' num2str(data5(2,end))],'fontsize',40);
+           patch([0 10 10 0],[0 0 200 200],'green','FaceAlpha',0.1)
+           text(5,180,0,['Right score: ' num2str(data5(1,end))],'fontsize',40);
            [y,Fs]=audioread('dragon-coin.wav');
            sound(y,Fs)
        end
     else
-        text(5,5,0,'Right score: 0','fontsize',40);
+        text(5,180,0,'Right score: 0','fontsize',40);
     end
      
     
