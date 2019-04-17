@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 4;
+    BT_INDEX = 5;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -4231,7 +4231,7 @@ Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_
         
 fileID = fopen(Filename,'a');
 
-fprintf(fileID,'Lap %d: %4.1f s\n',c,split_time);
+fprintf(fileID,'Lap %d: %4.1f s\r\n',c,split_time);
 fclose(fileID);
 
 
