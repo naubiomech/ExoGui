@@ -3338,7 +3338,7 @@ function Set_Bias_Callback(~, ~, handles)
             if not(isempty(bias))
                 fwrite(bt,'*');
                 fwrite(bt,bias,'double');
-                disp(['treadmill speed ',num2str(bias), 'm/s']);
+                disp(['target is ',num2str(bias), ' times baseline']);
             end
 
         catch
