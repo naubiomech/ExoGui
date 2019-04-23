@@ -499,7 +499,7 @@ end
 if data3(end)<1
     plot([0 10],[1,1],'Linewidth',8,'Color','red')
     text(1,1.8,['Right score: ' num2str(data5(end))],'fontsize',40);
-    patch([-10 0 0 -10],[0 0 data3(end) data3(end)],'red','FaceAlpha',0.1)
+    patch([0 10 10 0],[0 0 data3(end) data3(end)],'red','FaceAlpha',0.1)
 else
     plot([0 10],[1,1],'Linewidth',8,'Color','green')
     patch([0 10 10 0],[0 0 data3(end) data3(end)],'green','FaceAlpha',0.1)
