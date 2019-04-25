@@ -446,90 +446,68 @@ function draw_graphs(handles, GUI_Variables)
 
 %YF
 function draw_graph_BF(plots, RLCount)
-    figure(1)
-    
-    ax=axes('XLim',[-10 10],'YLim',[0,200],'Zlim',[-1,1]);
-    view(2);
-    grid on;
-    ylabel('Stride length (cm)')
-    
-    [x1, y1, z1]=cylinder([0.2 0],4);
-    [x2, y2, z2]=cylinder([0.6 0],4);
-    
-    h(1)=surface(x1,z1*6-0.5,y1,'FaceAlpha',0.5);
-    h(2)=surface(x2,z2*6,y2,'FaceAlpha',0.2);
-    
-    t1=hgtransform('Parent',ax);
-    t2=hgtransform('Parent',ax);
-    
-    set(h,'Parent',t1)
-    h2=copyobj(h,t2);
-    set(h,'FaceColor',[0.144 0.852 0.850])%left update
-    set(h2,'FaceColor',[0.988 0.093 0.156])%right update
-    
-    set(gcf,'Renderer','opengl')
+figure(1)
 
-    plotData1 = plots{10};%left leg update 
-    plotData2 = plots{12};%left leg target
-    plotData3 = plots{9}; %right leg update
-    plotData4 = plots{11};%right leg target
-    plotData5=plots{3};%right leg score
-    plotData6=plots{3};%left leg score
-    
-    dataLength = max(1, RLCount-1000):RLCount-1;
-    data1 = cellfun(@(x) x(dataLength), plotData1', 'UniformOutput', false);
-    data1 = cat(1,data1{:});
-    data2 = cellfun(@(x) x(dataLength), plotData2', 'UniformOutput', false);
-    data2 = cat(1,data2{:});
-    data3 = cellfun(@(x) x(dataLength), plotData3', 'UniformOutput', false);
-    data3 = cat(1,data3{:});
-    data4 = cellfun(@(x) x(dataLength), plotData4', 'UniformOutput', false);
-    data4 = cat(1,data4{:});
-    data5 = cellfun(@(x) x(dataLength), plotData5', 'UniformOutput', false);
-    data5 = cat(1,data5{:});
-    data6 = cellfun(@(x) x(dataLength), plotData6', 'UniformOutput', false);
-    data6 = cat(1,data6{:});
-    
-    trans1=makehgtform('translate',[-5, data1(end), 0]);
-    set(t1,'Matrix',trans1);
-    trans2=makehgtform('translate',[5, data3(end), 0]);
-    set(t2,'Matrix',trans2);
+ax=axes('XLim',[-10 10],'YLim',[0,2]);
+grid off;
+ylabel('Ratio')
 
-    hold on
-    plot3([0 0],[0,200],[0,0],'Linewidth',2,'Color','black')
-    
-    %left side text
-    if data2(end)~=0
-       if data2(end)>data1(end)
-           plot3([-10 0],[data2(end),data2(end)],[0,0],'Linewidth',10,'Color','red')
-           text(-9,180,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
-       else
-           plot3([-10 0],[data2(end),data2(end)],[0,0],'Linewidth',10,'Color','green')
-           patch([-10 0 0 -10],[0 0 200 200],'green','FaceAlpha',0.1)
-           text(-9,180,0,['Left score: ' num2str(data6(2,end))],'fontsize',40);
-           [y,Fs]=audioread('dragon-coin.wav');
-           sound(y,Fs)
-       end
-    else
-        text(-9,180,0,'Left score: 0','fontsize',40);
-    end
-    
-    %right side text
-    if data4(end)~=0
-       if data4(end)>data3(end)
-           plot3([0 10],[data4(end),data4(end)],[0,0],'Linewidth',10,'Color','red')
-           text(5,180,0,['Right score: ' num2str(data5(1,end))],'fontsize',40);
-       else
-           plot3([0 10],[data4(end),data4(end)],[0,0],'Linewidth',10,'Color','green')
-           patch([0 10 10 0],[0 0 200 200],'green','FaceAlpha',0.1)
-           text(5,180,0,['Right score: ' num2str(data5(1,end))],'fontsize',40);
-           [y,Fs]=audioread('dragon-coin.wav');
-           sound(y,Fs)
-       end
-    else
-        text(5,180,0,'Right score: 0','fontsize',40);
-    end
-     
+x1 = [0  , -2, 2];
+y1 = [0,-0.1,-0.1];
+
+g1 = hgtransform;
+patch('XData',x1,'YData',y1,'FaceColor',[0.144 0.852 0.850],'FaceAlpha',0.3,'Parent',g1)
+
+g2 = hgtransform;
+patch('XData',x1,'YData',y1,'FaceColor',[0.988 0.093 0.156],'FaceAlpha',0.3,'Parent',g2)
+
+plotData1 = plots{10};%left update
+plotData3 = plots{9}; %right update
+plotData5 = plots{11};%right score
+plotData6 = plots{12};%left score
+
+dataLength = max(1, RLCount-1000):RLCount-1;
+data1 = cellfun(@(x) x(dataLength), plotData1', 'UniformOutput', false);
+data1 = cat(1,data1{:});
+data3 = cellfun(@(x) x(dataLength), plotData3', 'UniformOutput', false);
+data3 = cat(1,data3{:});
+data5 = cellfun(@(x) x(dataLength), plotData5', 'UniformOutput', false);
+data5 = cat(1,data5{:});
+data6 = cellfun(@(x) x(dataLength), plotData6', 'UniformOutput', false);
+data6 = cat(1,data6{:});
+
+g1.Matrix=makehgtform('translate',[-5, data1(end), 0]);
+g2.Matrix=makehgtform('translate',[5, data3(end), 0]);
+
+hold on
+plot([0 0],[0,2],'Linewidth',2,'Color','black')
+
+%left side text
+if data1(end)<1
+    plot([-10 0],[1,1],'Linewidth',8,'Color','red')
+    text(-9,1.8,['Left score: ' num2str(data6(end))],'fontsize',40);
+    patch([-10 0 0 -10],[0 0 data1(end) data1(end)],'red','FaceAlpha',0.1)
+else
+    plot([-10 0],[1,1],'Linewidth',8,'Color','green')
+    patch([-10 0 0 -10],[0 0 data1(end) data1(end)],'green','FaceAlpha',0.1)
+    text(-9,1.8,['Left score: ' num2str(data6(end))],'fontsize',40);
+    [y,Fs]=audioread('dragon-coin.wav');
+    sound(y,Fs)
+end
+
+%right side text
+if data3(end)<1
+    plot([0 10],[1,1],'Linewidth',8,'Color','red')
+    text(1,1.8,['Right score: ' num2str(data5(end))],'fontsize',40);
+    patch([0 10 10 0],[0 0 data3(end) data3(end)],'red','FaceAlpha',0.1)
+else
+    plot([0 10],[1,1],'Linewidth',8,'Color','green')
+    patch([0 10 10 0],[0 0 data3(end) data3(end)],'green','FaceAlpha',0.1)
+    text(1,1.8,['Right score: ' num2str(data5(end))],'fontsize',40);
+    [y,Fs]=audioread('dragon-coin.wav');
+    sound(y,Fs)
+end
+
     
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
@@ -3360,7 +3338,7 @@ function Set_Bias_Callback(~, ~, handles)
             if not(isempty(bias))
                 fwrite(bt,'*');
                 fwrite(bt,bias,'double');
-                disp(['treadmill speed ',num2str(bias), 'm/s']);
+                disp(['target is ',num2str(bias), ' times baseline']);
             end
 
         catch
@@ -3616,10 +3594,6 @@ function BioFeedback_Baseline_Callback(~, ~, handles)
 
             fwrite(bt,':');
 
-            disp('BioFeedback Baseline for 3 steps (Default)');
-            set(handles.statusText,'String','BioFeedback Baseline for 3 steps');
-            
-            pause(4)
             set(handles.statusText,'String','Taking BioFeedback Baseline Finished');
         catch
         end
