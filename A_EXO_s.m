@@ -907,6 +907,12 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
         set(handles.Start_Timer,'enable','Off');
+        set(handles.Activate_Prop_Pivot,'value',0);
+        set(handles.Activate_Prop_ID,'value',0);
+        set(handles.Activate_Prop_Pivot,'enable','off');
+        set(handles.Activate_Prop_ID,'enable','off');
+        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Prop_Ctrl_Panel,'visible','off');
         
 
 
@@ -933,6 +939,12 @@ function End_Trial_Callback(hObject, eventdata, handles)
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
         set(handles.Start_Timer,'enable','Off');
+        set(handles.Activate_Prop_Pivot,'value',0);
+        set(handles.Activate_Prop_ID,'value',0);
+        set(handles.Activate_Prop_Pivot,'enable','off');
+        set(handles.Activate_Prop_ID,'enable','off');
+        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Prop_Ctrl_Panel,'visible','off');
  
     end
     
