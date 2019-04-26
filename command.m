@@ -202,6 +202,7 @@ switch(msg)
         if strcmp(get(handles.Activate_Prop_Pivot,'enable'),'off')
             set(handles.Activate_Prop_Pivot,'enable','on');  
             set(handles.Activate_Prop_ID,'enable','on');
+            set(handles.Resistance_Ctrl,'enable','on');
         end
         set(handles.statusText,'string','Baseline complete.');
         

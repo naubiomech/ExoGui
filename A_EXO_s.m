@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 15-Apr-2019 10:45:22
+% Last Modified by GUIDE v2.5 25-Apr-2019 17:34:03
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -909,8 +909,10 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Start_Timer,'enable','Off');
         set(handles.Activate_Prop_Pivot,'value',0);
         set(handles.Activate_Prop_ID,'value',0);
+        set(handles.Resistance_Ctrl,'value',0);
         set(handles.Activate_Prop_Pivot,'enable','off');
         set(handles.Activate_Prop_ID,'enable','off');
+        set(handles.Resistance_Ctrl,'enable','off');
         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
         set(handles.Prop_Ctrl_Panel,'visible','off');
         
@@ -941,8 +943,10 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Start_Timer,'enable','Off');
         set(handles.Activate_Prop_Pivot,'value',0);
         set(handles.Activate_Prop_ID,'value',0);
+        set(handles.Resistance_Ctrl,'value',0);
         set(handles.Activate_Prop_Pivot,'enable','off');
         set(handles.Activate_Prop_ID,'enable','off');
+        set(handles.Resistance_Ctrl,'enable','off');
         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
         set(handles.Prop_Ctrl_Panel,'visible','off');
  
@@ -4057,6 +4061,7 @@ bt = GUI_Variables.BT;
 
 value_Pivot = get(handles.Activate_Prop_Pivot,'value');
 value_ID = get(handles.Activate_Prop_ID,'value');
+value_Resistance = get(handles.Resistance_Ctrl,'value');
 
 if (bt.Status=="open")
 
@@ -4070,6 +4075,10 @@ if (bt.Status=="open")
         elseif (value_ID == 1)
                 fwrite(bt,'c');
                 disp('Activate Prop ID Ctrl');
+                
+        elseif (value_Resistance == 1)
+                fwrite(bt,'S');
+                disp('Activate Resistance Control'); %JL
             
         end
             
@@ -4111,6 +4120,7 @@ if (bt.Status=="open")
             set(handles.Prop_Ctrl_Panel,'visible','on');
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
+            set(handles.Resistance_Ctrl,'value',0);
             set(handles.Take_Baseline,'enable','on');
             set(handles.Check_Baseline,'enable','on');
             set(handles.Start_ATP,'Enable','on');
@@ -4123,6 +4133,7 @@ if (bt.Status=="open")
             set(handles.Prop_Ctrl_Panel,'visible','off');
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
+            set(handles.Resistance_Ctrl,'value',0);
             set(handles.Take_Baseline,'enable','off');
             set(handles.Check_Baseline,'enable','off');
             set(handles.Start_ATP,'Enable','off');
@@ -4386,6 +4397,3 @@ fwrite(bt,'j');        %TN
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
 end
-
-
-
