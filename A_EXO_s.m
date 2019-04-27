@@ -4005,68 +4005,6 @@ function Save_Prop_Prm_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-GUI_Variables = handles.GUI_Variables;
-
-bt = GUI_Variables.BT; 
-left_plant_peak_mean = 0; 
-right_plant_peak_mean = 0; 
-left_leg_Curr_Combined = 0;
-right_leg_Curr_Combined = 0;
-left_leg_fsr_Combined_peak_ref = 0;
-right_leg_fsr_Combined_peak_ref = 0;
-left_leg_fsr_Toe_peak_ref = 0;
-right_leg_fsr_Toe_peak_ref = 0;
-left_leg_fsr_Heel_peak_ref = 0;
-right_leg_fsr_Heel_peak_ref = 0;
-left_leg_torque_calibration_value = 0;
-right_leg_torque_calibration_value = 0;
-
-if(bt.Status=="open")
-    fwrite(bt,'e');
-    if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
-            indexes = find(message==44);
-        left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
-        right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
-        left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
-        right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
-        left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
-        right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
-        left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
-        right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
-        left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
-        right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
-        left_leg_torque_calibration_value = str2double(message((indexes(11)+1):(indexes(12)-1)));
-        right_leg_torque_calibration_value = str2double(message((indexes(12)+1):(indexes(13)-1)));
-
-        
-        end
-      
-        
-    currDir = cd;       % Current directory
-saveDir = [currDir,'\',GUI_Variables.SSID,'_',date,'_Proportional_Parameters'];    % Save directory specific to subject and date
-mkdir(currDir,[GUI_Variables.SSID,'_',date,'_Proportional_Parameters']);           % Make a save directory
-Filename_P = sprintf('%s_%d',fullfile(saveDir,[GUI_Variables.SSID,'_',date,'_','Proportional_Parameters_']),...
-    bt.UserData);               %Creates a new filename called "Torque_#"
-                                                                           %Where # is the trial number                                                                           
-fileID_P = fopen(Filename_P,'w');                                      %Actually creates that file
-pause(.01);
-fprintf(fileID_P,['left_plant_peak_mean = ', num2str(left_plant_peak_mean),'\n']);
-fprintf(fileID_P,['right_plant_peak_mean = ', num2str(right_plant_peak_mean),'\n']);
-fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\n']);
-fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\n']);
-fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\n']);
-fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\n']);
-fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\n']);
-fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\n']);
-fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\n']);
-fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\n']);
-fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\n']);
-fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\n']);
-fclose(fileID_P);
-    end
-end
 
 
 % --- Executes on button press in Load_Prop_Prm.
@@ -4082,7 +4020,7 @@ if (bt.Status=="open")
    
     try
        
-    [filename, pathname] = uigetfile({'*.mat', 'Matlab Files (*.mat)'; ...
+    [filename, pathname] = uigetfile({'*.txt', 'Matlab Files (*.txt)'; ...
                 '*.*',                   'All Files (*.*)'});
 
 %This code checks if the user pressed cancel on the dialog.
