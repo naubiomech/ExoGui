@@ -4099,6 +4099,9 @@ bt = GUI_Variables.BT;
 
 str = get(handles.Activate_Prop_Ctrl,'string');
 
+            set(handles.Activate_Prop_Pivot,'enable','on');   % TN 04-26-2019
+            set(handles.Activate_Prop_ID,'enable','on');      % TN 04-26-2019
+
 if (bt.Status=="open")
 
     try  
