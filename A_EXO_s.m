@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 3;
+    BT_INDEX = 4;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -179,7 +179,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.End_Trial,'Enable','on');
     set(handles.ATP_Mode,'Enable','on');
     set(handles.Start_Timer,'Enable','on');
-
+    set(handles.Prop_Ctrl_Panel,'visible','on'); 
 
     GUI_Variables.flag_start=1;
 
@@ -881,7 +881,69 @@ function End_Trial_Callback(hObject, eventdata, handles)
         fprintf(fileID,['KD_R = ',num2str(rkd),'\n']);
         fprintf(fileID,['KI_R = ',num2str(rki),'\n']);
         fclose(fileID);
+        
+%  TN 04-26-2019        
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        left_plant_peak_mean = 0; 
+        right_plant_peak_mean = 0; 
+        left_leg_Curr_Combined = 0;
+        right_leg_Curr_Combined = 0;
+        left_leg_fsr_Combined_peak_ref = 0;
+        right_leg_fsr_Combined_peak_ref = 0;
+        left_leg_fsr_Toe_peak_ref = 0;
+        right_leg_fsr_Toe_peak_ref = 0;
+        left_leg_fsr_Heel_peak_ref = 0;
+        right_leg_fsr_Heel_peak_ref = 0;
+        left_leg_torque_calibration_value = 0;
+        right_leg_torque_calibration_value = 0;
 
+
+    fwrite(bt,'e');
+          message = fgetl(bt);
+        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
+            indexes = find(message==44);
+        left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
+        right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
+        left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
+        right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
+        left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
+        right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
+        left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
+        right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
+        left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
+        right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
+        left_leg_torque_calibration_value = str2double(message((indexes(11)+1):(indexes(12)-1)));
+        right_leg_torque_calibration_value = str2double(message((indexes(12)+1):(indexes(13)-1)));
+
+        
+        end
+            
+ %   currDir = cd;       % Current directory
+        saveDir_P = [GUI_Variables.SSID,'_',date,'_Proportional_Parameters'];    % Save directory specific to subject and date
+            savePath_P = [currDir,'\',saveDir_P];    % Save directory specific to subject and date
+        if ~exist(saveDir_P, 'dir')
+            mkdir(currDir, saveDir_P);           % Make a save directory
+        end
+        Filename_P = sprintf('%s_%d.txt',fullfile(savePath_P,[GUI_Variables.SSID,'_',date,'_',...
+            GUI_Variables.TimeStamp,'_','Proportional_Parameters_']),bt.UserData);               %Creates a new filename called "Torque_#"
+                                                                           %Where # is the trial number                                                                           
+        fileID_P = fopen(Filename_P,'w');                                      %Actually creates that file
+        pause(.01);
+        fprintf(fileID_P,['left_plant_peak_mean = ', num2str(left_plant_peak_mean),'\r\n']);
+        fprintf(fileID_P,['right_plant_peak_mean = ', num2str(right_plant_peak_mean),'\r\n']);
+        fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\r\n']);
+        fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\r\n']);
+        fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\r\n']);
+        fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\r\n']);
+        fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\r\n']);
+        fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\r\n']);
+        fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\r\n']);
+        fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\r\n']);
+        fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\r\n']);
+        fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\r\n']);
+        fclose(fileID_P);
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
         set(handles.statusText,'String','Data has finished being Saved');
         GUI_Variables = Reset_GUI_Variables(GUI_Variables);
         bt.UserData = bt.UserData + 1; % Increments the trial number
@@ -907,12 +969,12 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
         set(handles.Start_Timer,'enable','Off');
-        set(handles.Activate_Prop_Pivot,'value',0);
-        set(handles.Activate_Prop_ID,'value',0);
-        set(handles.Activate_Prop_Pivot,'enable','off');
-        set(handles.Activate_Prop_ID,'enable','off');
-        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-        set(handles.Prop_Ctrl_Panel,'visible','off');
+%        set(handles.Activate_Prop_Pivot,'value',0);
+%        set(handles.Activate_Prop_ID,'value',0);
+%         set(handles.Activate_Prop_Pivot,'enable','on');
+%         set(handles.Activate_Prop_ID,'enable','on');
+%        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+%        set(handles.Prop_Ctrl_Panel,'visible','off');
         
 
 
@@ -939,12 +1001,12 @@ function End_Trial_Callback(hObject, eventdata, handles)
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
         set(handles.Start_Timer,'enable','Off');
-        set(handles.Activate_Prop_Pivot,'value',0);
-        set(handles.Activate_Prop_ID,'value',0);
-        set(handles.Activate_Prop_Pivot,'enable','off');
-        set(handles.Activate_Prop_ID,'enable','off');
-        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-        set(handles.Prop_Ctrl_Panel,'visible','off');
+%        set(handles.Activate_Prop_Pivot,'value',0);
+%        set(handles.Activate_Prop_ID,'value',0);
+%         set(handles.Activate_Prop_Pivot,'enable','off');
+%         set(handles.Activate_Prop_ID,'enable','off');
+%        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+%        set(handles.Prop_Ctrl_Panel,'visible','off');
  
     end
     
@@ -3942,70 +4004,71 @@ function Save_Prop_Prm_Callback(hObject, eventdata, handles)
 % hObject    handle to Save_Prop_Prm (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-GUI_Variables = handles.GUI_Variables;
-
-bt = GUI_Variables.BT; 
-left_plant_peak_mean = 0; 
-right_plant_peak_mean = 0; 
-left_leg_Curr_Combined = 0;
-right_leg_Curr_Combined = 0;
-left_leg_fsr_Combined_peak_ref = 0;
-right_leg_fsr_Combined_peak_ref = 0;
-left_leg_fsr_Toe_peak_ref = 0;
-right_leg_fsr_Toe_peak_ref = 0;
-left_leg_fsr_Heel_peak_ref = 0;
-right_leg_fsr_Heel_peak_ref = 0;
-left_leg_torque_calibration_value = 0;
-right_leg_torque_calibration_value = 0;
-
-if(bt.Status=="open")
-    fwrite(bt,'e');
-    if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
-            indexes = find(message==44);
-        left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
-        right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
-        left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
-        right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
-        left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
-        right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
-        left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
-        right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
-        left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
-        right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
-        left_leg_torque_calibration_value = str2double(message((indexes(11)+1):(indexes(12)-1)));
-        right_leg_torque_calibration_value = str2double(message((indexes(12)+1):(indexes(13)-1)));
-
-        
-        end
-      
-        
-    currDir = cd;       % Current directory
-saveDir = [currDir,'\',GUI_Variables.SSID,'_',date,'_Proportional_Parameters'];    % Save directory specific to subject and date
-mkdir(currDir,[GUI_Variables.SSID,'_',date,'_Proportional_Parameters']);           % Make a save directory
-Filename_P = sprintf('%s_%d',fullfile(saveDir,[GUI_Variables.SSID,'_',date,'_','Proportional_Parameters_']),...
-    bt.UserData);               %Creates a new filename called "Torque_#"
-                                                                           %Where # is the trial number                                                                           
-fileID_P = fopen(Filename_P,'w');                                      %Actually creates that file
-pause(.01);
-fprintf(fileID_P,['left_plant_peak_mean = ', num2str(left_plant_peak_mean),'\n']);
-fprintf(fileID_P,['right_plant_peak_mean = ', num2str(right_plant_peak_mean),'\n']);
-fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\n']);
-fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\n']);
-fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\n']);
-fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\n']);
-fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\n']);
-fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\n']);
-fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\n']);
-fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\n']);
-fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\n']);
-fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\n']);
-fclose(fileID_P);
-    end
-end
-
+% 
+%         GUI_Variables = handles.GUI_Variables;
+%         bt = GUI_Variables.BT; 
+%         
+%         left_plant_peak_mean = 0; 
+%         right_plant_peak_mean = 0; 
+%         left_leg_Curr_Combined = 0;
+%         right_leg_Curr_Combined = 0;
+%         left_leg_fsr_Combined_peak_ref = 0;
+%         right_leg_fsr_Combined_peak_ref = 0;
+%         left_leg_fsr_Toe_peak_ref = 0;
+%         right_leg_fsr_Toe_peak_ref = 0;
+%         left_leg_fsr_Heel_peak_ref = 0;
+%         right_leg_fsr_Heel_peak_ref = 0;
+%         left_leg_torque_calibration_value = 0;
+%         right_leg_torque_calibration_value = 0;
+% 
+% 
+%     fwrite(bt,'e');
+%           message = fgetl(bt);
+%         if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
+%             indexes = find(message==44);
+%         left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
+%         right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
+%         left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
+%         right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
+%         left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
+%         right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
+%         left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
+%         right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
+%         left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
+%         right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
+%         left_leg_torque_calibration_value = str2double(message((indexes(11)+1):(indexes(12)-1)));
+%         right_leg_torque_calibration_value = str2double(message((indexes(12)+1):(indexes(13)-1)));
+% 
+%         
+%         end
+%             
+%         currDir = cd;       % Current directory
+%         saveDir_P = [GUI_Variables.SSID,'_',date,'_Proportional_Parameters'];    % Save directory specific to subject and date
+%             savePath_P = [currDir,'\',saveDir_P];    % Save directory specific to subject and date
+%         if ~exist(saveDir_P, 'dir')
+%             mkdir(currDir, saveDir_P);           % Make a save directory
+%         end
+%         Filename_P = sprintf('%s_%d.txt',fullfile(savePath_P,[GUI_Variables.SSID,'_',date,'_',...
+%             GUI_Variables.TimeStamp,'_','Proportional_Parameters_']),bt.UserData);               %Creates a new filename called "Torque_#"
+%                                                                            %Where # is the trial number                                                                           
+%         fileID_P = fopen(Filename_P,'w');                                      %Actually creates that file
+%         pause(.01);
+%         fprintf(fileID_P,['left_plant_peak_mean = ', num2str(left_plant_peak_mean),'\r\n']);
+%         fprintf(fileID_P,['right_plant_peak_mean = ', num2str(right_plant_peak_mean),'\r\n']);
+%         fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\r\n']);
+%         fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\r\n']);
+%         fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\r\n']);
+%         fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\r\n']);
+%         fclose(fileID_P);
+%         
+%         
+%    
 
 % --- Executes on button press in Load_Prop_Prm.
 function Load_Prop_Prm_Callback(hObject, eventdata, handles)
@@ -4020,7 +4083,7 @@ if (bt.Status=="open")
    
     try
        
-    [filename, pathname] = uigetfile({'*.mat', 'Matlab Files (*.mat)'; ...
+    [filename, pathname] = uigetfile({'*.txt', 'Matlab Files (*.txt)'; ...
                 '*.*',                   'All Files (*.*)'});
 
 %This code checks if the user pressed cancel on the dialog.
@@ -4065,11 +4128,13 @@ if (bt.Status=="open")
 
         if (value_Pivot == 1)         
                 fwrite(bt,'#');
-                disp('Activate Prop Pivot Ctrl');
+                disp('Pivot Prop Ctrl'); 
+                set(handles.Take_Baseline,'Enable','on');
                
         elseif (value_ID == 1)
                 fwrite(bt,'c');
-                disp('Activate Prop ID Ctrl');
+                disp('ID Prop Ctrl');
+                set(handles.Take_Baseline,'Enable','on');
             
         end
             
@@ -4097,8 +4162,12 @@ function Activate_Prop_Ctrl_Callback(hObject, eventdata, handles)
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
 
-str = get(handles.Activate_Prop_Ctrl,'string');
+ str = get(handles.Activate_Prop_Ctrl,'string');
+% 
+%             set(handles.Activate_Prop_Pivot,'enable','on');   % TN 04-26-2019
+%             set(handles.Activate_Prop_ID,'enable','on');      % TN 04-26-2019
 
+      
 if (bt.Status=="open")
 
     try  
@@ -4106,13 +4175,14 @@ if (bt.Status=="open")
 
         if strcmp( str, 'Activate Prop Control' )
             GUI_Variables.PropOn = 1; 
+            fwrite(bt,'l');
             disp( 'Activate Prop Control' );
             set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','on');
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Take_Baseline,'enable','on');
-            set(handles.Check_Baseline,'enable','on');
+%            set(handles.Prop_Ctrl_Panel,'visible','on');
+%             set(handles.Activate_Prop_Pivot,'value',0);
+%             set(handles.Activate_Prop_ID,'value',0);
+%            set(handles.Take_Baseline,'enable','on');
+%            set(handles.Check_Baseline,'enable','on');
             set(handles.Start_ATP,'Enable','on');
             set(handles.Stop_ATP,'Enable','on');
         else
@@ -4120,11 +4190,11 @@ if (bt.Status=="open")
             disp( 'Deactivate Prop Control' );
             fwrite(bt,'^');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','off');
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Take_Baseline,'enable','off');
-            set(handles.Check_Baseline,'enable','off');
+%            set(handles.Prop_Ctrl_Panel,'visible','off');
+%             set(handles.Activate_Prop_Pivot,'value',0);
+%             set(handles.Activate_Prop_ID,'value',0);
+%            set(handles.Take_Baseline,'enable','off');
+%            set(handles.Check_Baseline,'enable','off');
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
         
@@ -4379,7 +4449,7 @@ if (bt.Status=="open")
 fwrite(bt,'j');        %TN
 
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','off');
+%             set(handles.Prop_Ctrl_Panel,'visible','off');
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
             set(handles.Take_Baseline,'enable','off');
