@@ -199,10 +199,9 @@ switch(msg)
     end
     
     case 'n'
-        if strcmp(get(handles.Activate_Prop_Pivot,'enable'),'off')
-            set(handles.Activate_Prop_Pivot,'enable','on');  
-            set(handles.Activate_Prop_ID,'enable','on');
-        end
+        
+        set(handles.Activate_Prop_Ctrl,'enable','on');  
+        set(handles.Check_Baseline,'enable','on');
         set(handles.statusText,'string','Baseline complete.');
         
         
