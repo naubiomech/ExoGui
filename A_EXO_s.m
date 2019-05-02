@@ -179,7 +179,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.End_Trial,'Enable','on');
     set(handles.ATP_Mode,'Enable','on');
     set(handles.Start_Timer,'Enable','on');
-
+    set(handles.Check_Baseline,'Enable','on');
 
     GUI_Variables.flag_start=1;
 
@@ -969,13 +969,12 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
         set(handles.Start_Timer,'enable','Off');
-        set(handles.Activate_Prop_Pivot,'value',0);
-        set(handles.Activate_Prop_ID,'value',0);
-        set(handles.Activate_Prop_Pivot,'enable','off');
-        set(handles.Activate_Prop_ID,'enable','off');
-        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-        set(handles.Prop_Ctrl_Panel,'visible','off');
-        
+%         set(handles.Activate_Prop_Pivot,'value',0);
+%         set(handles.Activate_Prop_ID,'value',0);
+%         set(handles.Activate_Prop_Pivot,'enable','off');
+%         set(handles.Activate_Prop_ID,'enable','off');
+%         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Check_Baseline,'enable','off');
 
 
     else
@@ -1001,12 +1000,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
         set(handles.Start_Timer,'enable','Off');
-        set(handles.Activate_Prop_Pivot,'value',0);
-        set(handles.Activate_Prop_ID,'value',0);
-        set(handles.Activate_Prop_Pivot,'enable','off');
-        set(handles.Activate_Prop_ID,'enable','off');
-        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-        set(handles.Prop_Ctrl_Panel,'visible','off');
+%         set(handles.Activate_Prop_Pivot,'value',0);
+%         set(handles.Activate_Prop_ID,'value',0);
+%         set(handles.Activate_Prop_Pivot,'enable','off');
+%         set(handles.Activate_Prop_ID,'enable','off');
+%         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Check_Baseline,'enable','off');
+        
+
  
     end
     
@@ -4110,12 +4111,13 @@ if (bt.Status=="open")
         if strcmp( str, 'Activate Prop Control' )
             GUI_Variables.PropOn = 1; 
             disp( 'Activate Prop Control' );
+            fwrite(bt,'l');
             set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','on');
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Take_Baseline,'enable','on');
-            set(handles.Check_Baseline,'enable','on');
+%            set(handles.Prop_Ctrl_Panel,'visible','on');
+ %           set(handles.Activate_Prop_Pivot,'value',0);
+ %           set(handles.Activate_Prop_ID,'value',0);
+ %           set(handles.Take_Baseline,'enable','on');
+ %           set(handles.Check_Baseline,'enable','on');
             set(handles.Start_ATP,'Enable','on');
             set(handles.Stop_ATP,'Enable','on');
         else
@@ -4123,11 +4125,11 @@ if (bt.Status=="open")
             disp( 'Deactivate Prop Control' );
             fwrite(bt,'^');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','off');
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Take_Baseline,'enable','off');
-            set(handles.Check_Baseline,'enable','off');
+ %           set(handles.Prop_Ctrl_Panel,'visible','off');
+ %           set(handles.Activate_Prop_Pivot,'value',0);
+ %           set(handles.Activate_Prop_ID,'value',0);
+%            set(handles.Take_Baseline,'enable','off');
+%            set(handles.Check_Baseline,'enable','off');
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
         
