@@ -4150,7 +4150,7 @@ function Start_Timer_Callback(hObject, eventdata, handles)
  
 str = get(handles.Start_Timer,'string');
 a = clock;
-time = a(4)*360+a(5)*60+a(6);
+time = a(4)*3600+a(5)*60+a(6);
 Send_Trig_Callback(hObject, 0, handles);
 
 if strcmp(get(handles.Start_Trial,'Enable'), 'off')
@@ -4185,7 +4185,7 @@ function Split_Timer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 a = clock;
-stop_time = a(4)*360 + a(5)*60 + a(6);
+stop_time = a(4)*3600 + a(5)*60 + a(6);
 %guidata(handles.Split_Timer,stop_time);
 start_time = getappdata(handles.Start_Timer,'start_time');
 setappdata(handles.Start_Timer,'start_time',stop_time);
@@ -4202,9 +4202,14 @@ set(handles.Timer_Value,'string',sprintf('%.3f',split_time));
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
 
-% if c == 1
-%     bt.UserData = bt.UserData + 1;
-% end
+% GO 5/3/19 - Send lap times to HLO for metabolics normalization
+if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
+    try
+        fwrite(GUI_Variables.t,num2str(split_time)); %Send lap time
+    catch
+        disp('Couldn"t send lap time to HLO, check TCP connection.');
+    end
+end     
 
 currDir = cd;       % Current directory
 saveDir = [GUI_Variables.SSID,'_',date];
