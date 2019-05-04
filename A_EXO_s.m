@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 15-Apr-2019 10:45:22
+% Last Modified by GUIDE v2.5 04-May-2019 15:07:35
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -92,7 +92,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'R_Bal_dyn_Toe',20,'R_Bal_dyn_Heel',30,'R_Bal_steady_Toe',40,'R_Bal_steady_Heel',50,...
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
-                           'PropOn',0,'SSID','No_ID','TimeStamp',' ');
+                           'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1);
     
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     handles.GUI_Variables = GUI_Variables;
@@ -907,12 +907,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
         set(handles.Start_Timer,'enable','Off');
-        set(handles.Activate_Prop_Pivot,'value',0);
-        set(handles.Activate_Prop_ID,'value',0);
-        set(handles.Activate_Prop_Pivot,'enable','off');
-        set(handles.Activate_Prop_ID,'enable','off');
-        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-        set(handles.Prop_Ctrl_Panel,'visible','off');
+        if ~GUI_Variables.ReuseBaseline %GO 5/4/19
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
+            set(handles.Activate_Prop_Pivot,'enable','off');
+            set(handles.Activate_Prop_ID,'enable','off');
+            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+            set(handles.Prop_Ctrl_Panel,'visible','off');
+        end
         
 
 
@@ -939,12 +941,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
         set(handles.Start_Timer,'enable','Off');
-        set(handles.Activate_Prop_Pivot,'value',0);
-        set(handles.Activate_Prop_ID,'value',0);
-        set(handles.Activate_Prop_Pivot,'enable','off');
-        set(handles.Activate_Prop_ID,'enable','off');
-        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-        set(handles.Prop_Ctrl_Panel,'visible','off');
+        if ~GUI_Variables.ReuseBaseline %GO 5/4/19
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
+            set(handles.Activate_Prop_Pivot,'enable','off');
+            set(handles.Activate_Prop_ID,'enable','off');
+            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+            set(handles.Prop_Ctrl_Panel,'visible','off');
+        end
  
     end
     
@@ -1070,6 +1074,12 @@ function L_Send_KF_Callback(hObject, ~, handles)
 
     new_KF = str2double(get(handles.L_Send_KF_Edit,'String'));         %Gets the Value entered into the edit Box in the G
 
+    if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
+        new_KF = 0.9;
+    elseif new_KF > 1.5
+        new_KF = 1.5;
+    end
+    
     GUI_Variables = handles.GUI_Variables;
 
     bt = GUI_Variables.BT;
@@ -2010,7 +2020,13 @@ function R_Send_KF_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     new_KF = str2double(get(handles.R_Send_KF_Edit,'String')); % Gets the Value entered into the edit Box in the G
-
+    
+    if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
+        new_KF = 0.9;
+    elseif new_KF > 1.5
+        new_KF = 1.5;
+    end
+    
     GUI_Variables = handles.GUI_Variables;
     state=GUI_Variables.state;
     disp(state);
@@ -4394,3 +4410,16 @@ end
 
 
 
+
+
+% --- Executes on button press in ReuseBaseline.
+function ReuseBaseline_Callback(hObject, eventdata, handles) %GO 5/4/19
+% hObject    handle to ReuseBaseline (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+GUI_Variables = handles.GUI_Variables;
+GUI_Variables.ReuseBaseline = get(handles.ReuseBaseline,'Value');
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
+
+% Hint: get(hObject,'Value') returns toggle state of ReuseBaseline
