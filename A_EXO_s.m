@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 04-May-2019 15:07:35
+% Last Modified by GUIDE v2.5 04-May-2019 20:02:50
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -92,7 +92,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'R_Bal_dyn_Toe',20,'R_Bal_dyn_Heel',30,'R_Bal_steady_Toe',40,'R_Bal_steady_Heel',50,...
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
-                           'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1);
+                           'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1,'LapBaseline',0);
     
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     handles.GUI_Variables = GUI_Variables;
@@ -4214,9 +4214,16 @@ c = c + 1;
 set(handles.Lap_Timer,'string',num2str(c));
 set(handles.Timer_Value,'string',sprintf('%.3f',split_time));
 
-
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
+
+% GO 5/4/19 - If a checkbox for retaking baseline each lap is selected,
+% perform the callback
+
+if GUI_Variables.LapBaseline
+    Take_Baseline_Callback(0, 0, handles);
+end
+    
 
 % GO 5/3/19 - Send lap times to HLO for metabolics normalization
 if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
@@ -4423,3 +4430,17 @@ handles.GUI_Variables = GUI_Variables;
 guidata(hObject, handles);
 
 % Hint: get(hObject,'Value') returns toggle state of ReuseBaseline
+
+
+% --- Executes on button press in LapBaseline.
+function LapBaseline_Callback(hObject, eventdata, handles) %GO 5/4/19
+% hObject    handle to LapBaseline (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+GUI_Variables = handles.GUI_Variables;
+GUI_Variables.LapBaseline = get(handles.LapBaseline,'value');
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
+
+% Hint: get(hObject,'Value') returns toggle state of LapBaseline
