@@ -1076,8 +1076,10 @@ function L_Send_KF_Callback(hObject, ~, handles)
 
     if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
         new_KF = 0.9;
+        set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
     elseif new_KF > 1.5
         new_KF = 1.5;
+        set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
     end
     
     GUI_Variables = handles.GUI_Variables;
@@ -2023,8 +2025,10 @@ function R_Send_KF_Callback(hObject, ~, handles)
     
     if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
         new_KF = 0.9;
+        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
     elseif new_KF > 1.5
         new_KF = 1.5;
+        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
     end
     
     GUI_Variables = handles.GUI_Variables;
