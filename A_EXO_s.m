@@ -1356,150 +1356,6 @@ function Connect_BT_Callback(hObject, ~, handles)
     guidata(hObject, handles);
 
 
-% --- Executes on selection change in L_List.
-function L_List_Callback(~, ~, handles)
-% hObject    handle to L_List (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns L_List contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from L_List
-    selectMode = get(handles.L_List,'Value');
-    if selectMode == 1
-        set(handles.L_Torque,'Visible','on');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 2
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','on');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 3
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','on');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 4
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','on');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 5
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','on');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 6
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','on');
-    end
-
-
-
-% --- Executes during object creation, after setting all properties.
-function L_List_CreateFcn(hObject, ~, ~)
-% hObject    handle to L_List (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-
-
-% --- Executes on selection change in R_list.
-function R_list_Callback(~, ~, handles)
-% hObject    handle to R_list (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns R_list contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from R_list
-    selectMode = get(handles.R_list,'Value');
-    if selectMode == 1
-        set(handles.R_Torque,'Visible','on');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 2
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','on');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 3
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','on');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 4
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','on');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 5
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','on');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 6
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','on');
-    end
-
-% --- Executes during object creation, after setting all properties.
-function R_list_CreateFcn(hObject, ~, ~)
-% hObject    handle to R_list (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-
-
 
 function R_Ki_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Ki_Edit (see GCBO)
@@ -2096,6 +1952,14 @@ function R_Send_KF_Callback(hObject, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
     new_KF = str2double(get(handles.R_Send_KF_Edit,'String')); % Gets the Value entered into the edit Box in the G
 
+    if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
+        new_KF = 0.9;
+        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
+    elseif new_KF > 1.5
+        new_KF = 1.5;
+        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
+    end
+    
     GUI_Variables = handles.GUI_Variables;
     state=GUI_Variables.state;
     disp(state);
@@ -4177,7 +4041,7 @@ function Start_Timer_Callback(hObject, eventdata, handles)
  
 str = get(handles.Start_Timer,'string');
 a = clock;
-time = a(4)*360+a(5)*60+a(6);
+time = a(4)*3600+a(5)*60+a(6);
 Send_Trig_Callback(hObject, 0, handles);
 
 if strcmp(get(handles.Start_Trial,'Enable'), 'off')
@@ -4212,7 +4076,7 @@ function Split_Timer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 a = clock;
-stop_time = a(4)*360 + a(5)*60 + a(6);
+stop_time = a(4)*3600 + a(5)*60 + a(6);
 %guidata(handles.Split_Timer,stop_time);
 start_time = getappdata(handles.Start_Timer,'start_time');
 setappdata(handles.Start_Timer,'start_time',stop_time);
@@ -4229,9 +4093,23 @@ set(handles.Timer_Value,'string',sprintf('%.3f',split_time));
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
 
-% if c == 1
-%     bt.UserData = bt.UserData + 1;
-% end
+
+% GO 5/4/19 - If a checkbox for retaking baseline each lap is selected,
+% perform the callback
+
+if GUI_Variables.LapBaseline
+    Take_Baseline_Callback(0, 0, handles);
+end
+    
+
+% GO 5/3/19 - Send lap times to HLO for metabolics normalization
+if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
+    try
+        fwrite(GUI_Variables.t,num2str(split_time)); %Send lap time
+    catch
+        disp('Couldn''t send lap time to HLO, check TCP connection.');
+    end
+end     
 
 currDir = cd;       % Current directory
 saveDir = [GUI_Variables.SSID,'_',date];
@@ -4416,3 +4294,47 @@ end
 
 
 
+
+
+% --- Executes on button press in ReuseBaseline.
+function ReuseBaseline_Callback(hObject, eventdata, handles) %GO 5/4/19
+% hObject    handle to ReuseBaseline (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+GUI_Variables = handles.GUI_Variables;
+GUI_Variables.ReuseBaseline = get(handles.ReuseBaseline,'Value');
+
+if GUI_Variables.ReuseBaseline == 1
+    set(handles.Load_Prop_Prm,'Enable','on');
+else
+    set(handles.Load_Prop_Prm,'Enable','off');
+end
+    
+
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
+
+% Hint: get(hObject,'Value') returns toggle state of ReuseBaseline
+
+
+% --- Executes on button press in LapBaseline.
+function LapBaseline_Callback(hObject, eventdata, handles) %GO 5/4/19
+% hObject    handle to LapBaseline (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+GUI_Variables = handles.GUI_Variables;
+GUI_Variables.LapBaseline = get(handles.LapBaseline,'value');
+
+
+if GUI_Variables.LapBaseline == 1
+    set(handles.Activate_Prop_Ctrl,'Enable','off');
+else
+    set(handles.Activate_Prop_Ctrl,'Enable','on');
+end
+
+
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
+
+% Hint: get(hObject,'Value') returns toggle state of LapBaseline
