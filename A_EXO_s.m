@@ -180,7 +180,21 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.ATP_Mode,'Enable','on');
     set(handles.Start_Timer,'Enable','on');
     set(handles.Check_Baseline,'Enable','on');
-
+    set(handles.Take_Baseline,'Enable','on');   % TN 5/6/19
+   
+    
+    if GUI_Variables.LapBaseline == 1         % TN 5/6/19
+        set(handles.Activate_Prop_Ctrl,'Enable','off');   
+    else
+        set(handles.Activate_Prop_Ctrl,'Enable','on'); 
+    end
+     
+    if GUI_Variables.ReuseBaseline == 1         % TN 5/6/19
+        set(handles.Load_Prop_Prm,'Enable','on');   
+    else
+        set(handles.Load_Prop_Prm,'Enable','off'); 
+    end
+    
     GUI_Variables.flag_start=1;
 
     pause(.01);
@@ -1133,6 +1147,14 @@ function L_Send_KF_Callback(hObject, ~, handles)
 
     new_KF = str2double(get(handles.L_Send_KF_Edit,'String'));         %Gets the Value entered into the edit Box in the G
 
+    if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
+        new_KF = 0.9;
+        set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
+    elseif new_KF > 1.5
+        new_KF = 1.5;
+        set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
+    end
+    
     GUI_Variables = handles.GUI_Variables;
 
     bt = GUI_Variables.BT;
