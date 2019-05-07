@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 15-Apr-2019 10:45:22
+% Last Modified by GUIDE v2.5 07-May-2019 16:08:17
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -4427,3 +4427,42 @@ handles.GUI_Variables = GUI_Variables;
 guidata(hObject,handles);
 
 % Hint: get(hObject,'Value') returns toggle state of LapBaseline
+
+
+% TN 5/6/19
+% --- Executes on button press in Ankle_Mode.
+function Ankle_Mode_Callback(hObject, eventdata, handles)
+% hObject    handle to Ankle_Mode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of Ankle_Mode
+
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT; 
+
+if (bt.Status=="open")
+   
+fwrite(bt,'P');
+
+end
+
+% TN 5/6/19
+% --- Executes on button press in Knee_Mode.
+function Knee_Mode_Callback(hObject, eventdata, handles)
+% hObject    handle to Knee_Mode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of Knee_Mode
+
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT; 
+
+if (bt.Status=="open")
+   
+fwrite(bt,'p');
+
+end
