@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 4;
+    BT_INDEX = 3;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -93,6 +93,10 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1,'LapBaseline',0);
+    
+    if get(handles.Activate_Prop_Pivot,'Value') %GO 5/7/19 - GUIDE is not cooperating so brute force
+        set(handles.Activate_Prop_Pivot,'Value',0); 
+    end
     
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     handles.GUI_Variables = GUI_Variables;
@@ -4079,6 +4083,8 @@ if (bt.Status=="open")
             disp( 'Activate Prop Control' );
             fwrite(bt,'l');
             set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
+            set(handles.Activate_Prop_Pivot,'enable','on'); % GO 5/7/19
+            set(handles.Activate_Prop_ID,'enable','on');    % GO 5/7/19
 %            set(handles.Prop_Ctrl_Panel,'visible','on');
 %             set(handles.Activate_Prop_Pivot,'value',0);
 %             set(handles.Activate_Prop_ID,'value',0);
@@ -4092,7 +4098,10 @@ if (bt.Status=="open")
             disp( 'Deactivate Prop Control' );
             fwrite(bt,'^');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-
+            set(handles.Activate_Prop_Pivot,'enable','off'); % GO 5/7/19
+            set(handles.Activate_Prop_ID,'enable','off');    % GO 5/7/19
+            set(handles.Activate_Prop_Pivot,'value',0);      % GO 5/7/19
+            set(handles.Activate_Prop_ID,'value',0);         % GO 5/7/19 
 %            set(handles.Prop_Ctrl_Panel,'visible','off');
 %             set(handles.Activate_Prop_Pivot,'value',0);
 %             set(handles.Activate_Prop_ID,'value',0);
