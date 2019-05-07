@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 04-May-2019 20:02:50
+% Last Modified by GUIDE v2.5 15-Apr-2019 10:45:22
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 3;
+    BT_INDEX = 4;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -199,9 +199,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
         set(handles.Load_Prop_Prm,'Enable','off'); 
     end
     
-
-    set(handles.Prop_Ctrl_Panel,'visible','on'); 
-
     GUI_Variables.flag_start=1;
 
     pause(.01);
@@ -991,14 +988,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Start_Timer,'enable','Off');
         set(handles.Check_Baseline,'enable','off');
 
-        if ~GUI_Variables.ReuseBaseline %GO 5/4/19
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Activate_Prop_Pivot,'enable','off');
-            set(handles.Activate_Prop_ID,'enable','off');
-            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','off');
-        end
+%         if ~GUI_Variables.ReuseBaseline %GO 5/4/19
+%             set(handles.Activate_Prop_Pivot,'value',0);
+%             set(handles.Activate_Prop_ID,'value',0);
+%            % set(handles.Activate_Prop_Pivot,'enable','off');
+%            % set(handles.Activate_Prop_ID,'enable','off');
+%             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+%            % set(handles.Prop_Ctrl_Panel,'visible','off');
+%         end
 
 
     else
@@ -1032,14 +1029,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
 %         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
         set(handles.Check_Baseline,'enable','off');
         
-        if ~GUI_Variables.ReuseBaseline %GO 5/4/19
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Activate_Prop_Pivot,'enable','off');
-            set(handles.Activate_Prop_ID,'enable','off');
-            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','off');
-        end
+%         if ~GUI_Variables.ReuseBaseline %GO 5/4/19
+%             set(handles.Activate_Prop_Pivot,'value',0);
+%             set(handles.Activate_Prop_ID,'value',0);
+%          %   set(handles.Activate_Prop_Pivot,'enable','off');
+%          %   set(handles.Activate_Prop_ID,'enable','off');
+%             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+%          %   set(handles.Prop_Ctrl_Panel,'visible','off');
+%         end
  
     end
     
@@ -4100,8 +4097,8 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
             set(handles.Activate_Prop_Pivot,'enable','off'); % GO 5/7/19
             set(handles.Activate_Prop_ID,'enable','off');    % GO 5/7/19
-            set(handles.Activate_Prop_Pivot,'value',0);      % GO 5/7/19
-            set(handles.Activate_Prop_ID,'value',0);         % GO 5/7/19 
+%            set(handles.Activate_Prop_Pivot,'value',0);      % GO 5/7/19
+%            set(handles.Activate_Prop_ID,'value',0);         % GO 5/7/19 
 %            set(handles.Prop_Ctrl_Panel,'visible','off');
 %             set(handles.Activate_Prop_Pivot,'value',0);
 %             set(handles.Activate_Prop_ID,'value',0);
@@ -4189,6 +4186,7 @@ bt = GUI_Variables.BT;
 
 if GUI_Variables.LapBaseline
     Take_Baseline_Callback(0, 0, handles);
+    set(handles.Activate_Prop_Ctrl,'Enable','off');  % TN 5/7/19
 end
     
 
@@ -4417,8 +4415,6 @@ function LapBaseline_Callback(hObject, eventdata, handles) %GO 5/4/19
 
 GUI_Variables = handles.GUI_Variables;
 GUI_Variables.LapBaseline = get(handles.LapBaseline,'value');
-
-
 
 if GUI_Variables.LapBaseline == 1
     set(handles.Activate_Prop_Ctrl,'Enable','off');
