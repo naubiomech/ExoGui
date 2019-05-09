@@ -17,6 +17,8 @@ switch(msg)
     GUI_Variables.SIG3(RLCount) = data(13);
     GUI_Variables.SIG4(RLCount) = data(14);%data(14)/100;
     GUI_Variables.BASER(RLCount)=GUI_Variables.baser;
+    GUI_Variables.BASER_KNEE(RLCount)=GUI_Variables.baser_knee;  % TN 5/8/19
+
 
     GUI_Variables.R_BAL_DYN_HEEL(RLCount)=GUI_Variables.R_Bal_dyn_Heel;
     GUI_Variables.R_BAL_STEADY_HEEL(RLCount)=GUI_Variables.R_Bal_steady_Heel;
@@ -32,6 +34,7 @@ switch(msg)
     GUI_Variables.SIG2(LLCount) = data(12);
 
     GUI_Variables.BASEL(LLCount)=GUI_Variables.basel;
+    GUI_Variables.BASEL_KNEE(LLCount)=GUI_Variables.basel_knee;  % TN 5/8/19
 
     GUI_Variables.L_BAL_DYN_HEEL(LLCount)=GUI_Variables.L_Bal_dyn_Heel;
     GUI_Variables.L_BAL_STEADY_HEEL(LLCount)=GUI_Variables.L_Bal_steady_Heel;
@@ -107,11 +110,22 @@ switch(msg)
     val=strcmp(get(handles.Balance_Text,'String'),'On');
     get(handles.Activate_BioFeedback_Text,'String');
     val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
+    val_ID = get(handles.Activate_Prop_ID,'value');
     
     if (val_biofb==1)
         disp('biofeedback baseline');
         GUI_Variables.basel_biofb=data(1);
         disp(GUI_Variables.basel_biofb);
+    elseif (val_ID==1)  % TN 5/8/19
+        GUI_Variables.basel= data(1);
+        GUI_Variables.baser= data(2);
+        GUI_Variables.basel_knee= data(3);
+        GUI_Variables.baser_knee= data(4);
+        disp('command');
+        disp(GUI_Variables.basel);
+        disp(GUI_Variables.baser);
+        disp(GUI_Variables.basel_knee);
+        disp(GUI_Variables.baser_knee);
     elseif (val==1)
         disp('balance baseline');
         GUI_Variables.L_Bal_steady_Toe= data(1);
