@@ -22,7 +22,9 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
+
 % Last Modified by GUIDE v2.5 13-May-2019 15:25:56
+
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -54,7 +56,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 5;
+    BT_INDEX = 4;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
