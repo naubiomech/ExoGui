@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 04-May-2019 20:02:50
+% Last Modified by GUIDE v2.5 13-May-2019 15:25:56
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 3;
+    BT_INDEX = 5;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -93,6 +93,10 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1,'LapBaseline',0);
+    
+    if get(handles.Activate_Prop_Pivot,'Value') %GO 5/7/19 - GUIDE is not cooperating so brute force
+        set(handles.Activate_Prop_Pivot,'Value',0); 
+    end
     
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     handles.GUI_Variables = GUI_Variables;
@@ -179,8 +183,20 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.End_Trial,'Enable','on');
     set(handles.ATP_Mode,'Enable','on');
     set(handles.Start_Timer,'Enable','on');
-
-
+    %set(handles.Check_Baseline,'Enable','on');  % tn 5/13/19
+    set(handles.Take_Baseline,'Enable','on');   % TN 5/6/19
+   
+    
+    if GUI_Variables.LapBaseline == 1         % TN 5/6/19
+        set(handles.Activate_Prop_Ctrl,'Enable','off');   
+    end
+     
+    if GUI_Variables.ReuseBaseline == 1         % TN 5/6/19
+        set(handles.Load_Prop_Prm,'Enable','on');   
+    else
+        set(handles.Load_Prop_Prm,'Enable','off'); 
+    end
+    
     GUI_Variables.flag_start=1;
 
     pause(.01);
@@ -881,7 +897,68 @@ function End_Trial_Callback(hObject, eventdata, handles)
         fprintf(fileID,['KD_R = ',num2str(rkd),'\n']);
         fprintf(fileID,['KI_R = ',num2str(rki),'\n']);
         fclose(fileID);
+        
+%  TN 04-26-2019        
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        left_plant_peak_mean = 0; 
+        right_plant_peak_mean = 0; 
+        left_leg_Curr_Combined = 0;
+        right_leg_Curr_Combined = 0;
+        left_leg_fsr_Combined_peak_ref = 0;
+        right_leg_fsr_Combined_peak_ref = 0;
+        left_leg_fsr_Toe_peak_ref = 0;
+        right_leg_fsr_Toe_peak_ref = 0;
+        left_leg_fsr_Heel_peak_ref = 0;
+        right_leg_fsr_Heel_peak_ref = 0;
+        left_leg_torque_calibration_value = 0;
+        right_leg_torque_calibration_value = 0;
 
+    fwrite(bt,'e');
+          message = fgetl(bt);
+        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
+            indexes = find(message==44);
+        left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
+        right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
+        left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
+        right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
+        left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
+        right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
+        left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
+        right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
+        left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
+        right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
+        left_leg_torque_calibration_value = str2double(message((indexes(11)+1):(indexes(12)-1)));
+        right_leg_torque_calibration_value = str2double(message((indexes(12)+1):(indexes(13)-1)));
+
+        
+        end
+            
+ %   currDir = cd;       % Current directory
+        saveDir_P = [GUI_Variables.SSID,'_',date,'_Proportional_Parameters'];    % Save directory specific to subject and date
+            savePath_P = [currDir,'\',saveDir_P];    % Save directory specific to subject and date
+        if ~exist(saveDir_P, 'dir')
+            mkdir(currDir, saveDir_P);           % Make a save directory
+        end
+        Filename_P = sprintf('%s_%d.txt',fullfile(savePath_P,[GUI_Variables.SSID,'_',date,'_',...
+            GUI_Variables.TimeStamp,'_','Proportional_Parameters_']),bt.UserData);               %Creates a new filename called "Torque_#"
+                                                                           %Where # is the trial number                                                                           
+        fileID_P = fopen(Filename_P,'w');                                      %Actually creates that file
+        pause(.01);
+        fprintf(fileID_P,['left_plant_peak_mean = ', num2str(left_plant_peak_mean),'\r\n']);
+        fprintf(fileID_P,['right_plant_peak_mean = ', num2str(right_plant_peak_mean),'\r\n']);
+        fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\r\n']);
+        fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\r\n']);
+        fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\r\n']);
+        fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\r\n']);
+        fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\r\n']);
+        fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\r\n']);
+        fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\r\n']);
+        fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\r\n']);
+        fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\r\n']);
+        fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\r\n']);
+        fclose(fileID_P);
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
         set(handles.statusText,'String','Data has finished being Saved');
         GUI_Variables = Reset_GUI_Variables(GUI_Variables);
         bt.UserData = bt.UserData + 1; % Increments the trial number
@@ -907,15 +984,19 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
         set(handles.Start_Timer,'enable','Off');
-        if ~GUI_Variables.ReuseBaseline %GO 5/4/19
+        
+        if GUI_Variables.LapBaseline % TN 5/8/19
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
             set(handles.Activate_Prop_Pivot,'enable','off');
             set(handles.Activate_Prop_ID,'enable','off');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','off');
+            set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/8/17
+           % set(handles.Prop_Ctrl_Panel,'visible','off');
+           set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
+
+           fwrite(bt,'^');  % TN 5/8/19
         end
-        
 
 
     else
@@ -941,13 +1022,24 @@ function End_Trial_Callback(hObject, eventdata, handles)
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
         set(handles.Start_Timer,'enable','Off');
-        if ~GUI_Variables.ReuseBaseline %GO 5/4/19
+
+%         set(handles.Activate_Prop_Pivot,'value',0);
+%         set(handles.Activate_Prop_ID,'value',0);
+%         set(handles.Activate_Prop_Pivot,'enable','off');
+%         set(handles.Activate_Prop_ID,'enable','off');
+%         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Check_Baseline,'enable','off');
+        
+        if GUI_Variables.LapBaseline % TN 5/8/19
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
             set(handles.Activate_Prop_Pivot,'enable','off');
             set(handles.Activate_Prop_ID,'enable','off');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','off');
+            set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/8/17
+            set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
+         %   set(handles.Prop_Ctrl_Panel,'visible','off');
+            fwrite(bt,'^');  % TN 5/8/19
         end
  
     end
@@ -1281,151 +1373,6 @@ function Connect_BT_Callback(hObject, ~, handles)
     end
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
-
-
-% --- Executes on selection change in L_List.
-function L_List_Callback(~, ~, handles)
-% hObject    handle to L_List (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns L_List contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from L_List
-    selectMode = get(handles.L_List,'Value');
-    if selectMode == 1
-        set(handles.L_Torque,'Visible','on');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 2
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','on');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 3
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','on');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 4
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','on');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 5
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','on');
-        set(handles.Balance_panel,'Visible','off');
-    end
-    if selectMode == 6
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
-        set(handles.Optimization_Panel,'Visible','off');
-        set(handles.Balance_panel,'Visible','on');
-    end
-
-
-
-% --- Executes during object creation, after setting all properties.
-function L_List_CreateFcn(hObject, ~, ~)
-% hObject    handle to L_List (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-
-
-% --- Executes on selection change in R_list.
-function R_list_Callback(~, ~, handles)
-% hObject    handle to R_list (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns R_list contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from R_list
-    selectMode = get(handles.R_list,'Value');
-    if selectMode == 1
-        set(handles.R_Torque,'Visible','on');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 2
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','on');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 3
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','on');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 4
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','on');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 5
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','on');
-        set(handles.Bio_Feedback_panel,'Visible','off');
-    end
-    if selectMode == 6
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
-        set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
-        set(handles.Bio_Feedback_panel,'Visible','on');
-    end
-
-% --- Executes during object creation, after setting all properties.
-function R_list_CreateFcn(hObject, ~, ~)
-% hObject    handle to R_list (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
-
 
 
 function R_Ki_Edit_Callback(~, ~, ~)
@@ -2022,7 +1969,7 @@ function R_Send_KF_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     new_KF = str2double(get(handles.R_Send_KF_Edit,'String')); % Gets the Value entered into the edit Box in the G
-    
+
     if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
         new_KF = 0.9;
         set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
@@ -3962,69 +3909,71 @@ function Save_Prop_Prm_Callback(hObject, eventdata, handles)
 % hObject    handle to Save_Prop_Prm (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-GUI_Variables = handles.GUI_Variables;
-
-bt = GUI_Variables.BT; 
-left_plant_peak_mean = 0; 
-right_plant_peak_mean = 0; 
-left_leg_Curr_Combined = 0;
-right_leg_Curr_Combined = 0;
-left_leg_fsr_Combined_peak_ref = 0;
-right_leg_fsr_Combined_peak_ref = 0;
-left_leg_fsr_Toe_peak_ref = 0;
-right_leg_fsr_Toe_peak_ref = 0;
-left_leg_fsr_Heel_peak_ref = 0;
-right_leg_fsr_Heel_peak_ref = 0;
-left_leg_torque_calibration_value = 0;
-right_leg_torque_calibration_value = 0;
-
-if(bt.Status=="open")
-    fwrite(bt,'e');
-    if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
-            indexes = find(message==44);
-        left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
-        right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
-        left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
-        right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
-        left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
-        right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
-        left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
-        right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
-        left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
-        right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
-        left_leg_torque_calibration_value = str2double(message((indexes(11)+1):(indexes(12)-1)));
-        right_leg_torque_calibration_value = str2double(message((indexes(12)+1):(indexes(13)-1)));
-
-        
-        end
-      
-        
-    currDir = cd;       % Current directory
-saveDir = [currDir,'\',GUI_Variables.SSID,'_',date,'_Proportional_Parameters'];    % Save directory specific to subject and date
-mkdir(currDir,[GUI_Variables.SSID,'_',date,'_Proportional_Parameters']);           % Make a save directory
-Filename_P = sprintf('%s_%d',fullfile(saveDir,[GUI_Variables.SSID,'_',date,'_','Proportional_Parameters_']),...
-    bt.UserData);               %Creates a new filename called "Torque_#"
-                                                                           %Where # is the trial number                                                                           
-fileID_P = fopen(Filename_P,'w');                                      %Actually creates that file
-pause(.01);
-fprintf(fileID_P,['left_plant_peak_mean = ', num2str(left_plant_peak_mean),'\n']);
-fprintf(fileID_P,['right_plant_peak_mean = ', num2str(right_plant_peak_mean),'\n']);
-fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\n']);
-fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\n']);
-fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\n']);
-fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\n']);
-fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\n']);
-fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\n']);
-fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\n']);
-fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\n']);
-fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\n']);
-fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\n']);
-fclose(fileID_P);
-    end
-end
+% 
+%         GUI_Variables = handles.GUI_Variables;
+%         bt = GUI_Variables.BT; 
+%         
+%         left_plant_peak_mean = 0; 
+%         right_plant_peak_mean = 0; 
+%         left_leg_Curr_Combined = 0;
+%         right_leg_Curr_Combined = 0;
+%         left_leg_fsr_Combined_peak_ref = 0;
+%         right_leg_fsr_Combined_peak_ref = 0;
+%         left_leg_fsr_Toe_peak_ref = 0;
+%         right_leg_fsr_Toe_peak_ref = 0;
+%         left_leg_fsr_Heel_peak_ref = 0;
+%         right_leg_fsr_Heel_peak_ref = 0;
+%         left_leg_torque_calibration_value = 0;
+%         right_leg_torque_calibration_value = 0;
+% 
+% 
+%     fwrite(bt,'e');
+%           message = fgetl(bt);
+%         if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
+%             indexes = find(message==44);
+%         left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
+%         right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
+%         left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
+%         right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
+%         left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
+%         right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
+%         left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
+%         right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
+%         left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
+%         right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
+%         left_leg_torque_calibration_value = str2double(message((indexes(11)+1):(indexes(12)-1)));
+%         right_leg_torque_calibration_value = str2double(message((indexes(12)+1):(indexes(13)-1)));
+% 
+%         
+%         end
+%             
+%         currDir = cd;       % Current directory
+%         saveDir_P = [GUI_Variables.SSID,'_',date,'_Proportional_Parameters'];    % Save directory specific to subject and date
+%             savePath_P = [currDir,'\',saveDir_P];    % Save directory specific to subject and date
+%         if ~exist(saveDir_P, 'dir')
+%             mkdir(currDir, saveDir_P);           % Make a save directory
+%         end
+%         Filename_P = sprintf('%s_%d.txt',fullfile(savePath_P,[GUI_Variables.SSID,'_',date,'_',...
+%             GUI_Variables.TimeStamp,'_','Proportional_Parameters_']),bt.UserData);               %Creates a new filename called "Torque_#"
+%                                                                            %Where # is the trial number                                                                           
+%         fileID_P = fopen(Filename_P,'w');                                      %Actually creates that file
+%         pause(.01);
+%         fprintf(fileID_P,['left_plant_peak_mean = ', num2str(left_plant_peak_mean),'\r\n']);
+%         fprintf(fileID_P,['right_plant_peak_mean = ', num2str(right_plant_peak_mean),'\r\n']);
+%         fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\r\n']);
+%         fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\r\n']);
+%         fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\r\n']);
+%         fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\r\n']);
+%         fclose(fileID_P);
+%         
+%         
+%    
 
 
 % --- Executes on button press in Load_Prop_Prm.
@@ -4040,7 +3989,7 @@ if (bt.Status=="open")
    
     try
        
-    [filename, pathname] = uigetfile({'*.mat', 'Matlab Files (*.mat)'; ...
+    [filename, pathname] = uigetfile({'*.txt', 'Matlab Files (*.txt)'; ...
                 '*.*',                   'All Files (*.*)'});
 
 %This code checks if the user pressed cancel on the dialog.
@@ -4085,11 +4034,13 @@ if (bt.Status=="open")
 
         if (value_Pivot == 1)         
                 fwrite(bt,'#');
-                disp('Activate Prop Pivot Ctrl');
+                disp('Pivot Prop Ctrl'); 
+                set(handles.Take_Baseline,'Enable','on');
                
         elseif (value_ID == 1)
                 fwrite(bt,'c');
-                disp('Activate Prop ID Ctrl');
+                disp('ID Prop Ctrl');
+                set(handles.Take_Baseline,'Enable','on');
             
         end
             
@@ -4117,7 +4068,10 @@ function Activate_Prop_Ctrl_Callback(hObject, eventdata, handles)
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
 
-str = get(handles.Activate_Prop_Ctrl,'string');
+ str = get(handles.Activate_Prop_Ctrl,'string');
+% 
+%             set(handles.Activate_Prop_Pivot,'enable','on');   % TN 04-26-2019
+%             set(handles.Activate_Prop_ID,'enable','on');      % TN 04-26-2019
 
 if (bt.Status=="open")
 
@@ -4126,13 +4080,18 @@ if (bt.Status=="open")
 
         if strcmp( str, 'Activate Prop Control' )
             GUI_Variables.PropOn = 1; 
+            fwrite(bt,'l');
             disp( 'Activate Prop Control' );
+            fwrite(bt,'l');
             set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','on');
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Take_Baseline,'enable','on');
-            set(handles.Check_Baseline,'enable','on');
+            set(handles.Activate_Prop_Pivot,'enable','on'); % GO 5/7/19
+            set(handles.Activate_Prop_ID,'enable','on');    % GO 5/7/19
+%            set(handles.Prop_Ctrl_Panel,'visible','on');
+%             set(handles.Activate_Prop_Pivot,'value',0);
+%             set(handles.Activate_Prop_ID,'value',0);
+%            set(handles.Take_Baseline,'enable','on');
+%            set(handles.Check_Baseline,'enable','on');
+
             set(handles.Start_ATP,'Enable','on');
             set(handles.Stop_ATP,'Enable','on');
         else
@@ -4140,11 +4099,15 @@ if (bt.Status=="open")
             disp( 'Deactivate Prop Control' );
             fwrite(bt,'^');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','off');
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Take_Baseline,'enable','off');
-            set(handles.Check_Baseline,'enable','off');
+            set(handles.Activate_Prop_Pivot,'enable','off'); % GO 5/7/19
+            set(handles.Activate_Prop_ID,'enable','off');    % GO 5/7/19
+            set(handles.Activate_Prop_Pivot,'value',0);      % GO 5/7/19
+            set(handles.Activate_Prop_ID,'value',0);         % GO 5/7/19 
+%            set(handles.Prop_Ctrl_Panel,'visible','off');
+%             set(handles.Activate_Prop_Pivot,'value',0);
+%             set(handles.Activate_Prop_ID,'value',0);
+%            set(handles.Take_Baseline,'enable','off');
+%            set(handles.Check_Baseline,'enable','off');
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
         
@@ -4221,11 +4184,13 @@ set(handles.Timer_Value,'string',sprintf('%.3f',split_time));
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
 
+
 % GO 5/4/19 - If a checkbox for retaking baseline each lap is selected,
 % perform the callback
 
 if GUI_Variables.LapBaseline
     Take_Baseline_Callback(0, 0, handles);
+%    set(handles.Activate_Prop_Ctrl,'Enable','off');  % TN 5/7/19
 end
     
 
@@ -4234,7 +4199,8 @@ if GUI_Variables.t~=0 && GUI_Variables.t.Status == "open"
     try
         fwrite(GUI_Variables.t,num2str(split_time)); %Send lap time
     catch
-        disp('Couldn"t send lap time to HLO, check TCP connection.');
+        disp('Couldn''t send lap time to HLO, check TCP connection.');
+
     end
 end     
 
@@ -4408,12 +4374,12 @@ bt = GUI_Variables.BT;
 
 if (bt.Status=="open")
    
-fwrite(bt,'j');        %TN
+fwrite(bt,'j');        % TN 5/8/19
 
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Prop_Ctrl_Panel,'visible','off');
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
+%             set(handles.Prop_Ctrl_Panel,'visible','off');
+%            set(handles.Activate_Prop_Pivot,'value',0);
+%            set(handles.Activate_Prop_ID,'value',0);
             set(handles.Take_Baseline,'enable','off');
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
@@ -4430,6 +4396,15 @@ function ReuseBaseline_Callback(hObject, eventdata, handles) %GO 5/4/19
 % handles    structure with handles and user data (see GUIDATA)
 GUI_Variables = handles.GUI_Variables;
 GUI_Variables.ReuseBaseline = get(handles.ReuseBaseline,'Value');
+
+
+if GUI_Variables.ReuseBaseline == 1
+    set(handles.Load_Prop_Prm,'Enable','on');
+else
+    set(handles.Load_Prop_Prm,'Enable','off');
+end
+    
+
 handles.GUI_Variables = GUI_Variables;
 guidata(hObject, handles);
 
@@ -4444,7 +4419,47 @@ function LapBaseline_Callback(hObject, eventdata, handles) %GO 5/4/19
 
 GUI_Variables = handles.GUI_Variables;
 GUI_Variables.LapBaseline = get(handles.LapBaseline,'value');
+
+% if GUI_Variables.LapBaseline == 1
+%     set(handles.Activate_Prop_Ctrl,'Enable','off');
+% else
+%     set(handles.Activate_Prop_Ctrl,'Enable','on');
+% end
+
+
 handles.GUI_Variables = GUI_Variables;
 guidata(hObject,handles);
 
 % Hint: get(hObject,'Value') returns toggle state of LapBaseline
+
+
+% --- Executes on button press in SaveTRQ.
+function SaveTRQ_Callback(hObject, eventdata, handles)
+% hObject    handle to SaveTRQ (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+if bt.Status=="open"
+    fwrite(bt,'p'); %Save the current torque calibration in EEPROM
+    set(handles.statusText,'String',...
+        'Saved current torque sensor calibration to EEPROM!');
+end
+
+
+% --- Executes on button press in LoadTRQ.
+function LoadTRQ_Callback(hObject, eventdata, handles)
+% hObject    handle to LoadTRQ (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+if bt.Status=="open"
+    fwrite(bt,'P'); %Load the current torque calibration in EEPROM
+    set(handles.statusText,'String',...
+        'Loaded current torque sensor calibration from EEPROM!');
+end
