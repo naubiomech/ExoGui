@@ -189,8 +189,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     
     if GUI_Variables.LapBaseline == 1         % TN 5/6/19
         set(handles.Activate_Prop_Ctrl,'Enable','off');   
-    else
-        set(handles.Activate_Prop_Ctrl,'Enable','on'); 
     end
      
     if GUI_Variables.ReuseBaseline == 1         % TN 5/6/19
