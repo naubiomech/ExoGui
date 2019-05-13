@@ -56,7 +56,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 4;
+    BT_INDEX = 5;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -800,34 +800,34 @@ function End_Trial_Callback(hObject, eventdata, handles)
         if ~exist(saveDir, 'dir')
             mkdir(currDir, saveDir);           % Make a save directory
         end
-        Filename = sprintf('%s_%d',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',GUI_Variables.TimeStamp,'_',...
+        Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',GUI_Variables.TimeStamp,'_',...
             'Trial_Number_']),bt.UserData);               %Creates a new filename called "Torque_#"
 
 
         fileID = fopen(Filename,'w'); % Actually creates that file
         pause(.01);
         str_fileID='';
-        str_fileID_title='\t';
+        str_fileID_title='';
         for jk=1:size(A,1)
 
             if jk==1
-                str_fileID=[str_fileID,'\t','%0.2f\t\t '];
+                str_fileID=[str_fileID,'%0.2f\t '];
             elseif jk==size(A,1)
                 str_fileID=[str_fileID,'%0.2f\n '];
             else
-                str_fileID=[str_fileID,'%0.2f\t\t '];
+                str_fileID=[str_fileID,'%0.2f\t '];
             end
 
             if length(A{jk})>6
-                str_fileID_title=[str_fileID_title,A{jk},'\t\t'];
+                str_fileID_title=[str_fileID_title,A{jk},'\t'];
             else
-                str_fileID_title=[str_fileID_title,A{jk},'\t\t\t'];
+                str_fileID_title=[str_fileID_title,A{jk},'\t'];
             end
 
         end
 
-        fprintf(fileID,[str_fileID_title,'\n']);
-        fprintf(fileID,str_fileID,A_mat);
+        fprintf(fileID,[str_fileID_title,'\r\n']);
+        fprintf(fileID,str_fileID,A_mat,'\r\n');
 
         fclose(fileID);
 
@@ -880,24 +880,24 @@ function End_Trial_Callback(hObject, eventdata, handles)
         if ~exist(saveDir, 'dir')
             mkdir(currDir, saveDir);           % Make a save directory
         end
-        Filename = sprintf('%s_%d',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',...
+        Filename = sprintf('%s_%d.txt',fullfile(savePath,[GUI_Variables.SSID,'_',date,'_',...
             GUI_Variables.TimeStamp,'_','Parameters_Trial_Number_']),...
                            bt.UserData);               %Creates a new filename called "Torque_#"
         fileID = fopen(Filename,'w'); % Actually creates that file
         pause(.01);
-        fprintf(fileID,['N1 = ',num2str(n1),'\n']);
-        fprintf(fileID,['N2 = ',num2str(n2),'\n']);
-        fprintf(fileID,['N3 = ',num2str(n3),'\n']);
-        fprintf(fileID,['KF_LL = ',num2str(lkf),'\n']);
-        fprintf(fileID,['KF_RL = ',num2str(rkf),'\n']);
-        fprintf(fileID,['FSR_TH_LL = ',num2str(lfsr),'\n']);
-        fprintf(fileID,['FSR_TH_RL = ',num2str(rfsr),'\n']);
-        fprintf(fileID,['KP_L = ',num2str(lkp),'\n']);
-        fprintf(fileID,['KD_L = ',num2str(lkd),'\n']);
-        fprintf(fileID,['KI_L = ',num2str(lki),'\n']);
-        fprintf(fileID,['KP_R = ',num2str(rkp),'\n']);
-        fprintf(fileID,['KD_R = ',num2str(rkd),'\n']);
-        fprintf(fileID,['KI_R = ',num2str(rki),'\n']);
+        fprintf(fileID,['N1 = ',num2str(n1),'\r\n']);
+        fprintf(fileID,['N2 = ',num2str(n2),'\r\n']);
+        fprintf(fileID,['N3 = ',num2str(n3),'\r\n']);
+        fprintf(fileID,['KF_LL = ',num2str(lkf),'\r\n']);
+        fprintf(fileID,['KF_RL = ',num2str(rkf),'\r\n']);
+        fprintf(fileID,['FSR_TH_LL = ',num2str(lfsr),'\r\n']);
+        fprintf(fileID,['FSR_TH_RL = ',num2str(rfsr),'\r\n']);
+        fprintf(fileID,['KP_L = ',num2str(lkp),'\r\n']);
+        fprintf(fileID,['KD_L = ',num2str(lkd),'\r\n']);
+        fprintf(fileID,['KI_L = ',num2str(lki),'\r\n']);
+        fprintf(fileID,['KP_R = ',num2str(rkp),'\r\n']);
+        fprintf(fileID,['KD_R = ',num2str(rkd),'\r\n']);
+        fprintf(fileID,['KI_R = ',num2str(rki),'\r\n']);
         fclose(fileID);
         
 %  TN 04-26-2019        
@@ -4292,7 +4292,7 @@ if stop_time > start_time
             'ATP_']),bt.UserData); 
         
         fileID = fopen(Filename,'w');
-        fprintf(fileID,'%6.2f %6.2f %6.2f %6.2f %6.2f \n',[t; RLTRQ; RLFSR; LLTRQ; LLFSR]);
+        fprintf(fileID,'%6.2f %6.2f %6.2f %6.2f %6.2f \r\n',[t; RLTRQ; RLFSR; LLTRQ; LLFSR]);
         fclose(fileID);
 %        bt.UserData = bt.UserData + 1;
 end
