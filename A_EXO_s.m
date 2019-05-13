@@ -183,7 +183,7 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.End_Trial,'Enable','on');
     set(handles.ATP_Mode,'Enable','on');
     set(handles.Start_Timer,'Enable','on');
-    set(handles.Check_Baseline,'Enable','on');
+    %set(handles.Check_Baseline,'Enable','on');  % tn 5/13/19
     set(handles.Take_Baseline,'Enable','on');   % TN 5/6/19
    
     
@@ -986,8 +986,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
         GUI_Variables.counter=0;
         set(handles.TRIG_NUM_TEXT,'String',0);
         set(handles.Start_Timer,'enable','Off');
-        set(handles.Check_Baseline,'enable','off');
-
+        
         if GUI_Variables.LapBaseline % TN 5/8/19
             set(handles.Activate_Prop_Pivot,'value',0);
             set(handles.Activate_Prop_ID,'value',0);
@@ -996,6 +995,8 @@ function End_Trial_Callback(hObject, eventdata, handles)
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
             set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/8/17
            % set(handles.Prop_Ctrl_Panel,'visible','off');
+           set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
+
            fwrite(bt,'^');  % TN 5/8/19
         end
 
@@ -1038,6 +1039,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
             set(handles.Activate_Prop_ID,'enable','off');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
             set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/8/17
+            set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
          %   set(handles.Prop_Ctrl_Panel,'visible','off');
             fwrite(bt,'^');  % TN 5/8/19
         end
