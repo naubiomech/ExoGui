@@ -190,8 +190,6 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     
     if GUI_Variables.LapBaseline == 1         % TN 5/6/19
         set(handles.Activate_Prop_Ctrl,'Enable','off');   
-    else
-        set(handles.Activate_Prop_Ctrl,'Enable','on'); 
     end
      
     if GUI_Variables.ReuseBaseline == 1         % TN 5/6/19
@@ -4103,8 +4101,8 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Pivot,'enable','on'); % GO 5/7/19
             set(handles.Activate_Prop_ID,'enable','on');    % GO 5/7/19
 %            set(handles.Prop_Ctrl_Panel,'visible','on');
-%             set(handles.Activate_Prop_Pivot,'value',0);
-%             set(handles.Activate_Prop_ID,'value',0);
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
 %            set(handles.Take_Baseline,'enable','on');
 %            set(handles.Check_Baseline,'enable','on');
 
