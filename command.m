@@ -110,22 +110,22 @@ switch(msg)
     val=strcmp(get(handles.Balance_Text,'String'),'On');
     get(handles.Activate_BioFeedback_Text,'String');
     val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
-    val_ID = get(handles.Activate_Prop_ID,'value');
+%     val_ID = get(handles.Activate_Prop_ID,'value');
     
     if (val_biofb==1)
         disp('biofeedback baseline');
         GUI_Variables.basel_biofb=data(1);
         disp(GUI_Variables.basel_biofb);
-    elseif (val_ID==1)  % TN 5/8/19
-        GUI_Variables.basel= data(1);
-        GUI_Variables.baser= data(2);
-        GUI_Variables.basel_knee= data(3);
-        GUI_Variables.baser_knee= data(4);
-        disp('command');
-        disp(GUI_Variables.basel);
-        disp(GUI_Variables.baser);
-        disp(GUI_Variables.basel_knee);
-        disp(GUI_Variables.baser_knee);
+%     elseif (val_ID==1)  % TN 5/8/19
+%         GUI_Variables.basel= data(1);
+%         GUI_Variables.baser= data(2);
+%         GUI_Variables.basel_knee= data(3);
+%         GUI_Variables.baser_knee= data(4);
+%         disp('command');
+%         disp(GUI_Variables.basel);
+%         disp(GUI_Variables.baser);
+%         disp(GUI_Variables.basel_knee);
+%         disp(GUI_Variables.baser_knee);
     elseif (val==1)
         disp('balance baseline');
         GUI_Variables.L_Bal_steady_Toe= data(1);
@@ -137,13 +137,16 @@ switch(msg)
         GUI_Variables.L_Bal_dyn_Heel= data(6);
         GUI_Variables.R_Bal_dyn_Toe= data(7);
         GUI_Variables.R_Bal_dyn_Heel= data(8);
-    elseif(val==0)
+    else
         GUI_Variables.basel= data(1);
         GUI_Variables.baser= data(2);
-    disp('command');
-    disp(GUI_Variables.basel);
-    disp(GUI_Variables.baser);
-
+        GUI_Variables.basel_knee= data(3);
+        GUI_Variables.baser_knee= data(4);
+        disp('command');
+        disp(GUI_Variables.basel);
+        disp(GUI_Variables.baser);
+        disp(GUI_Variables.basel_knee);
+        disp(GUI_Variables.baser_knee);
     end
   case 'V'
     steady_val = (data(1));
