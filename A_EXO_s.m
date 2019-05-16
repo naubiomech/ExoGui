@@ -4096,8 +4096,7 @@ if (bt.Status=="open")
             GUI_Variables.PropOn = 1; 
             fwrite(bt,'l');
             disp( 'Activate Prop Control' );
-            fwrite(bt,'l');
-            set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
+             set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
 %            set(handles.Activate_Prop_Pivot,'enable','on'); % GO 5/7/19
 %            set(handles.Activate_Prop_ID,'enable','on');    % GO 5/7/19
 %            set(handles.Prop_Ctrl_Panel,'visible','on');
