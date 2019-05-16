@@ -23,7 +23,7 @@ function varargout = A_EXO_s(varargin)
 % Edit the above text to modify the response to help A_EXO_s
 
 
-% Last Modified by GUIDE v2.5 13-May-2019 15:25:56
+% Last Modified by GUIDE v2.5 16-May-2019 14:57:05
 
 
 % Begin initialization code - DO NOT EDIT
@@ -3755,6 +3755,7 @@ function Torque_Callback(hObject, eventdata, handles)
         set(handles.R_Smoothing,'Visible','off');
         set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
+        set(handles.Perturbation_Panel,'Visible','off');    %TH 5/16/19
         
         
 % --- Executes on button press in PID.
@@ -3776,6 +3777,7 @@ function PID_Callback(hObject, eventdata, handles)
         set(handles.R_Smoothing,'Visible','off');
         set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
+        set(handles.Perturbation_Panel,'Visible','off');    %TH 5/16/19
         
 % --- Executes on button press in Adj.
 function Adj_Callback(hObject, eventdata, handles)
@@ -3796,6 +3798,7 @@ function Adj_Callback(hObject, eventdata, handles)
         set(handles.R_Smoothing,'Visible','off');
         set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
+        set(handles.Perturbation_Panel,'Visible','off');    %TH 5/16/19
         
 % --- Executes on button press in Smoothing.
 function Smoothing_Callback(hObject, eventdata, handles)
@@ -3816,6 +3819,7 @@ function Smoothing_Callback(hObject, eventdata, handles)
         set(handles.R_Smoothing,'Visible','on');
         set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
+        set(handles.Perturbation_Panel,'Visible','off');    %TH 5/16/19
         
         
 % --- Executes on button press in Pro_Ctrl.
@@ -3838,7 +3842,7 @@ function Pro_Ctrl_Callback(hObject, eventdata, handles)
         set(handles.R_Smoothing,'Visible','off');
         set(handles.R_Proportional_Ctrl,'Visible','on');
         set(handles.Bio_Feedback_panel,'Visible','off');
-        
+        set(handles.Perturbation_Panel,'Visible','off');    %TH 5/16/19
         
                 
 % --- Executes on button press in Optimization.
@@ -3860,7 +3864,7 @@ function Optimization_Callback(hObject, eventdata, handles)
         set(handles.R_Smoothing,'Visible','off');
         set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
-        
+        set(handles.Perturbation_Panel,'Visible','off');    %TH 5/16/19
         
                         
 % --- Executes on button press in Balance_Ctrl.
@@ -3882,6 +3886,7 @@ function Balance_Ctrl_Callback(hObject, eventdata, handles)
         set(handles.R_Smoothing,'Visible','off');
         set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
+        set(handles.Perturbation_Panel,'Visible','off');    %TH 5/16/19
         
         
                         
@@ -3904,6 +3909,7 @@ function Bio_Feedback_Callback(hObject, eventdata, handles)
         set(handles.R_Smoothing,'Visible','off');
         set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','on');
+        set(handles.Perturbation_Panel,'Visible','off');    %TH 5/16/19
 
 
 % --- Executes on button press in Save_Prop_Prm.
@@ -4454,3 +4460,117 @@ if bt.Status=="open"
     set(handles.statusText,'String',...
         'Loaded current torque sensor calibration from EEPROM!');
 end
+
+
+% --- Executes on button press in Perturbation_Mode.
+function Perturbation_Mode_Callback(hObject, eventdata, handles)
+% hObject    handle to Perturbation_Mode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    set(handles.L_Torque,'Visible','off');
+    set(handles.L_PID,'Visible','off');
+    set(handles.L_Adj,'Visible','off');
+    set(handles.L_Proportional_Ctrl,'Visible','off');
+    set(handles.Optimization_Panel,'Visible','off');
+    set(handles.Balance_panel,'Visible','off');
+
+    set(handles.R_Torque,'Visible','off');
+    set(handles.R_PID,'Visible','off');
+    set(handles.R_Adj,'Visible','off');
+    set(handles.R_Smoothing,'Visible','off');
+    set(handles.R_Proportional_Ctrl,'Visible','off');
+    set(handles.Bio_Feedback_panel,'Visible','off');
+    set(handles.Perturbation_Panel,'Visible','on');
+    set(handles.Stop_Ptb,'Enable','off');
+
+
+% --- Executes on button press in Start_Ptb.
+function Start_Ptb_Callback(hObject, eventdata, handles)
+% hObject    handle to Start_Ptb (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+if (bt.Status=="open")
+
+    try
+        moveTreadmill(GUI_Variables.SIG1,GUI_Variables.SIG2,GUI_Variables.RLCount);
+    catch
+        disp('No treadmill connection');
+    end
+
+set(handles.Start_Ptb,'Enable','off');
+set(handles.Stop_Ptb,'Enable','on');
+disp('Start Perturbations');
+end
+
+
+% --- Executes on button press in Stop_Ptb.
+function Stop_Ptb_Callback(hObject, eventdata, handles)
+% hObject    handle to Stop_Ptb (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+LS = -1000;   %mm/s
+RS = LS;
+LA = 1000;   %mm/s^2
+RA = LA;
+IN = 0;
+
+try
+    setTreadmill(LS,RS,LA,RA,IN);
+catch
+    disp('No treadmill connection');
+end
+
+set(handles.Start_Ptb,'Enable','on');
+set(handles.Stop_Ptb,'Enable','off');
+disp('Stop Perturbations');
+
+
+
+function Edit_Speed_Callback(hObject, eventdata, handles)
+% hObject    handle to Edit_Speed (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Edit_Speed as text
+%        str2double(get(hObject,'String')) returns contents of Edit_Speed as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Edit_Speed_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Edit_Speed (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in L_Leg_Select.
+function L_Leg_Select_Callback(hObject, eventdata, handles)
+% hObject    handle to L_Leg_Select (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of L_Leg_Select
+
+set(handles.R_Leg_Select,'value',0);
+
+
+% --- Executes on button press in R_Leg_Select.
+function R_Leg_Select_Callback(hObject, eventdata, handles)
+% hObject    handle to R_Leg_Select (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of R_Leg_Select
+
+set(handles.L_Leg_Select,'value',0);
