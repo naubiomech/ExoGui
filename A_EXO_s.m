@@ -1171,8 +1171,8 @@ function L_Send_KF_Callback(hObject, ~, handles)
     if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
         new_KF = 0.9;
         set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
-    elseif new_KF > 2.0
-        new_KF = 2.0;
+    elseif new_KF > 3.0
+        new_KF = 3.0;
         set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
     end
     
@@ -1975,8 +1975,8 @@ function R_Send_KF_Callback(hObject, ~, handles)
     if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
         new_KF = 0.9;
         set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
-    elseif new_KF > 2.0
-        new_KF = 2.0;
+    elseif new_KF > 3.0
+        new_KF = 3.0;
         set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
     end
     
