@@ -1311,6 +1311,7 @@ function valBT=Check_Bluetooth_Callback(hObject, ~, handles)
             if ~isempty(msgstr)        %GO 5/23/19
                 error(msgid,msgstr);   %GO 5/23/19
             end
+            valBT=1;    %GO 5/23/19
         catch
             set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
             set(handles.flag_bluetooth,'Color',[1 0 0]);
@@ -1361,10 +1362,13 @@ function Connect_BT_Callback(hObject, ~, handles)
         set(handles.axes8,'Color',[0 0 1])
         set(handles.axes10,'Color',[0 0 1])
         set(handles.EXP_Params_axes,'Color',[0 0 1])
-        fprintf("Made a connection to the Right Ankle bluetooth!\n");
-        set(handles.statusText,'String',"Made a Connection to the Right Ankle Bluetooth!");
-        pause(1);
-        Version_Button_Callback(hObject,' ',handles);
+        valBT=Check_Bluetooth_Callback(hObject,' ',handles);
+        if valBT
+            fprintf("Made a connection to the Right Ankle bluetooth!\n");
+            set(handles.statusText,'String',"Made a Connection to the Right Ankle Bluetooth!");
+            pause(1);
+            Version_Button_Callback(hObject,' ',handles);
+        end
     end
 
     if(bt.status == "closed")
