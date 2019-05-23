@@ -201,7 +201,6 @@ switch(msg)
     case 'n'
         
         set(handles.Activate_Prop_Ctrl,'enable','on');  
-        set(handles.Check_Baseline,'enable','on');
         set(handles.statusText,'string','Baseline complete.');
         
         
