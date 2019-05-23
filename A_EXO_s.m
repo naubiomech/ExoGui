@@ -1298,9 +1298,19 @@ function valBT=Check_Bluetooth_Callback(hObject, ~, handles)
     pause(.01);
     draw_graphs(handles, GUI_Variables);   
     try
+        lastwarn('');              %GO 5/23/19
         fwrite(bt,char(78))
+        [msgstr,msgid] = lastwarn; %GO 5/23/19
+        if ~isempty(msgstr)        %GO 5/23/19
+            error(msgid,msgstr);   %GO 5/23/19
+        end
         try
+            lastwarn('');              %GO 5/23/19
             GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+            [msgstr,msgid] = lastwarn; %GO 5/23/19
+            if ~isempty(msgstr)        %GO 5/23/19
+                error(msgid,msgstr);   %GO 5/23/19
+            end
         catch
             set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
             set(handles.flag_bluetooth,'Color',[1 0 0]);
