@@ -2815,25 +2815,24 @@ function Fast_0_Trq_Callback(~, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % SEND 'F'
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
 
-    disp('goes to 0 Fast')
+disp('goes to 0 Fast')
 
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'F');
-        end
+try
+    if(bt.Status=="open")
+        fwrite(bt,'F');
         fwrite(bt,-1,'double');
-        pause(0.2);
-        if(bt.Status=="open")
-            fwrite(bt,'f');
-        end
         fwrite(bt,-1,'double');
-
-    catch
-
+        fwrite(bt,'f');
+        fwrite(bt,-1,'double');
+        fwrite(bt,-1,'double');
     end
+
+catch
+
+end
 
 
 % --- Executes on button press in Slow_0_Trq.
@@ -2845,20 +2844,17 @@ function Slow_0_Trq_Callback(~, ~, handles)
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
 
-
 disp('goes to 0 Slow')
 
 try
     if(bt.Status=="open")
         fwrite(bt,'F');
-    end
-    fwrite(bt,0,'double');
-    pause(0.2);
-    if(bt.Status=="open")
+        fwrite(bt,0,'double');
+        fwrite(bt,0,'double');
         fwrite(bt,'f');
+        fwrite(bt,0,'double');
+        fwrite(bt,0,'double');
     end
-    fwrite(bt,0,'double');
-
 catch
 
 end
