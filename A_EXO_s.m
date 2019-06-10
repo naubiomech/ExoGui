@@ -54,7 +54,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 6;
+    BT_INDEX = 3;
     BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
               'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
     BT_NAME = BT_NAMES{BT_INDEX};
@@ -432,28 +432,33 @@ function draw_graphs(handles, GUI_Variables)
               "LL Torque","LL State","LL Force Toe and Heel","Left Balance", ...
               "SIG1","SIG2","SIG3","SIG4"};
     
-    RLCount = GUI_Variables.RLCount;
-    
-    whichPlotLeft = get(handles.Bottom_Graph,'Value');
-    whichPlotRight = get(handles.Top_Graph,'Value');
-    draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
-    draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
-%YF    
-    if (strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')==1)%if biofeedback is on
-        draw_graph_BF(plots, RLCount);
-    end
-    drawnow nocallbacks;
+      RLCount = GUI_Variables.RLCount;
+
+      whichPlotLeft = get(handles.Bottom_Graph,'Value');
+      whichPlotRight = get(handles.Top_Graph,'Value');
+
+      %YF
+      if (strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')==1)%if biofeedback is on
+          draw_graph_BF(plots, RLCount);
+          draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
+      else
+          draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
+          draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
+      end
+      drawnow nocallbacks;
 
 %YF
 function draw_graph_BF(plots, RLCount)
 figure(1)
 
-ax=axes('XLim',[-10 10],'YLim',[0,2]);
+ylim1=0.5;
+ylim2=1.5;
+ax=axes('XLim',[-10 10],'YLim',[ylim1,ylim2]);
 grid off;
 ylabel('Ratio')
 
 x1 = [0  , -2, 2];
-y1 = [0,-0.1,-0.1];
+y1 = [0,-0.05,-0.05];
 
 g1 = hgtransform;
 patch('XData',x1,'YData',y1,'FaceColor',[0.144 0.852 0.850],'FaceAlpha',0.3,'Parent',g1)
@@ -461,53 +466,59 @@ patch('XData',x1,'YData',y1,'FaceColor',[0.144 0.852 0.850],'FaceAlpha',0.3,'Par
 g2 = hgtransform;
 patch('XData',x1,'YData',y1,'FaceColor',[0.988 0.093 0.156],'FaceAlpha',0.3,'Parent',g2)
 
-plotData1 = plots{10};%left update
-plotData3 = plots{9}; %right update
-plotData5 = plots{11};%right score
-plotData6 = plots{12};%left score
+plotData1 = plots{3};%right update(1),target(2)
+plotData2 = plots{7};%left leg update(1)target(2)
+plotData3 = plots{2}; %right score
+plotData4 = plots{6};%left score
 
 dataLength = max(1, RLCount-1000):RLCount-1;
 data1 = cellfun(@(x) x(dataLength), plotData1', 'UniformOutput', false);
 data1 = cat(1,data1{:});
+data2 = cellfun(@(x) x(dataLength), plotData2', 'UniformOutput', false);
+data2 = cat(1,data2{:});
 data3 = cellfun(@(x) x(dataLength), plotData3', 'UniformOutput', false);
 data3 = cat(1,data3{:});
-data5 = cellfun(@(x) x(dataLength), plotData5', 'UniformOutput', false);
-data5 = cat(1,data5{:});
-data6 = cellfun(@(x) x(dataLength), plotData6', 'UniformOutput', false);
-data6 = cat(1,data6{:});
+data4 = cellfun(@(x) x(dataLength), plotData4', 'UniformOutput', false);
+data4 = cat(1,data4{:});
 
-g1.Matrix=makehgtform('translate',[-5, data1(end), 0]);
-g2.Matrix=makehgtform('translate',[5, data3(end), 0]);
+g1.Matrix=makehgtform('translate',[-5, data2(1,end), 0]);%left
+g2.Matrix=makehgtform('translate',[5, data1(1,end), 0]);%right
 
 hold on
-plot([0 0],[0,2],'Linewidth',2,'Color','black')
+plot([0 0],[0,100],'Linewidth',2,'Color','black')
 
 %left side text
-if data1(end)<1
-    plot([-10 0],[1,1],'Linewidth',8,'Color','red')
-    text(-9,1.8,['Left score: ' num2str(data6(end))],'fontsize',40);
-    patch([-10 0 0 -10],[0 0 data1(end) data1(end)],'red','FaceAlpha',0.1)
+if data2(2,end)~=0
+    if 1>data2(1,end)
+        plot([-10 0],[1,1],'Linewidth',10,'Color','red')
+        text(-8,ylim2-0.1,['Left score: ' num2str(data4(end))],'fontsize',40);
+    else
+        plot([-10 0],[1,1],'Linewidth',10,'Color','green')
+        patch([-10 0 0 -10],[ylim1 ylim1 ylim2 ylim2],'green','FaceAlpha',0.1)
+        text(-8,ylim2-0.1,['Left score: ' num2str(data4(end))],'fontsize',40);
+        [y,Fs]=audioread('dragon-coin.wav');
+        sound(y,Fs)
+    end
 else
-    plot([-10 0],[1,1],'Linewidth',8,'Color','green')
-    patch([-10 0 0 -10],[0 0 data1(end) data1(end)],'green','FaceAlpha',0.1)
-    text(-9,1.8,['Left score: ' num2str(data6(end))],'fontsize',40);
-    [y,Fs]=audioread('dragon-coin.wav');
-    sound(y,Fs)
+    text(-9,ylim2-0.1,'Left score: 0','fontsize',40);
 end
 
 %right side text
-if data3(end)<1
-    plot([0 10],[1,1],'Linewidth',8,'Color','red')
-    text(1,1.8,['Right score: ' num2str(data5(end))],'fontsize',40);
-    patch([0 10 10 0],[0 0 data3(end) data3(end)],'red','FaceAlpha',0.1)
+if data1(2,end)~=0
+    if 1>data1(1,end)
+        plot([0 10],[1,1],'Linewidth',10,'Color','red')
+        text(2,ylim2-0.1,['Right score: ' num2str(data3(end))],'fontsize',40);
+    else
+        plot([0 10],[1,1],'Linewidth',10,'Color','green')
+        patch([0 10 10 0],[ylim1 ylim1 ylim2 ylim2],'green','FaceAlpha',0.1)
+        text(2,ylim2-0.1,['Right score: ' num2str(data3(end))],'fontsize',40);
+        [y,Fs]=audioread('dragon-coin.wav');
+        sound(y,Fs)
+    end
 else
-    plot([0 10],[1,1],'Linewidth',8,'Color','green')
-    patch([0 10 10 0],[0 0 data3(end) data3(end)],'green','FaceAlpha',0.1)
-    text(1,1.8,['Right score: ' num2str(data5(end))],'fontsize',40);
-    [y,Fs]=audioread('dragon-coin.wav');
-    sound(y,Fs)
+    text(3,ylim2-0.1,'Right score: 0','fontsize',40);
 end
-
+     
     
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
@@ -3362,7 +3373,7 @@ function Set_Target_Callback(~, ~, handles)
             if not(isempty(target))
 
                 fwrite(bt,target,'double');
-                disp(['BioFeedback Target ',num2str(target)]);
+                disp(['Treadmill speed is ',num2str(target),'m/s']);
             end
 
         catch
@@ -3594,6 +3605,10 @@ function BioFeedback_Baseline_Callback(~, ~, handles)
 
             fwrite(bt,':');
 
+            disp('BioFeedback Baseline for 3 steps (Default)');
+            set(handles.statusText,'String','BioFeedback Baseline for 3 steps');
+            
+            pause(4)
             set(handles.statusText,'String','Taking BioFeedback Baseline Finished');
         catch
         end
