@@ -23,7 +23,7 @@ function varargout = A_EXO_s(varargin)
 % Edit the above text to modify the response to help A_EXO_s
 
 
-% Last Modified by GUIDE v2.5 13-May-2019 15:25:56
+% Last Modified by GUIDE v2.5 23-May-2019 15:39:17
 
 
 % Begin initialization code - DO NOT EDIT
@@ -56,13 +56,6 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
 
     handles.output = hObject;
 
-    BT_INDEX = 5;
-    BT_NAMES={'Exo_Bluetooth_3','Capstone_Bluetooth_1', ...
-              'Exo_Bluetooth_2','Exo_High_Power','Jacks_Bluetooth', 'Jasons_Bluetooth'};
-    BT_NAME = BT_NAMES{BT_INDEX};
-    fprintf("Connecting to %s\n", BT_NAME);
-    bt = Bluetooth(BT_NAME,1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
-    bt.Timeout=2;
     str_uno=input('Would you use the arduino trigger? [y/n] ','s');
 
     if (strcmp(str_uno,'y'))
@@ -81,7 +74,7 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
         Uno=0;
     end
 
-    GUI_Variables = struct('BT',bt,'IP','0.0.0.0','t',0,'Timer',NaN,'state',0,'RLTRQ',NaN(1,60000), ...
+    GUI_Variables = struct('BT',0,'bt_name',' ','IP','0.0.0.0','t',0,'Timer',NaN,'state',0,'RLTRQ',NaN(1,60000), ...
                            'LLTRQ',NaN(1,60000),'LLFSR',NaN(1,60000),'RLFSR',NaN(1,60000),...
                            'LLVOLT',NaN(1,60000),'RLVOLT',NaN(1,60000),'LLVOLT_H',NaN(1,60000),'RLVOLT_H',NaN(1,60000),'RLCount',1,'LLCount',1,...
                            'COUNT',0,'UNO',Uno,'flag_calib',0,'flag_start',0,'first_calib',0,...
@@ -185,13 +178,8 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.End_Trial,'Enable','on');
     set(handles.ATP_Mode,'Enable','on');
     set(handles.Start_Timer,'Enable','on');
-    %set(handles.Check_Baseline,'Enable','on');  % tn 5/13/19
+    set(handles.Check_Baseline,'Enable','on');  % tn 5/13/19
     set(handles.Take_Baseline,'Enable','on');   % TN 5/6/19
-   
-    
-    if GUI_Variables.LapBaseline == 1         % TN 5/6/19
-        set(handles.Activate_Prop_Ctrl,'Enable','off');   
-    end
      
     if GUI_Variables.ReuseBaseline == 1         % TN 5/6/19
         set(handles.Load_Prop_Prm,'Enable','on');   
@@ -993,11 +981,7 @@ function End_Trial_Callback(hObject, eventdata, handles)
             set(handles.Activate_Prop_Pivot,'enable','off');
             set(handles.Activate_Prop_ID,'enable','off');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/8/17
-           % set(handles.Prop_Ctrl_Panel,'visible','off');
-           set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
-
-           fwrite(bt,'^');  % TN 5/8/19
+            fwrite(bt,'^');  % TN 5/8/19
         end
 
 
@@ -1024,13 +1008,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
         set(handles.Start_Timer,'enable','Off');
-
-%         set(handles.Activate_Prop_Pivot,'value',0);
-%         set(handles.Activate_Prop_ID,'value',0);
-%         set(handles.Activate_Prop_Pivot,'enable','off');
-%         set(handles.Activate_Prop_ID,'enable','off');
-%         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-        set(handles.Check_Baseline,'enable','off');
         
         if GUI_Variables.LapBaseline % TN 5/8/19
             set(handles.Activate_Prop_Pivot,'value',0);
@@ -1038,9 +1015,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
             set(handles.Activate_Prop_Pivot,'enable','off');
             set(handles.Activate_Prop_ID,'enable','off');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/8/17
-            set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
-         %   set(handles.Prop_Ctrl_Panel,'visible','off');
             fwrite(bt,'^');  % TN 5/8/19
         end
  
@@ -1171,8 +1145,8 @@ function L_Send_KF_Callback(hObject, ~, handles)
     if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
         new_KF = 0.9;
         set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
-    elseif new_KF > 1.5
-        new_KF = 1.5;
+    elseif new_KF > 2.0
+        new_KF = 2.0;
         set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
     end
     
@@ -1302,33 +1276,49 @@ function Send_Trig_Callback(hObject, ~, handles)
 function valBT=Check_Bluetooth_Callback(hObject, ~, handles)
     GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
-    pause(.01);
-    set(handles.statusText,'String',"Checking Bluetooth Connection");
-    pause(.01);
-    draw_graphs(handles, GUI_Variables);   
-    try
-        fwrite(bt,char(78))
+    if bt == 0
+        set(handles.statusText,'String',...
+            'Bluetooth object not created! Connect a device first.');
+    else
+        pause(.01);
+        set(handles.statusText,'String',"Checking Bluetooth Connection");
+        pause(.01);
+        draw_graphs(handles, GUI_Variables);   
         try
-            GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+            lastwarn('');              %GO 5/23/19
+            fwrite(bt,char(78))
+            [msgstr,msgid] = lastwarn; %GO 5/23/19
+            if ~isempty(msgstr)        %GO 5/23/19
+                error(msgid,msgstr);   %GO 5/23/19
+            end
+            try
+                lastwarn('');              %GO 5/23/19
+                GUI_Variables = Receive_Data_Message(GUI_Variables, handles);
+                [msgstr,msgid] = lastwarn; %GO 5/23/19
+                if ~isempty(msgstr)        %GO 5/23/19
+                    error(msgid,msgstr);   %GO 5/23/19
+                end
+                valBT=1;    %GO 5/23/19
+            catch
+                set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
+                set(handles.flag_bluetooth,'Color',[1 0 0]);
+                set(handles.axes8,'Color',[0 0 0])
+                set(handles.axes10,'Color',[0 0 0])
+                set(handles.EXP_Params_axes,'Color',[0 0 0])
+                valBT=0;
+                fclose(bt);
+            end
         catch
-            set(handles.statusText,'String',"A problem Occured and Bt has been closed!");
-            set(handles.flag_bluetooth,'Color',[1 0 0]);
-            set(handles.axes8,'Color',[0 0 0])
-            set(handles.axes10,'Color',[0 0 0])
-            set(handles.EXP_Params_axes,'Color',[0 0 0])
-            valBT=0;
-            fclose(bt);
-        end
-    catch
-        try
-            set(handles.flag_bluetooth,'Color',[1 0 0]);
-            set(handles.axes8,'Color',[0 0 0])
-            set(handles.axes10,'Color',[0 0 0])
-            set(handles.EXP_Params_axes,'Color',[0 0 0])
-            valBT=0;
-            fclose(bt);
-            set(handles.statusText,'String',"MATLAB was unable to communicate with the Bluetooth");
-        catch
+            try
+                set(handles.flag_bluetooth,'Color',[1 0 0]);
+                set(handles.axes8,'Color',[0 0 0])
+                set(handles.axes10,'Color',[0 0 0])
+                set(handles.EXP_Params_axes,'Color',[0 0 0])
+                valBT=0;
+                fclose(bt);
+                set(handles.statusText,'String',"MATLAB was unable to communicate with the Bluetooth");
+            catch
+            end
         end
     end
     handles.GUI_Variables = GUI_Variables;
@@ -1340,41 +1330,67 @@ function Connect_BT_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     GUI_Variables = handles.GUI_Variables;
+    BT_NAME = GUI_Variables.bt_name;
     bt = GUI_Variables.BT;
-    fprintf('Attempting to make a connection to the bluetooth\n');
-    set(handles.statusText,'String',"Attempting to make a Connection to the Bluetooth!");
-    pause(.01);
+    
+    % GO 5/23/19 -------------------------------------
+    if BT_NAME == ' '
+        set(handles.statusText,'String',...
+            'Select BT name from drop-down menu!');
+    else
+        fprintf("Connecting to %s\n", BT_NAME);
+        set(handles.statusText,'String',...
+            ['Generating Bluetooth object: ', BT_NAME]);
+        pause(.01);
+        if bt ~= 0 && (length(lower(BT_NAME)) == length(bt.RemoteName)) && all(lower(BT_NAME) == bt.RemoteName)
+            set(handles.statusText,'String',...
+                'Bluetooth object already open.');
+        else
+            bt = Bluetooth(BT_NAME,1,'UserData',0,'InputBufferSize',2048*16*50); %Creates Bluetooth Object
+            bt.Timeout=2;
+            GUI_Variables.BT = bt;
+            handles.GUI_Variables = GUI_Variables;
+            guidata(hObject, handles);
+        end
+    % -------------------------------------------------    
 
+        fprintf('Attempting to make a connection to the bluetooth\n');
+        set(handles.statusText,'String',"Attempting to make a Connection to the Bluetooth!");
+        pause(.01);
 
-    try
-        fopen(bt); % Attempts to Make a connection to Bluetooth Object
-    catch
-        set(handles.flag_bluetooth,'Color',[1 0 0]);
-        set(handles.axes8,'Color',[0 0 0])
-        set(handles.axes10,'Color',[0 0 0])
-        set(handles.EXP_Params_axes,'Color',[0 0 0])
-    end % Makes a connection to Bluetooth Object
+        try
+            fopen(bt); % Attempts to Make a connection to Bluetooth Object
+        catch
+            set(handles.flag_bluetooth,'Color',[1 0 0]);
+            set(handles.axes8,'Color',[0 0 0])
+            set(handles.axes10,'Color',[0 0 0])
+            set(handles.EXP_Params_axes,'Color',[0 0 0])
+        end % Makes a connection to Bluetooth Object
 
-    if(bt.status == "open")
-        set(handles.flag_bluetooth,'Color',[0 1 0]);
-        set(handles.axes8,'Color',[0 0 1])
-        set(handles.axes10,'Color',[0 0 1])
-        set(handles.EXP_Params_axes,'Color',[0 0 1])
-        fprintf("Made a connection to the Right Ankle bluetooth!\n");
-        set(handles.statusText,'String',"Made a Connection to the Right Ankle Bluetooth!");
-        pause(1);
-        Version_Button_Callback(hObject,' ',handles);
+        if(bt.status == "open")
+            set(handles.flag_bluetooth,'Color',[0 1 0]);
+            set(handles.axes8,'Color',[0 0 1])
+            set(handles.axes10,'Color',[0 0 1])
+            set(handles.EXP_Params_axes,'Color',[0 0 1])
+            valBT=Check_Bluetooth_Callback(hObject,' ',handles);
+            if valBT
+                fprintf("Made a connection to the Right Ankle bluetooth!\n");
+                set(handles.statusText,'String',"Made a Connection to the Right Ankle Bluetooth!");
+                pause(1);
+                Version_Button_Callback(hObject,' ',handles);
+            end
+        end
+
+        if(bt.status == "closed")
+            set(handles.flag_bluetooth,'Color',[1 0 0]);
+            set(handles.axes8,'Color',[0 0 0])
+            set(handles.axes10,'Color',[0 0 0])
+            set(handles.EXP_Params_axes,'Color',[0 0 0])
+            set(handles.statusText,'String',"Could Not Connect to the Right Ankle Bluetooth :(  Try Again! (If it fails 3+ times attempt a power cycle)");
+        end
+        handles.GUI_Variables = GUI_Variables;
+        guidata(hObject, handles);
     end
-
-    if(bt.status == "closed")
-        set(handles.flag_bluetooth,'Color',[1 0 0]);
-        set(handles.axes8,'Color',[0 0 0])
-        set(handles.axes10,'Color',[0 0 0])
-        set(handles.EXP_Params_axes,'Color',[0 0 0])
-        set(handles.statusText,'String',"Could Not Connect to the Right Ankle Bluetooth :(  Try Again! (If it fails 3+ times attempt a power cycle)");
-    end
-    handles.GUI_Variables = GUI_Variables;
-    guidata(hObject, handles);
 
 
 function R_Ki_Edit_Callback(~, ~, ~)
@@ -1975,8 +1991,8 @@ function R_Send_KF_Callback(hObject, ~, handles)
     if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
         new_KF = 0.9;
         set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
-    elseif new_KF > 1.5
-        new_KF = 1.5;
+    elseif new_KF > 2.0
+        new_KF = 2.0;
         set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
     end
     
@@ -4453,4 +4469,35 @@ if bt.Status=="open"
     fwrite(bt,'P'); %Load the current torque calibration in EEPROM
     set(handles.statusText,'String',...
         'Loaded current torque sensor calibration from EEPROM!');
+end
+
+
+% --- Executes on selection change in BT_Select.
+function BT_Select_Callback(hObject, eventdata, handles)
+% hObject    handle to BT_Select (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns BT_Select contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from BT_Select
+
+%GO 5/23/19
+GUI_Variables = handles.GUI_Variables;
+contents = cellstr(get(hObject,'String'));
+bt_name = contents{get(hObject,'Value')};
+GUI_Variables.bt_name = bt_name;
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function BT_Select_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BT_Select (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end

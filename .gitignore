@@ -79,3 +79,5 @@ CATKIN_IGNORE
 *.txt
 *.mat
 A_EXO_s.m.rej
+*.fig
+*.png
