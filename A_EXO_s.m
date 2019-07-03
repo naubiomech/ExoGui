@@ -4218,8 +4218,6 @@ if (bt.Status=="open")
             disp( 'Deactivate Prop Control' );
             fwrite(bt,'^');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Activate_Prop_Pivot,'enable','off'); % GO 5/7/19
-            set(handles.Activate_Prop_ID,'enable','off');    % GO 5/7/19
             set(handles.Activate_Prop_Pivot,'value',0);      % GO 5/7/19
             set(handles.Activate_Prop_ID,'value',0);         % GO 5/7/19 
             set(handles.Prop_Ctrl_sPanel,'visible','off');    % GO 5/14/19
