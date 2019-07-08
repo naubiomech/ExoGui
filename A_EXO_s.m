@@ -4139,6 +4139,8 @@ Old_Pro_Prm = importdata(fullfile(pathname, filename));
 
 fwrite(bt,'g'); %send the character "%"
 
+set(handles.Activate_Prop_Ctrl,'Enable','on');  % TN 7/8/19
+
 parameters = {'left_plant_peak_mean', 'right_plant_peak_mean', 'left_leg_torque_calibration_value',...
     'right_leg_torque_calibration_value'};
 
