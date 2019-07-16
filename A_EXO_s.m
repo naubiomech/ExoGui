@@ -930,9 +930,11 @@ function End_Trial_Callback(hObject, eventdata, handles)
 %         right_leg_fsr_Toe_peak_ref = 0;
 %         left_leg_fsr_Heel_peak_ref = 0;
 %         right_leg_fsr_Heel_peak_ref = 0;
-        left_leg_torque_calibration_value = 0;
-        right_leg_torque_calibration_value = 0;
-
+        left_leg_torque_calibration_value_Ankle = 0;  % TN 7/15/19
+        right_leg_torque_calibration_value_Ankle = 0;  % TN 7/15/19
+        left_leg_torque_calibration_value_Knee = 0;   % TN 7/15/19
+        right_leg_torque_calibration_value_Knee = 0;   % TN 7/15/19
+ 
     fwrite(bt,'e');
           message = fgetl(bt);
         if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
@@ -941,8 +943,10 @@ function End_Trial_Callback(hObject, eventdata, handles)
         right_plant_peak_mean_toe = str2double(message((indexes(2)+1):(indexes(3)-1)));
         left_plant_peak_mean_heel = str2double(message((indexes(3)+1):(indexes(4)-1)));
         right_plant_peak_mean_heel = str2double(message((indexes(4)+1):(indexes(5)-1)));
-        left_leg_torque_calibration_value = str2double(message((indexes(5)+1):(indexes(6)-1)));
-        right_leg_torque_calibration_value = str2double(message((indexes(6)+1):(indexes(7)-1)));
+        left_leg_torque_calibration_value_Ankle = str2double(message((indexes(5)+1):(indexes(6)-1)));  % TN 7/15/19
+        right_leg_torque_calibration_value_Ankle = str2double(message((indexes(6)+1):(indexes(7)-1)));  % TN 7/15/19
+        left_leg_torque_calibration_value_Knee = str2double(message((indexes(7)+1):(indexes(8)-1)));  % TN 7/15/19
+        right_leg_torque_calibration_value_Knee = str2double(message((indexes(8)+1):(indexes(9)-1)));  % TN 7/15/19
 
         
         end
@@ -970,8 +974,10 @@ function End_Trial_Callback(hObject, eventdata, handles)
 %         fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\r\n']);
 %         fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\r\n']);
 %         fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\r\n']);
-        fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\r\n']);
-        fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\r\n']);
+        fprintf(fileID_P,['left_leg_torque_calibration_value_Ankle = ', num2str(left_leg_torque_calibration_value_Ankle),'\r\n']);
+        fprintf(fileID_P,['right_leg_torque_calibration_value_Ankle = ', num2str(right_leg_torque_calibration_value_Ankle),'\r\n']);
+        fprintf(fileID_P,['left_leg_torque_calibration_value_Knee = ', num2str(left_leg_torque_calibration_value_Knee),'\r\n']);
+        fprintf(fileID_P,['right_leg_torque_calibration_value_Knee = ', num2str(right_leg_torque_calibration_value_Knee),'\r\n']);
         fclose(fileID_P);
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
@@ -4140,9 +4146,10 @@ Old_Pro_Prm = importdata(fullfile(pathname, filename));
 fwrite(bt,'g'); %send the character "%"
 
 set(handles.Activate_Prop_Ctrl,'Enable','on');  % TN 7/8/19
-
+% TN 7/15/19
 parameters = {'left_plant_peak_mean_toe', 'right_plant_peak_mean_toe', 'left_plant_peak_mean_heel',...
-    'right_plant_peak_mean_heel', 'left_leg_torque_calibration_value', 'right_leg_torque_calibration_value'};
+    'right_plant_peak_mean_heel', 'left_leg_torque_calibration_value_Ankle', 'right_leg_torque_calibration_value_Ankle',...
+    'left_leg_torque_calibration_value_Knee', 'right_leg_torque_calibration_value_Knee'};
 
 for i=1:length(Old_Pro_Prm.data)
     fwrite(bt,Old_Pro_Prm.data(i),'double');
