@@ -88,7 +88,15 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'R_Bal_dyn_Toe',20,'R_Bal_dyn_Heel',30,'R_Bal_steady_Toe',40,'R_Bal_steady_Heel',50,...
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
-                           'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1,'LapBaseline',0);
+                           'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1,'LapBaseline',0,'Joint_Mode',0,...
+                           'NewSetpoint_Ankle_L', 0, 'NewSetpoint_Ankle_R', 0, 'NewSetpoint_Knee_L', 0, 'NewSetpoint_Knee_R', 0,...
+                           'NewSetpoint_Dorsi_Ankle_L', 0, 'NewSetpoint_Dorsi_Ankle_R', 0, 'NewSetpoint_Dorsi_Knee_L', 0, 'NewSetpoint_Dorsi_Knee_R', 0,...
+                           'Kp_A_L', 0, 'Kd_A_L', 0,'Ki_A_L', 0,'Kp_A_R', 0, 'Kd_A_R', 0,'Ki_A_R', 0,...
+                           'Kp_K_L', 0, 'Kd_K_L', 0,'Ki_K_L', 0,'Kp_K_R', 0, 'Kd_K_R', 0,'Ki_K_R', 0,...
+                           'LFSRTH_A', 0, 'RFSRTH_A', 0, 'LFSRTH_K', 0, 'RFSRTH_K', 0,...
+                           'KF_A_L', 0, 'KF_A_R', 0, 'KF_K_L', 0, 'KF_K_R', 0, 'LKF_A', 0, 'LKF_K', 0,...
+                           'L_Zero_Modif_A', 0, 'R_Zero_Modif_A', 0, 'L_Zero_Modif_K', 0, 'R_Zero_Modif_K', 0,...
+                           'L_New_Gain_A', 0, 'R_New_Gain_A', 0, 'L_New_Gain_K', 0, 'R_New_Gain_K', 0);
     
     if get(handles.Activate_Prop_Pivot,'Value') %GO 5/7/19 - GUIDE is not cooperating so brute force
         set(handles.Activate_Prop_Pivot,'Value',0); 
@@ -1189,10 +1197,10 @@ function L_Send_KF_Callback(hObject, ~, handles)
 
     if new_KF_L < 0.9 %GO 5/4/19 - Set limits on the manual KF
         new_KF_L = 0.9;
-        set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
+        set(handles.L_Send_KF_Edit,'String',num2str(new_KF_L));
     elseif new_KF_L > 1.5
         new_KF_L = 1.5;
-        set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
+        set(handles.L_Send_KF_Edit,'String',num2str(new_KF_L));
     end
     
   % TN 6/13/19
@@ -1201,10 +1209,10 @@ function L_Send_KF_Callback(hObject, ~, handles)
 
     if new_KF_R < 0.9 %GO 5/4/19 - Set limits on the manual KF
         new_KF_R = 0.9;
-        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
+        set(handles.R_Send_KF_Edit,'String',num2str(new_KF_R));
     elseif new_KF_R > 1.5
         new_KF_R = 1.5;
-        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
+        set(handles.R_Send_KF_Edit,'String',num2str(new_KF_R));
     end
     
    
@@ -1227,6 +1235,14 @@ function L_Send_KF_Callback(hObject, ~, handles)
         catch 
             disp("Impossible to write on bt the new KF");
         end
+    end
+    %% TN 7/18/19
+    if GUI_Variables.Joint_Mode == 0 % ankle
+        GUI_Variables.KF_A_L = new_KF_L;
+        GUI_Variables.KF_A_R = new_KF_R;
+    else                                   % knee
+        GUI_Variables.KF_K_L = new_KF_L;
+        GUI_Variables.KF_K_R = new_KF_R;
     end
     
     handles.GUI_Variables = GUI_Variables;
@@ -1618,7 +1634,7 @@ function [lkp,lkd,lki,rkp,rkd,rki]=L_Get_PID_Callback(~, ~, handles)
     rki = get(handles.R_Kp_text,'String');
 
 % --- Executes on button press in L_Set_PID.
-function L_Set_PID_Callback(~, ~, handles)
+function L_Set_PID_Callback(hObject, ~, handles)
 % hObject    handle to L_Set_PID (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -1713,7 +1729,25 @@ function L_Set_PID_Callback(~, ~, handles)
         pause(0.3);
         L_Get_PID_Callback(0,0,handles);
 %        R_Get_PID_Callback(0,0,handles);
-        
+%% TN 7/18/19
+if GUI_Variables.Joint_Mode == 0 % ankle
+    GUI_Variables.Kp_A_L = kp_l;
+    GUI_Variables.Kd_A_L = kd_l;
+    GUI_Variables.Ki_A_L = ki_l;
+    GUI_Variables.Kp_A_R = kp_r;
+    GUI_Variables.Kd_A_R = kd_r;
+    GUI_Variables.Ki_A_R = ki_r;
+else                           % knee
+    GUI_Variables.Kp_K_L = kp_l;
+    GUI_Variables.Kd_K_L = kd_l;
+    GUI_Variables.Ki_K_L = ki_l;
+    GUI_Variables.Kp_K_R = kp_r;
+    GUI_Variables.Kd_K_R = kd_r;
+    GUI_Variables.Ki_K_R = ki_r;   
+end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
+
     end
 
 function L_Kp_Edit_Callback(~, ~, ~)
@@ -1885,6 +1919,18 @@ function L_Set_Setpoint_Callback(hObject, ~, handles)
     fwrite(bt,NewSetpoint_Dorsi_R,'double');
 
        
+    if GUI_Variables.Joint_Mode == 0
+        GUI_Variables.NewSetpoint_Ankle_L = NewSetpoint_L;
+        GUI_Variables.NewSetpoint_Dorsi_Ankle_L = NewSetpoint_Dorsi_L;
+        GUI_Variables.NewSetpoint_Ankle_R = NewSetpoint_R;
+        GUI_Variables.NewSetpoint_Dorsi_Ankle_R = NewSetpoint_Dorsi_R;
+    else
+        GUI_Variables.NewSetpoint_Knee_L = NewSetpoint_L;
+        GUI_Variables.NewSetpoint_Dorsi_Knee_L = NewSetpoint_Dorsi_L;
+        GUI_Variables.NewSetpoint_Knee_R = NewSetpoint_R;
+        GUI_Variables.NewSetpoint_Dorsi_Knee_R = NewSetpoint_Dorsi_R;
+    end
+    
     GUI_Variables.Setpoint=NewSetpoint_L;
     axes(handles.PROP_FUNCTION_axes);
     hold off
@@ -2230,8 +2276,19 @@ function L_Send_FSR_Th_Callback(hObject, ~, handles)
         catch
             disp("Impossible to set FSR th parameters");
         end
+    %% TN 7/18/19
+    if GUI_Variables.Joint_Mode == 0 % ankle
+        GUI_Variables.LFSRTH_A = LFSRTH;
+        GUI_Variables.RFSRTH_A = RFSRTH;        
+    else                                 % knee
+        GUI_Variables.LFSRTH_K = LFSRTH;
+        GUI_Variables.RFSRTH_K = RFSRTH;  
     end
-
+    
+    end
+    
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
                
 % % --- Executes on button press in R_Check_FSR_Th.
 % function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
@@ -2786,7 +2843,7 @@ function L_Check_Gain_Callback(hObject, ~, handles)
 
 
 % --- Executes on button press in L_Set_Gain.
-function L_Set_Gain_Callback(~, ~, handles)
+function L_Set_Gain_Callback(hObject, ~, handles)
 % hObject    handle to L_Set_Gain (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -2820,7 +2877,16 @@ function L_Set_Gain_Callback(~, ~, handles)
     catch
     end
 
-
+    %% TN 7/18/19
+    if GUI_Variables.Joint_Mode == 0 % ankle
+        GUI_Variables.L_New_Gain_A = L_New_Gain;
+        GUI_Variables.R_New_Gain_A = R_New_Gain;
+    else                                 % knee  
+        GUI_Variables.L_New_Gain_K = L_New_Gain;
+        GUI_Variables.R_New_Gain_K = R_New_Gain;
+    end
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
 
 
 
@@ -2910,7 +2976,19 @@ function L_Auto_KF_Callback(hObject, ~, handles)
             end
         catch
         end
+        
+        
     end
+    
+    %% TN 7/18/19
+    if GUI_Variables.Joint_Mode == 0 % ankle
+        GUI_Variables.LKF_A = LKF;
+    else                            % knee
+        GUI_Variables.LKF_K = LKF;
+    end
+    
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
    
 
 % --- Executes on button press in Fast_0_Trq.
@@ -3079,7 +3157,7 @@ function L_Zero_Modif_Edit_CreateFcn(hObject, ~, ~)
 
 
 % --- Executes on button press in L_Set_Zero_Modif.
-function L_Set_Zero_Modif_Callback(~, ~, handles)
+function L_Set_Zero_Modif_Callback(hObject, ~, handles)
 % hObject    handle to L_Set_Zero_Modif (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -3098,8 +3176,20 @@ function L_Set_Zero_Modif_Callback(~, ~, handles)
         R_Zero_Modif = str2double(get(handles.R_Zero_Modif_Edit,'String'));               %Gets the Value entered into the edit Box in the G
         fwrite(bt,R_Zero_Modif,'double');
         disp(R_Zero_Modif);
+        
+        if GUI_Variables.Joint_Mode == 0 % ankle
+            GUI_Variables.L_Zero_Modif_A = L_Zero_Modif;
+            GUI_Variables.R_Zero_Modif_A = R_Zero_Modif;
+        else
+            GUI_Variables.L_Zero_Modif_K = L_Zero_Modif;
+            GUI_Variables.R_Zero_Modif_K = R_Zero_Modif;
+        end
+           
     catch
     end
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
+
 
 
 function R_Zero_Modif_Edit_Callback(~, ~, ~)
@@ -4677,11 +4767,46 @@ function Ankle_Mode_Callback(hObject, eventdata, handles)
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT; 
 
-if (bt.Status=="open")
+%if (bt.Status=="open")
    
 fwrite(bt,'[');
 
-end
+%% TN 7/18/19
+GUI_Variables.Joint_Mode = 0;
+
+set(handles.L_Setpoint_Edit,'String',GUI_Variables.NewSetpoint_Ankle_L);
+set(handles.R_Setpoint_Edit,'String',GUI_Variables.NewSetpoint_Ankle_R);
+set(handles.L_Setpoint_Dorsi_Edit,'String',GUI_Variables.NewSetpoint_Dorsi_Ankle_L);
+set(handles.R_Setpoint_Dorsi_Edit,'String',GUI_Variables.NewSetpoint_Dorsi_Ankle_R);
+L_Get_Setpoint_Callback(hObject, 0, handles);
+
+set(handles.L_Kp_Edit,'String',GUI_Variables.Kp_A_L);            
+set(handles.L_Kd_Edit,'String',GUI_Variables.Kd_A_L);
+set(handles.L_Ki_Edit,'String',GUI_Variables.Ki_A_L);
+set(handles.R_Kp_Edit,'String',GUI_Variables.Kp_A_R);            
+set(handles.R_Kd_Edit,'String',GUI_Variables.Kd_A_R);
+set(handles.R_Ki_Edit,'String',GUI_Variables.Ki_A_R);
+L_Get_PID_Callback(hObject, 0, handles);
+
+set(handles.L_Send_FSR_Edit,'String',GUI_Variables.LFSRTH_A);
+set(handles.R_Send_FSR_Edit,'String',GUI_Variables.RFSRTH_A);
+L_Check_FSR_Th_Callback(hObject, 0, handles);
+
+set(handles.L_Send_KF_Edit,'String',GUI_Variables.KF_A_L);
+set(handles.R_Send_KF_Edit,'String',GUI_Variables.KF_A_R); 
+L_Check_KF_Callback(hObject, 0, handles); 
+
+set(handles.L_Zero_Modif_Edit,'String',GUI_Variables.L_Zero_Modif_A);
+set(handles.R_Zero_Modif_Edit,'String',GUI_Variables.R_Zero_Modif_A);
+set(handles.L_Auto_KF, 'Value',GUI_Variables.LKF_A);
+
+set(handles.L_Set_Gain_Edit,'String',GUI_Variables.L_New_Gain_A); 
+set(handles.R_Set_Gain_Edit,'String',GUI_Variables.R_New_Gain_A); 
+L_Check_Gain_Callback(hObject, 0, handles); 
+
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
+%end
 
 % TN 5/6/19
 % --- Executes on button press in Knee_Mode.
@@ -4696,8 +4821,48 @@ function Knee_Mode_Callback(hObject, eventdata, handles)
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT; 
 
-if (bt.Status=="open")
+%if (bt.Status=="open")
    
 fwrite(bt,']');
 
-end
+%% TN 7/18/19
+GUI_Variables.Joint_Mode = 1;
+
+set(handles.L_Setpoint_Edit,'String',GUI_Variables.NewSetpoint_Knee_L);
+set(handles.R_Setpoint_Edit,'String',GUI_Variables.NewSetpoint_Knee_R);
+set(handles.L_Setpoint_Dorsi_Edit,'String',GUI_Variables.NewSetpoint_Dorsi_Knee_L);
+set(handles.R_Setpoint_Dorsi_Edit,'String',GUI_Variables.NewSetpoint_Dorsi_Knee_R);
+L_Get_Setpoint_Callback(hObject, 0, handles);
+
+
+
+set(handles.L_Kp_Edit,'String',GUI_Variables.Kp_K_L);            
+set(handles.L_Kd_Edit,'String',GUI_Variables.Kd_K_L);
+set(handles.L_Ki_Edit,'String',GUI_Variables.Ki_K_L);
+set(handles.R_Kp_Edit,'String',GUI_Variables.Kp_K_R);            
+set(handles.R_Kd_Edit,'String',GUI_Variables.Kd_K_R);
+set(handles.R_Ki_Edit,'String',GUI_Variables.Ki_K_R);
+L_Get_PID_Callback(hObject, 0, handles);
+
+
+set(handles.L_Send_FSR_Edit,'String',GUI_Variables.LFSRTH_K);
+set(handles.R_Send_FSR_Edit,'String',GUI_Variables.RFSRTH_K);
+L_Check_FSR_Th_Callback(hObject, 0, handles);
+
+
+set(handles.L_Send_KF_Edit,'String',GUI_Variables.KF_K_L);
+set(handles.R_Send_KF_Edit,'String',GUI_Variables.KF_K_R); 
+L_Check_KF_Callback(hObject, 0, handles); 
+
+set(handles.L_Zero_Modif_Edit,'String',GUI_Variables.L_Zero_Modif_K);
+set(handles.R_Zero_Modif_Edit,'String',GUI_Variables.R_Zero_Modif_K);
+
+set(handles.L_Auto_KF, 'Value',GUI_Variables.LKF_K);
+
+set(handles.L_Set_Gain_Edit,'String',GUI_Variables.L_New_Gain_K); 
+set(handles.R_Set_Gain_Edit,'String',GUI_Variables.R_New_Gain_K); 
+L_Check_Gain_Callback(hObject, 0, handles); 
+
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
+%end
