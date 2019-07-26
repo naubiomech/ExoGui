@@ -4229,8 +4229,7 @@ if (bt.Status=="open")
              disp('User pressed cancel')
         else
              disp(['User selected ', fullfile(pathname, filename)])
-
-        end
+        
 Old_Pro_Prm = importdata(fullfile(pathname, filename));
 
 fwrite(bt,'g'); %send the character "%"
@@ -4247,9 +4246,15 @@ for i=1:length(Old_Pro_Prm.data)
         
    % pause(0.1);
 end
+
+        end
+        
     catch
 
+    
+        
     end
+    
 end
 
 
