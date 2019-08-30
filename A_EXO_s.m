@@ -193,13 +193,13 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     
     if GUI_Variables.LapBaseline == 1         % TN 7/5/19
         set(handles.Activate_Prop_Ctrl,'Enable','off');  
-%         set(handles.Activate_Prop_Pivot,'value',0);
-%         set(handles.Activate_Prop_ID,'value',0);
-%         set(handles.Activate_Prop_Pivot,'enable','off');
-%         set(handles.Activate_Prop_ID,'enable','off');
-%         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Activate_Prop_Pivot,'value',0);
+        set(handles.Activate_Prop_ID,'value',0);
+        set(handles.Activate_Prop_Pivot,'enable','off');
+        set(handles.Activate_Prop_ID,'enable','off');
+        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
         set(handles.Check_Baseline,'enable','off');  
-%         fwrite(bt,'^');  
+        fwrite(bt,'^');  
     end
      
     if GUI_Variables.ReuseBaseline == 1         % TN 5/6/19
@@ -1016,15 +1016,15 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Start_Timer,'enable','Off');
         
         if GUI_Variables.LapBaseline % TN 5/8/19
-%             set(handles.Activate_Prop_Pivot,'value',0);
-%             set(handles.Activate_Prop_ID,'value',0);
-%             set(handles.Activate_Prop_Pivot,'enable','off');
-%             set(handles.Activate_Prop_ID,'enable','off');
-%             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
+            set(handles.Activate_Prop_Pivot,'enable','off');
+            set(handles.Activate_Prop_ID,'enable','off');
+            set(handles.Prop_Ctrl_sPanel,'visible','off');  %TN 8/30/19
+            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
             set(handles.Activate_Prop_Ctrl,'enable','off'); % TN 7/5/19
             set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
-
-%            fwrite(bt,'^');  % TN 5/8/19
+            fwrite(bt,'^');  % TN 5/8/19
         end
 
 
@@ -1052,23 +1052,25 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.statusText,'String','System not connected');
         set(handles.Start_Timer,'enable','Off');
 
-%         set(handles.Activate_Prop_Pivot,'value',0);
-%         set(handles.Activate_Prop_ID,'value',0);
-%         set(handles.Activate_Prop_Pivot,'enable','off');
-%         set(handles.Activate_Prop_ID,'enable','off');
-%         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Activate_Prop_Pivot,'value',0);
+        set(handles.Activate_Prop_ID,'value',0);
+        set(handles.Activate_Prop_Pivot,'enable','off');
+        set(handles.Activate_Prop_ID,'enable','off');
+        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Activate_Prop_Ctrl,'enable','off');
         set(handles.Check_Baseline,'enable','off');
+        fwrite(bt,'^');   % 8/30/19
         
         if GUI_Variables.LapBaseline % TN 5/8/19
-%             set(handles.Activate_Prop_Pivot,'value',0);
-%             set(handles.Activate_Prop_ID,'value',0);
-%             set(handles.Activate_Prop_Pivot,'enable','off');
-%             set(handles.Activate_Prop_ID,'enable','off');
-%             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+            set(handles.Activate_Prop_Pivot,'value',0);
+            set(handles.Activate_Prop_ID,'value',0);
+            set(handles.Activate_Prop_Pivot,'enable','off');
+            set(handles.Activate_Prop_ID,'enable','off');
+            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
             set(handles.Activate_Prop_Ctrl,'enable','off'); % TN 7/5/19
             set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
-         %   set(handles.Prop_Ctrl_sPanel,'visible','off');
-%             fwrite(bt,'^');  % TN 5/8/19
+            %set(handles.Prop_Ctrl_sPanel,'visible','off');
+            fwrite(bt,'^');  % TN 5/8/19
         end
  
     end
@@ -4235,6 +4237,7 @@ Old_Pro_Prm = importdata(fullfile(pathname, filename));
 fwrite(bt,'g'); %send the character "%"
 
 set(handles.Activate_Prop_Ctrl,'Enable','on');  % TN 7/8/19
+set(handles.Check_Baseline,'Enable','on');  % TN 8/30/19
 % TN 7/15/19
 parameters = {'left_plant_peak_mean_toe', 'right_plant_peak_mean_toe', 'left_plant_peak_mean_heel',...
     'right_plant_peak_mean_heel', 'left_leg_torque_calibration_value_Ankle', 'right_leg_torque_calibration_value_Ankle',...
@@ -4684,11 +4687,9 @@ function LapBaseline_Callback(hObject, eventdata, handles) %GO 5/4/19
 GUI_Variables = handles.GUI_Variables;
 GUI_Variables.LapBaseline = get(handles.LapBaseline,'value');
 
-if GUI_Variables.LapBaseline == 1
-    set(handles.Activate_Prop_Ctrl,'Enable','off');
-else
-    set(handles.Activate_Prop_Ctrl,'Enable','on');
-end
+% if GUI_Variables.LapBaseline == 1
+%     set(handles.Activate_Prop_Ctrl,'Enable','off');
+% end
 
 
 handles.GUI_Variables = GUI_Variables;

@@ -227,6 +227,7 @@ switch(msg)
     case 'n'
         
         set(handles.Activate_Prop_Ctrl,'enable','on');  
+        set(handles.Prop_Ctrl_sPanel,'visible','on');    % TN 8/30/19
         set(handles.Check_Baseline,'enable','on');
         set(handles.statusText,'string','Baseline complete.');
         
