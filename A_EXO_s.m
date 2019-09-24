@@ -94,8 +94,11 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'R_Bal_dyn_Toe',20,'R_Bal_dyn_Heel',30,'R_Bal_steady_Toe',40,'R_Bal_steady_Heel',50,...
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
-                           'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1,'LapBaseline',0);
+                           'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1,'LapBaseline',0,...
+                           'PtbOn',0,'old_TM_right',0,'TM_right',0,'old_TM_left',0,'TM_left',0,'flag_TM_left',0,'flag_TM_right',0,'TM_counter',1);
     
+                       
+                       
     if get(handles.Activate_Prop_Pivot,'Value') %GO 5/7/19 - GUIDE is not cooperating so brute force
         set(handles.Activate_Prop_Pivot,'Value',0); 
     end
@@ -103,7 +106,6 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
     GUI_Variables = Reset_GUI_Variables(GUI_Variables);
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
-
 
 
 % --- Outputs from this function are returned to the command line.
@@ -221,6 +223,29 @@ function Start_Trial_Callback(hObject, eventdata, handles)
         while strcmp(get(handles.Start_Trial,'Enable'), 'off')
             handles=guidata(hObject);
             GUI_Variables = handles.GUI_Variables;
+            if GUI_Variables.PtbOn == 1 %TH 5/17/19
+%                 disp(['GUI_Variables.flag_TM_right =', num2str(GUI_Variables.flag_TM_right)]);
+                if (GUI_Variables.flag_TM_right == 1 && get(handles.R_Leg_Select,'value') == 1)
+                    moveTreadmill(GUI_Variables.TM_counter, handles);
+                    GUI_Variables.flag_TM_right = 0;
+                    GUI_Variables.TM_counter = GUI_Variables.TM_counter + 1;
+                    if GUI_Variables.TM_counter == 13
+                        GUI_Variables.TM_counter = 1;
+                        pause(0.1);
+                        set(handles.statusText,'String','12 Perturbations Complete')
+%                         setTreadmill(0,0,1000,1000,0);
+                    end
+                elseif (GUI_Variables.flag_TM_left == 1 && get(handles.L_Leg_Select,'value') == 1)
+                    moveTreadmill(GUI_Variables.TM_counter, handles);
+                    GUI_Variables.flag_TM_left = 0; 
+                    GUI_Variables.TM_counter = GUI_Variables.TM_counter + 1;
+                    if GUI_Variables.TM_counter == 13
+                        GUI_Variables.TM_counter = 1;
+                        set(handles.statusText,'String','12 Perturbations Complete')
+%                         setTreadmill(0,0,1000,1000,0);
+                    end
+                end
+            end
             GUI_Variables = Update_GUI(GUI_Variables, handles);
             GUI_Variables = accept_message(bt,handles, GUI_Variables);
             handles.GUI_Variables = GUI_Variables;
@@ -595,7 +620,6 @@ function GUI_Variables = Reset_GUI_Variables(GUI_Variables)
 
     GUI_Variables.L_COUNT_SPEED=[];
     GUI_Variables.R_COUNT_SPEED=[];
-
 
 
 % --- Executes on button press in End_Trial.
@@ -1050,7 +1074,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
     guidata(hObject, handles);
 
 
-
 % --- Executes on button press in Calibrate_Torque.
 function Calibrate_Torque_Callback(~, ~, handles)
 % hObject    handle to Calibrate_Torque (see GCBO)
@@ -1399,7 +1422,6 @@ function R_Ki_Edit_CreateFcn(hObject, ~, ~)
     end
 
 
-
 function R_Kd_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Kd_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1420,7 +1442,6 @@ function R_Kd_Edit_CreateFcn(hObject, ~, ~)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
-
 
 
 function R_Kp_Edit_Callback(~, ~, ~)
@@ -1533,7 +1554,6 @@ function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
     lki = get(handles.L_Ki_text,'String');
     
 
-
 % --- Executes on button press in L_Set_PID.
 function L_Set_PID_Callback(~, ~, handles)
 % hObject    handle to L_Set_PID (see GCBO)
@@ -1609,7 +1629,6 @@ function L_Kp_Edit_CreateFcn(hObject, ~, ~)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
-
 
 
 function L_Kd_Edit_Callback(~, ~, ~)
@@ -2671,10 +2690,6 @@ function L_Set_Gain_Callback(~, ~, handles)
     catch
     end
 
-
-
-
-
 function L_Set_Gain_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Set_Gain_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -2727,40 +2742,11 @@ function Activate_Balance_Callback(~, ~, handles)
     end
 
 
-
-
-% --- Executes on button press in radiobutton12.
-function radiobutton12_Callback(~, ~, ~)
-% hObject    handle to radiobutton12 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton12
-
-
-% --- Executes on button press in radiobutton11.
-function radiobutton11_Callback(~, ~, ~)
-% hObject    handle to radiobutton11 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton11
-
-
 % --- Executes during object creation, after setting all properties.
 function R_Torque_CreateFcn(~, ~, ~)
 % hObject    handle to R_Torque (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-
-
-% --- Executes on button press in Activate_Balance.
-function radiobutton13_Callback(~, ~, ~)
-% hObject    handle to Activate_Balance (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of Activate_Balance
 
 
 % --- Executes on button press in L_Auto_KF.
@@ -3059,7 +3045,6 @@ function BT_auto_reconnect_radiobutton_Callback(hObject, ~, handles)
     end
 
 
-
 % --- Executes on button press in Steady_Balance_Base.
 function Steady_Balance_Base_Callback(~, ~, handles)
 % hObject    handle to Steady_Balance_Base (see GCBO)
@@ -3080,7 +3065,6 @@ function Steady_Balance_Base_Callback(~, ~, handles)
     end
 
 
-
 % --- Executes on button press in Dynamic_Balance_Base.
 function Dynamic_Balance_Base_Callback(~, ~, handles)
 % hObject    handle to Dynamic_Balance_Base (see GCBO)
@@ -3097,7 +3081,6 @@ function Dynamic_Balance_Base_Callback(~, ~, handles)
         disp('Balance Baseline');
     catch
     end
-
 
 
 % --- Executes on button press in Set_Steady_Val.
@@ -3203,7 +3186,6 @@ function Steady_Edit_CreateFcn(hObject, ~, ~)
     end
 
 
-
 function Dyn_Edit_Callback(~, ~, ~)
 % hObject    handle to Dyn_Edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -3238,7 +3220,6 @@ function Flush_Biobluetooth_Callback(~, ~, handles)
     end
 
 
-
 % --- Executes on button press in BT_Auto_Reconnection.
 function BT_Auto_Reconnection_Callback(~, ~, handles)
 % hObject    handle to BT_Auto_Reconnection (see GCBO)
@@ -3265,17 +3246,6 @@ function BT_Auto_Reconnection_Callback(~, ~, handles)
         end
         set(handles.BT_Text,'String','On')
     end
-
-
-
-% --- Executes on button press in radiobutton23.
-function radiobutton23_Callback(~, ~, ~)
-% hObject    handle to radiobutton23 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton23
-
 
 
 % --- Executes on button press in Activate_BioFeedback.
@@ -3617,7 +3587,6 @@ function Stop_Optimization_CreateFcn(~, ~, ~)
 % handles    empty - handles not created until after all CreateFcns called
 
 
-
 function FSR_Distance_In_Callback(~, ~, ~)
 % hObject    handle to FSR_Distance_In (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -3638,7 +3607,6 @@ function FSR_Distance_In_CreateFcn(hObject, ~, ~)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
-
 
 
 function Ankle2FSR_Distance_In_Callback(~, ~, ~)
@@ -4482,7 +4450,6 @@ function Perturbation_Mode_Callback(hObject, eventdata, handles)
     set(handles.R_Proportional_Ctrl,'Visible','off');
     set(handles.Bio_Feedback_panel,'Visible','off');
     set(handles.Perturbation_Panel,'Visible','on');
-    set(handles.Stop_Ptb,'Enable','off');
 
 
 % --- Executes on button press in Start_Ptb.
@@ -4493,19 +4460,15 @@ function Start_Ptb_Callback(hObject, eventdata, handles)
 
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
-
-if (bt.Status=="open")
-
-    try
-        moveTreadmill(GUI_Variables.SIG1,GUI_Variables.SIG2,GUI_Variables.RLCount);
-    catch
-        disp('No treadmill connection');
-    end
-
+value_r_leg = get(handles.R_Leg_Select,'value');
+value_l_leg = get(handles.L_Leg_Select,'value');
+pause(0.0000001) %button click
 set(handles.Start_Ptb,'Enable','off');
 set(handles.Stop_Ptb,'Enable','on');
+GUI_Variables.PtbOn = 1;
 disp('Start Perturbations');
-end
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
 
 
 % --- Executes on button press in Stop_Ptb.
@@ -4514,22 +4477,30 @@ function Stop_Ptb_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+pause(0.0000001) %button click
+set(handles.Start_Ptb,'Enable','on');
+set(handles.Stop_Ptb,'Enable','off');
+
+GUI_Variables = handles.GUI_Variables;
+GUI_Variables.PtbOn = 0;
+
 LS = -1000;   %mm/s
 RS = LS;
-LA = 1000;   %mm/s^2
+LA = 3000;   %mm/s^2 was 1000
 RA = LA;
 IN = 0;
 
 try
-    setTreadmill(LS,RS,LA,RA,IN);
+    setTreadmill(0,0,LA,RA,IN);
 catch
     disp('No treadmill connection');
 end
 
-set(handles.Start_Ptb,'Enable','on');
-set(handles.Stop_Ptb,'Enable','off');
+GUI_Variables.TM_counter = 1;
+% GUI_Variables.LegSelect = 0;
 disp('Stop Perturbations');
-
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
 
 
 function Edit_Speed_Callback(hObject, eventdata, handles)
@@ -4539,6 +4510,12 @@ function Edit_Speed_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of Edit_Speed as text
 %        str2double(get(hObject,'String')) returns contents of Edit_Speed as a double
+
+if str2double(get(handles.Edit_Speed,'String')) > 1.25
+    set(handles.Edit_Speed, 'String', num2str(1));
+elseif str2double(get(handles.Edit_Speed,'String')) < -1.25
+    set(handles.Edit_Speed, 'String', num2str(-1));
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -4564,6 +4541,8 @@ function L_Leg_Select_Callback(hObject, eventdata, handles)
 
 set(handles.R_Leg_Select,'value',0);
 
+disp('Right Leg Perturbations');
+
 
 % --- Executes on button press in R_Leg_Select.
 function R_Leg_Select_Callback(hObject, eventdata, handles)
@@ -4574,3 +4553,34 @@ function R_Leg_Select_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of R_Leg_Select
 
 set(handles.L_Leg_Select,'value',0);
+
+disp('Left Leg Perturbations');
+
+
+function moveTreadmill(counter,handles)
+
+direction = {'Ant','Ant','Post','Post','Ant','Post','Ant','Post','Post','Ant','Ant','Post'};
+direction_local = direction{counter};
+norm = str2double(get(handles.Edit_Speed,'String'))*1000; %-1000;
+fast = norm+norm*.5;
+slow = norm-norm*.5;
+LS = norm;   %mm/s
+RS = LS;
+LA = 1000;   %mm/s^2
+RA = LA;
+IN = 0;
+T2 = abs(fast-norm)/3000;   %pause before slow down
+
+if strcmp(direction_local,'Ant')
+    newLS = slow;
+else
+    newLS = fast;
+end
+newRS = newLS;
+newLA = 3000;
+newRA = newLA;
+
+setTreadmill(newLS,newRS,newLA,newRA,IN) %speed up or slow down
+pause(5*T2);
+setTreadmill(LS,RS,LA,RA,IN)
+
