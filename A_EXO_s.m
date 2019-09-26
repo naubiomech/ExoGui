@@ -4463,12 +4463,13 @@ function Send_ATP_Callback(hObject, eventdata, handles)
                 '*.*',                   'All Files (*.*)'});
 
 %This code checks if the user pressed cancel on the dialog.
-        if isequal(filename,0) || isequal(pathname,0)
+if isequal(filename,0) || isequal(pathname,0)
              disp('User pressed cancel')
-        else
+        
+else
              disp(['User selected ', fullfile(pathname, filename)])
 
-        end
+      
         
 ATP_file = fullfile(pathname, filename);
 
@@ -4505,7 +4506,7 @@ fid = fopen(new_file,'w');
 fprintf(fid,'double ATP[202] = {%s};\n',str);
 fclose(fid);
 
-% end
+end
 
 
 
