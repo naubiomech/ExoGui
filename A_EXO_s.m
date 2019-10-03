@@ -23,7 +23,7 @@ function varargout = A_EXO_s(varargin)
 % Edit the above text to modify the response to help A_EXO_s
 
 
-% Last Modified by GUIDE v2.5 23-May-2019 15:39:17
+% Last Modified by GUIDE v2.5 13-Jun-2019 14:36:08
 
 
 % Begin initialization code - DO NOT EDIT
@@ -178,8 +178,23 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.End_Trial,'Enable','on');
     set(handles.ATP_Mode,'Enable','on');
     set(handles.Start_Timer,'Enable','on');
-    set(handles.Check_Baseline,'Enable','on');  % tn 5/13/19
+    %set(handles.Check_Baseline,'Enable','on');  % tn 5/13/19
     set(handles.Take_Baseline,'Enable','on');   % TN 5/6/19
+   
+    
+    if GUI_Variables.LapBaseline == 1         % TN 5/6/19
+        set(handles.Activate_Prop_Ctrl,'Enable','off');  
+        set(handles.Prop_Ctrl_sPanel,'visible','off');
+%         set(handles.Activate_Prop_Pivot,'value',0);
+%         set(handles.Activate_Prop_ID,'value',0);
+%         set(handles.Activate_Prop_Pivot,'enable','off');
+%         set(handles.Activate_Prop_ID,'enable','off');
+%         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Check_Baseline,'enable','off');  % TN 7/5/19
+% 
+%         fwrite(bt,'^');  % TN 7/5/19
+        
+    end
      
     if GUI_Variables.ReuseBaseline == 1         % TN 5/6/19
         set(handles.Load_Prop_Prm,'Enable','on');   
@@ -843,8 +858,8 @@ function End_Trial_Callback(hObject, eventdata, handles)
             rfsr=R_Check_FSR_Th_Callback(hObject, eventdata, handles);
             lkf=L_Check_KF_Callback(hObject, eventdata, handles);
             rkf=R_Check_KF_Callback(hObject, eventdata, handles);
-            [lkp,lkd,lki]=L_Get_PID_Callback(hObject, eventdata, handles);
-            [rkp,rkd,rki]=R_Get_PID_Callback(hObject, eventdata, handles);
+            [lkp,lkd,lki,rkp,rkd,rki]=L_Get_PID_Callback(hObject, eventdata, handles);
+%             [rkp,rkd,rki]=R_Get_PID_Callback(hObject, eventdata, handles);
         catch
 
             n1 = -1;
@@ -892,14 +907,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
         left_plant_peak_mean = 0; 
         right_plant_peak_mean = 0; 
-        left_leg_Curr_Combined = 0;
-        right_leg_Curr_Combined = 0;
-        left_leg_fsr_Combined_peak_ref = 0;
-        right_leg_fsr_Combined_peak_ref = 0;
-        left_leg_fsr_Toe_peak_ref = 0;
-        right_leg_fsr_Toe_peak_ref = 0;
-        left_leg_fsr_Heel_peak_ref = 0;
-        right_leg_fsr_Heel_peak_ref = 0;
+%         left_leg_Curr_Combined = 0;
+%         right_leg_Curr_Combined = 0;
+%         left_leg_fsr_Combined_peak_ref = 0;
+%         right_leg_fsr_Combined_peak_ref = 0;
+%         left_leg_fsr_Toe_peak_ref = 0;
+%         right_leg_fsr_Toe_peak_ref = 0;
+%         left_leg_fsr_Heel_peak_ref = 0;
+%         right_leg_fsr_Heel_peak_ref = 0;
         left_leg_torque_calibration_value = 0;
         right_leg_torque_calibration_value = 0;
 
@@ -909,16 +924,16 @@ function End_Trial_Callback(hObject, eventdata, handles)
             indexes = find(message==44);
         left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
         right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
-        left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
-        right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
-        left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
-        right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
-        left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
-        right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
-        left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
-        right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
-        left_leg_torque_calibration_value = str2double(message((indexes(11)+1):(indexes(12)-1)));
-        right_leg_torque_calibration_value = str2double(message((indexes(12)+1):(indexes(13)-1)));
+%         left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
+%         right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
+%         left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
+%         right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
+%         left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
+%         right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
+%         left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
+%         right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
+        left_leg_torque_calibration_value = str2double(message((indexes(3)+1):(indexes(4)-1)));
+        right_leg_torque_calibration_value = str2double(message((indexes(4)+1):(indexes(5)-1)));
 
         
         end
@@ -936,14 +951,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
         pause(.01);
         fprintf(fileID_P,['left_plant_peak_mean = ', num2str(left_plant_peak_mean),'\r\n']);
         fprintf(fileID_P,['right_plant_peak_mean = ', num2str(right_plant_peak_mean),'\r\n']);
-        fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\r\n']);
-        fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\r\n']);
-        fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\r\n']);
-        fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\r\n']);
-        fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\r\n']);
-        fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\r\n']);
-        fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\r\n']);
-        fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['left_leg_Curr_Combined = ', num2str(left_leg_Curr_Combined),'\r\n']);
+%         fprintf(fileID_P,['right_leg_Curr_Combined = ', num2str(right_leg_Curr_Combined),'\r\n']);
+%         fprintf(fileID_P,['left_leg_fsr_Combined_peak_ref = ', num2str(left_leg_fsr_Combined_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['right_leg_fsr_Combined_peak_ref = ', num2str(right_leg_fsr_Combined_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['left_leg_fsr_Toe_peak_ref = ', num2str(left_leg_fsr_Toe_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['right_leg_fsr_Toe_peak_ref = ', num2str(right_leg_fsr_Toe_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['left_leg_fsr_Heel_peak_ref = ', num2str(left_leg_fsr_Heel_peak_ref),'\r\n']);
+%         fprintf(fileID_P,['right_leg_fsr_Heel_peak_ref = ', num2str(right_leg_fsr_Heel_peak_ref),'\r\n']);
         fprintf(fileID_P,['left_leg_torque_calibration_value = ', num2str(left_leg_torque_calibration_value),'\r\n']);
         fprintf(fileID_P,['right_leg_torque_calibration_value = ', num2str(right_leg_torque_calibration_value),'\r\n']);
         fclose(fileID_P);
@@ -955,18 +970,18 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
         Reset_Timer_Callback(0, 0, handles);
         set(handles.L_Get_Setpoint,'Enable','on');
-        set(handles.R_Get_Setpoint,'Enable','on');
+        %set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
         set(handles.Calibrate_FSR,'Enable','on');
         set(handles.Calibrate_Torque,'Enable','on');
         set(handles.Check_Memory,'Enable','on');
         set(handles.Clean_Memory,'Enable','on');
         set(handles.L_Get_PID,'Enable','on');
-        set(handles.R_Get_PID,'Enable','on');
+        %set(handles.R_Get_PID,'Enable','on');
         set(handles.L_Check_KF,'Enable','on');
-        set(handles.R_Check_KF,'Enable','on');
+        %set(handles.R_Check_KF,'Enable','on');
         set(handles.L_Check_FSR_Th,'Enable','on');
-        set(handles.R_Check_FSR_Th,'Enable','on');
+        %set(handles.R_Check_FSR_Th,'Enable','on');
         set(handles.Start_Trial,'Enable','on');
         set(handles.End_Trial,'Enable','off'); % Disables the button to stop the trial
         set(handles.Start_Trial,'Enable','on');
@@ -975,13 +990,17 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.TRIG_NUM_TEXT,'String',0);
         set(handles.Start_Timer,'enable','Off');
         
-        if GUI_Variables.LapBaseline % TN 5/8/19
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Activate_Prop_Pivot,'enable','off');
-            set(handles.Activate_Prop_ID,'enable','off');
-            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            fwrite(bt,'^');  % TN 5/8/19
+        if GUI_Variables.LapBaseline == 1% TN 5/8/19
+%             set(handles.Activate_Prop_Pivot,'value',0);
+%             set(handles.Activate_Prop_ID,'value',0);
+%             set(handles.Activate_Prop_Pivot,'enable','off');
+%             set(handles.Activate_Prop_ID,'enable','off');
+            set(handles.Prop_Ctrl_sPanel,'visible','off');
+%             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+            set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/13/19
+            set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
+
+%            fwrite(bt,'^');  % TN 5/8/19
         end
 
 
@@ -989,18 +1008,18 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
         Reset_Timer_Callback(0, 0, handles);
         set(handles.L_Get_Setpoint,'Enable','on');
-        set(handles.R_Get_Setpoint,'Enable','on');
+        %set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
         set(handles.Calibrate_FSR,'Enable','on');
         set(handles.Calibrate_Torque,'Enable','on');
         set(handles.Check_Memory,'Enable','on');
         set(handles.Clean_Memory,'Enable','on');
         set(handles.L_Get_PID,'Enable','on');
-        set(handles.R_Get_PID,'Enable','on');
+        %set(handles.R_Get_PID,'Enable','on');
         set(handles.L_Check_KF,'Enable','on');
-        set(handles.R_Check_KF,'Enable','on');
+        %set(handles.R_Check_KF,'Enable','on');
         set(handles.L_Check_FSR_Th,'Enable','on');
-        set(handles.R_Check_FSR_Th,'Enable','on');
+        %set(handles.R_Check_FSR_Th,'Enable','on');
         set(handles.Start_Trial,'Enable','on');
         set(handles.End_Trial,'Enable','off');                                      %Disables the button to stop the trial
         set(handles.Start_Trial,'Enable','on');
@@ -1008,15 +1027,27 @@ function End_Trial_Callback(hObject, eventdata, handles)
         disp("System not connected");
         set(handles.statusText,'String','System not connected');
         set(handles.Start_Timer,'enable','Off');
+
+        set(handles.Activate_Prop_Pivot,'value',0);
+        set(handles.Activate_Prop_ID,'value',0);
+        set(handles.Activate_Prop_Pivot,'enable','off');
+        set(handles.Activate_Prop_ID,'enable','off');
+        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+        set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/13/19
+        set(handles.Check_Baseline,'enable','off');
+        fwrite(bt,'^');  % TN 5/8/19
         
-        if GUI_Variables.LapBaseline % TN 5/8/19
-            set(handles.Activate_Prop_Pivot,'value',0);
-            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Activate_Prop_Pivot,'enable','off');
-            set(handles.Activate_Prop_ID,'enable','off');
-            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            fwrite(bt,'^');  % TN 5/8/19
-        end
+%         if GUI_Variables.LapBaseline == 1% TN 5/8/19
+%             set(handles.Activate_Prop_Pivot,'value',0);
+%             set(handles.Activate_Prop_ID,'value',0);
+%             set(handles.Activate_Prop_Pivot,'enable','off');
+%             set(handles.Activate_Prop_ID,'enable','off');
+%             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+%             set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
+%             set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/13/19
+%          %   set(handles.Prop_Ctrl_sPanel,'visible','off');
+%             fwrite(bt,'^');  % TN 5/8/19
+%         end
  
     end
     
@@ -1116,10 +1147,10 @@ function Clean_Memory_Callback(~, ~, handles)
 
 
 % --- Executes on button press in L_Check_KF.
-function lkf=L_Check_KF_Callback(hObject, ~, handles)
+function L_Check_KF_Callback(hObject, ~, handles)
     GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
-    lkf=0;
+  
     if (bt.Status=="open")
         fwrite(bt,'`'); % send the character "`"
         if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
@@ -1140,32 +1171,52 @@ function L_Send_KF_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    new_KF = str2double(get(handles.L_Send_KF_Edit,'String'));         %Gets the Value entered into the edit Box in the G
+    new_KF_L = str2double(get(handles.L_Send_KF_Edit,'String'));         %Gets the Value entered into the edit Box in the G
 
-    if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
-        new_KF = 0.9;
+    if new_KF_L < 0.9 %GO 5/4/19 - Set limits on the manual KF
+        new_KF_L = 0.9;
         set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
-    elseif new_KF > 2.0
-        new_KF = 2.0;
+    elseif new_KF_L > 1.5
+        new_KF_L = 1.5;
         set(handles.L_Send_KF_Edit,'String',num2str(new_KF));
     end
     
+  % TN 6/13/19
+
+    new_KF_R = str2double(get(handles.R_Send_KF_Edit,'String')); % Gets the Value entered into the edit Box in the G
+
+    if new_KF_R < 0.9 %GO 5/4/19 - Set limits on the manual KF
+        new_KF_R = 0.9;
+        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
+    elseif new_KF_R > 1.5
+        new_KF_R = 1.5;
+        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
+    end
+    
+   
     GUI_Variables = handles.GUI_Variables;
+    state=GUI_Variables.state;
+    disp(state);
 
     bt = GUI_Variables.BT;
 
     if (bt.Status=="open")
         try
             fwrite(bt,char(95)); % send the character "_"
-            fwrite(bt,new_KF,'double');
+            fwrite(bt,new_KF_L,'double');
             disp("Send new Left KF ");
-            disp(new_KF);
+            disp(new_KF_L);
+            fwrite(bt,new_KF_R,'double');
+            disp("Send new Right KF ");
+            disp(new_KF_R);
             L_Check_KF_Callback(hObject,0,handles);
         catch 
             disp("Impossible to write on bt the new KF");
         end
     end
-
+    
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
 
 function L_Send_KF_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Send_KF_Edit (see GCBO)
@@ -1352,8 +1403,8 @@ function Connect_BT_Callback(hObject, ~, handles)
             handles.GUI_Variables = GUI_Variables;
             guidata(hObject, handles);
         end
-    % -------------------------------------------------    
-
+    % -------------------------------------------------   
+   
         fprintf('Attempting to make a connection to the bluetooth\n');
         set(handles.statusText,'String',"Attempting to make a Connection to the Bluetooth!");
         pause(.01);
@@ -1461,78 +1512,78 @@ function R_Kp_Edit_CreateFcn(hObject, ~, ~)
     end
 
 
-% --- Executes on button press in R_Set_PID.
-function R_Set_PID_Callback(~, ~, handles)
-% hObject    handle to R_Set_PID (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% SEND 'm'
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-    if(bt.Status=="open")
-        fwrite(bt,char(109));
-        kp = str2double(get(handles.R_Kp_Edit,'String'));               %Gets the Value entered into the edit Box in the G
-        kd = str2double(get(handles.R_Kd_Edit,'String'));
-        ki = str2double(get(handles.R_Ki_Edit,'String'));
+% % --- Executes on button press in R_Set_PID.
+% function R_Set_PID_Callback(~, ~, handles)
+% % hObject    handle to R_Set_PID (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% % SEND 'm'
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+%     if(bt.Status=="open")
+%         fwrite(bt,char(109));
+%         kp = str2double(get(handles.R_Kp_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+%         kd = str2double(get(handles.R_Kd_Edit,'String'));
+%         ki = str2double(get(handles.R_Ki_Edit,'String'));
+% 
+% 
+%         if size(ki,1)>1
+%             k1=str2double(get(handles.R_Ki_Edit,'String'));
+%             if isnan(k1(1))
+%                 ki=k1(2);
+%             else
+%                 ki=k1(1);
+%             end
+%         end
+% 
+%         if size(kp,1)>1
+%             k1=str2double(get(handles.R_Kp_Edit,'String'));
+%             if isnan(k1(1))
+%                 kp=k1(2);
+%             else
+%                 kp=k1(1);
+%             end
+%         end
+% 
+%         if size(kd,1)>1
+%             k1=str2double(get(handles.R_Kd_Edit,'String'));
+%             if isnan(k1(1))
+%                 kd=k1(2);
+%             else
+%                 kd=k1(1);
+%             end
+%         end
+% 
+%         disp(' New R PID gain')
+%         disp(kp)
+%         disp(kd)
+%         disp(ki)
+% 
+%         fwrite(bt,kp,'double');                                   %Sends the new Torque Value to Arduino
+%         fwrite(bt,kd,'double');
+%         fwrite(bt,ki,'double');
+%         pause(0.3);
+%         R_Get_PID_Callback(0,0,handles);
+%     end
 
-
-        if size(ki,1)>1
-            k1=str2double(get(handles.R_Ki_Edit,'String'));
-            if isnan(k1(1))
-                ki=k1(2);
-            else
-                ki=k1(1);
-            end
-        end
-
-        if size(kp,1)>1
-            k1=str2double(get(handles.R_Kp_Edit,'String'));
-            if isnan(k1(1))
-                kp=k1(2);
-            else
-                kp=k1(1);
-            end
-        end
-
-        if size(kd,1)>1
-            k1=str2double(get(handles.R_Kd_Edit,'String'));
-            if isnan(k1(1))
-                kd=k1(2);
-            else
-                kd=k1(1);
-            end
-        end
-
-        disp(' New R PID gain')
-        disp(kp)
-        disp(kd)
-        disp(ki)
-
-        fwrite(bt,kp,'double');                                   %Sends the new Torque Value to Arduino
-        fwrite(bt,kd,'double');
-        fwrite(bt,ki,'double');
-        pause(0.3);
-        R_Get_PID_Callback(0,0,handles);
-    end
-
-% --- Executes on button press in R_Get_PID.
-function [rkp,rkd,rki]=R_Get_PID_Callback(~, ~, handles)
-% SEND 'k' char 107
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if(bt.Status=="open")
-        fwrite(bt,char(107));
-        if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
-            Receive_Data_Message(GUI_Variables, handles);
-        end
-    end
-    rkp = get(handles.R_Kp_text,'String');
-    rkd = get(handles.R_Kp_text,'String');
-    rki = get(handles.R_Kp_text,'String');
+% % --- Executes on button press in R_Get_PID.
+% function [rkp,rkd,rki]=R_Get_PID_Callback(~, ~, handles)
+% % SEND 'k' char 107
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+% 
+%     if(bt.Status=="open")
+%         fwrite(bt,char(107));
+%         if(strcmp(get(handles.Start_Trial,'Enable'), 'on') )
+%             Receive_Data_Message(GUI_Variables, handles);
+%         end
+%     end
+%     rkp = get(handles.R_Kp_text,'String');
+%     rkd = get(handles.R_Kp_text,'String');
+%     rki = get(handles.R_Kp_text,'String');
 
 % --- Executes on button press in L_Get_PID.
-function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
+function [lkp,lkd,lki,rkp,rkd,rki]=L_Get_PID_Callback(~, ~, handles)
 % SEND 'K' char 75
     GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
@@ -1547,8 +1598,10 @@ function [lkp,lkd,lki]=L_Get_PID_Callback(~, ~, handles)
     lkp = get(handles.L_Kp_text,'String');
     lkd = get(handles.L_Kd_text,'String');
     lki = get(handles.L_Ki_text,'String');
-    
-
+    % TN 6/13/19  
+    rkp = get(handles.R_Kp_text,'String');
+    rkd = get(handles.R_Kp_text,'String');
+    rki = get(handles.R_Kp_text,'String');
 
 % --- Executes on button press in L_Set_PID.
 function L_Set_PID_Callback(~, ~, handles)
@@ -1561,48 +1614,92 @@ function L_Set_PID_Callback(~, ~, handles)
     bt = GUI_Variables.BT;
     if(bt.Status=="open")
         fwrite(bt,'M');
-        kp = str2double(get(handles.L_Kp_Edit,'String')); % Gets the Value entered into the edit Box in the G
-        kd = str2double(get(handles.L_Kd_Edit,'String'));
-        ki = str2double(get(handles.L_Ki_Edit,'String'));
+        kp_l = str2double(get(handles.L_Kp_Edit,'String')); % Gets the Value entered into the edit Box in the G
+        kd_l = str2double(get(handles.L_Kd_Edit,'String'));
+        ki_l = str2double(get(handles.L_Ki_Edit,'String'));
 
-        if size(ki,1)>1
+        if size(ki_l,1)>1
             k1=str2double(get(handles.L_Ki_Edit,'String'));
             if isnan(k1(1))
-                ki=k1(2);
+                ki_l=k1(2);
             else
-                ki=k1(1);
+                ki_l=k1(1);
             end
         end
 
-        if size(kp,1)>1
+        if size(kp_l,1)>1
             k1=str2double(get(handles.L_Kp_Edit,'String'));
             if isnan(k1(1))
-                kp=k1(2);
+                kp_l=k1(2);
             else
-                kp=k1(1);
+                kp_l=k1(1);
             end
         end
 
-        if size(kd,1)>1
+        if size(kd_l,1)>1
             k1=str2double(get(handles.L_Kd_Edit,'String'));
             if isnan(k1(1))
-                kd=k1(2);
+                kd_l=k1(2);
             else
-                kd=k1(1);
+                kd_l=k1(1);
+            end
+        end
+      % TN 6/13/19  
+        kp_r = str2double(get(handles.R_Kp_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+        kd_r = str2double(get(handles.R_Kd_Edit,'String'));
+        ki_r = str2double(get(handles.R_Ki_Edit,'String'));
+
+
+        if size(ki_r,1)>1
+            k1=str2double(get(handles.R_Ki_Edit,'String'));
+            if isnan(k1(1))
+                ki_r=k1(2);
+            else
+                ki_r=k1(1);
+            end
+        end
+
+        if size(kp_r,1)>1
+            k1=str2double(get(handles.R_Kp_Edit,'String'));
+            if isnan(k1(1))
+                kp_r=k1(2);
+            else
+                kp_r=k1(1);
+            end
+        end
+
+        if size(kd_r,1)>1
+            k1=str2double(get(handles.R_Kd_Edit,'String'));
+            if isnan(k1(1))
+                kd_r=k1(2);
+            else
+                kd_r=k1(1);
             end
         end
 
         disp(' New L PID gain')
-        disp(kp)
-        disp(kd)
-        disp(ki)
+        disp(kp_l)
+        disp(kd_l)
+        disp(ki_l)
+       
+        disp(' New R PID gain')
+        disp(kp_r)
+        disp(kd_r)
+        disp(ki_r)
 
-
-        fwrite(bt,kp,'double'); % Sends the new Torque Value to Arduino
-        fwrite(bt,kd,'double');
-        fwrite(bt,ki,'double');
+        
+        fwrite(bt,kp_l,'double'); % Sends the new Torque Value to Arduino
+        fwrite(bt,kd_l,'double');
+        fwrite(bt,ki_l,'double');
+        
+        fwrite(bt,kp_r,'double');                                   %Sends the new Torque Value to Arduino
+        fwrite(bt,kd_r,'double');
+        fwrite(bt,ki_r,'double');
+       
         pause(0.3);
         L_Get_PID_Callback(0,0,handles);
+%        R_Get_PID_Callback(0,0,handles);
+        
     end
 
 function L_Kp_Edit_Callback(~, ~, ~)
@@ -1650,27 +1747,27 @@ function L_Kd_Edit_CreateFcn(hObject, ~, ~)
     end
 
 
-% --- Executes on button press in R_Set_Setpoint.
-function R_Set_Setpoint_Callback(hObject, ~, handles)
-% hObject    handle to R_Set_Setpoint (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% SEND f
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if(bt.Status=="open")
-        fwrite(bt,char(102));
-    end
-
-    NewSetpoint = str2double(get(handles.R_Setpoint_Edit,'String')); % Gets the Value entered into the edit Box in the G
-    fwrite(bt,NewSetpoint,'double');
-    NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit, 'String')); % Gets the Value entered into the edit Box in the G
-    fwrite(bt,NewSetpoint_Dorsi,'double');
-
-    pause(0.3);
-    R_Get_Setpoint_Callback(hObject,0,handles);
+% % --- Executes on button press in R_Set_Setpoint.
+% function R_Set_Setpoint_Callback(hObject, ~, handles)
+% % hObject    handle to R_Set_Setpoint (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% % SEND f
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+% 
+%     if(bt.Status=="open")
+%         fwrite(bt,char(102));
+%     end
+% 
+%     NewSetpoint = str2double(get(handles.R_Setpoint_Edit,'String')); % Gets the Value entered into the edit Box in the G
+%     fwrite(bt,NewSetpoint,'double');
+%     NewSetpoint_Dorsi = str2double(get(handles.R_Setpoint_Dorsi_Edit, 'String')); % Gets the Value entered into the edit Box in the G
+%     fwrite(bt,NewSetpoint_Dorsi,'double');
+% 
+%     pause(0.3);
+%     R_Get_Setpoint_Callback(hObject,0,handles);
 
 function R_Setpoint_Edit_Callback(~, ~, ~)
 % hObject    handle to R_Setpoint_Edit (see GCBO)
@@ -1694,21 +1791,21 @@ function R_Setpoint_Edit_CreateFcn(hObject, ~, ~)
     end
 
 
-% --- Executes on button press in R_Get_Setpoint.
-function R_Get_Setpoint_Callback(hObject, ~, handles)
-%  SEND 'd'
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if(bt.Status=="open")
-        fwrite(bt,char(100));
-    end
-
-    if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
-    end
-    handles.GUI_Variables = GUI_Variables;
-    guidata(hObject, handles);
+% % --- Executes on button press in R_Get_Setpoint.
+% function R_Get_Setpoint_Callback(hObject, ~, handles)
+% %  SEND 'd'
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+% 
+%     if(bt.Status=="open")
+%         fwrite(bt,char(100));
+%     end
+% 
+%     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
+%         GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+%     end
+%     handles.GUI_Variables = GUI_Variables;
+%     guidata(hObject, handles);
     
 % --- Executes on button press in L_Get_Setpoint.
 function L_Get_Setpoint_Callback(hObject, ~, handles)
@@ -1763,12 +1860,18 @@ function L_Set_Setpoint_Callback(hObject, ~, handles)
         fwrite(bt,char(70));
     end
 
-    NewSetpoint = str2double(get(handles.L_Setpoint_Edit,'String')); % Gets the Value entered into the edit Box in the G
-    fwrite(bt,NewSetpoint,'double');
-    NewSetpoint_Dorsi = str2double(get(handles.L_Setpoint_Dorsi_Edit,'String'));
-    fwrite(bt,NewSetpoint_Dorsi,'double');
+    NewSetpoint_L = str2double(get(handles.L_Setpoint_Edit,'String')); % Gets the Value entered into the edit Box in the G
+    fwrite(bt,NewSetpoint_L,'double');
+    NewSetpoint_Dorsi_L = str2double(get(handles.L_Setpoint_Dorsi_Edit,'String'));
+    fwrite(bt,NewSetpoint_Dorsi_L,'double');
+   % TN 6/13/19
+    NewSetpoint_R = str2double(get(handles.R_Setpoint_Edit,'String')); % Gets the Value entered into the edit Box in the G
+    fwrite(bt,NewSetpoint_R,'double');
+    NewSetpoint_Dorsi_R = str2double(get(handles.R_Setpoint_Dorsi_Edit, 'String')); % Gets the Value entered into the edit Box in the G
+    fwrite(bt,NewSetpoint_Dorsi_R,'double');
 
-    GUI_Variables.Setpoint=NewSetpoint;
+       
+    GUI_Variables.Setpoint=NewSetpoint_L;
     axes(handles.PROP_FUNCTION_axes);
     hold off
     x=0.4:0.01:1.2;
@@ -1776,7 +1879,7 @@ function L_Set_Setpoint_Callback(hObject, ~, handles)
     hold on
     plot([1 1],ylim,'-.k')
 
-    plot(xlim,[NewSetpoint NewSetpoint],'-.k')
+    plot(xlim,[NewSetpoint_L NewSetpoint_L],'-.k')
 
     pause(0.3);
     L_Get_Setpoint_Callback(hObject,0,handles);
@@ -1981,90 +2084,94 @@ function R_Send_KF_Edit_CreateFcn(hObject, ~, ~)
     end
 
 
-% --- Executes on button press in R_Send_KF.
-function R_Send_KF_Callback(hObject, ~, handles)
-% hObject    handle to R_Send_KF (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    new_KF = str2double(get(handles.R_Send_KF_Edit,'String')); % Gets the Value entered into the edit Box in the G
+% % --- Executes on button press in R_Send_KF.
+% function R_Send_KF_Callback(hObject, ~, handles)
+% % hObject    handle to R_Send_KF (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+%     new_KF = str2double(get(handles.R_Send_KF_Edit,'String')); % Gets the Value entered into the edit Box in the G
+% 
+%     if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
+%         new_KF = 0.9;
+%         set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
+%     elseif new_KF > 1.5
+%         new_KF = 1.5;
+%         set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
+%     end
+%     
+%     GUI_Variables = handles.GUI_Variables;
+%     state=GUI_Variables.state;
+%     disp(state);
+% 
+%     bt = GUI_Variables.BT;
+% 
+%     if (bt.Status=="open")
+%         try
+%             fwrite(bt,'-'); % send the character "-"
+%             fwrite(bt,new_KF,'double');
+%             disp("Send new Right KF ");
+%             disp(new_KF);
+% 
+%         catch
+%             disp("Impossible to write on bt the new KF");
+%         end
+%     end
+%     R_Check_KF_Callback(hObject, 0, handles);
+%     handles.GUI_Variables = GUI_Variables;
+%     guidata(hObject, handles);
 
-    if new_KF < 0.9 %GO 5/4/19 - Set limits on the manual KF
-        new_KF = 0.9;
-        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
-    elseif new_KF > 2.0
-        new_KF = 2.0;
-        set(handles.R_Send_KF_Edit,'String',num2str(new_KF));
-    end
-    
-    GUI_Variables = handles.GUI_Variables;
-    state=GUI_Variables.state;
-    disp(state);
-
-    bt = GUI_Variables.BT;
-
-    if (bt.Status=="open")
-        try
-            fwrite(bt,'-'); % send the character "-"
-            fwrite(bt,new_KF,'double');
-            disp("Send new Right KF ");
-            disp(new_KF);
-
-        catch
-            disp("Impossible to write on bt the new KF");
-        end
-    end
-    R_Check_KF_Callback(hObject, 0, handles);
-    handles.GUI_Variables = GUI_Variables;
-    guidata(hObject, handles);
-
-% --- Executes on button press in R_Check_KF.
-function rkf=R_Check_KF_Callback(hObject, ~, handles)
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-    rkf=0;
-    if (bt.Status=="open")
-        try
-
-            fwrite(bt,'~'); % send the character "~"
-            if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-
-                GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
-            end
-        catch
-            disp("Impossible to know KF");
-            set(handles.R_Check_KF_Text,'String',"NaN");
-        end
-    end
-
-    if (bt.Status=="closed")
-        disp("Impossible to know KF");
-        set(handles.R_Check_KF_Text,'String',"NaN");
-    end
-    handles.GUI_Variables = GUI_Variables;
-    guidata(hObject, handles);
+% % --- Executes on button press in R_Check_KF.
+% function rkf=R_Check_KF_Callback(hObject, ~, handles)
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+%     rkf=0;
+%     if (bt.Status=="open")
+%         try
+% 
+%             fwrite(bt,'~'); % send the character "~"
+%             if (strcmp(get(handles.Start_Trial,'Enable'), 'on'))
+% 
+%                 GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+%             end
+%         catch
+%             disp("Impossible to know KF");
+%             set(handles.R_Check_KF_Text,'String',"NaN");
+%         end
+%     end
+% 
+%     if (bt.Status=="closed")
+%         disp("Impossible to know KF");
+%         set(handles.R_Check_KF_Text,'String',"NaN");
+%     end
+%     handles.GUI_Variables = GUI_Variables;
+%     guidata(hObject, handles);
 
 % --- Executes on button press in L_Check_FSR_Th.
-function lfsr=L_Check_FSR_Th_Callback(hObject, ~, handles)
+function L_Check_FSR_Th_Callback(hObject, ~, handles)
     GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
-    lfsr=0;
+%     lfsr = 0;
+%     rfsr = 0;
     if (bt.Status=="open")
         try
             fwrite(bt,char('Q')); % send the character "Q"
             GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+%             lfsr = FSR_thresh_LL;
+%             rfsr = FSR_thresh_RL;
         catch
-            disp("Impossible to know L FSR TH");
-            set(handles.R_Check_FSR_Text,'String',"NaN");
+            disp("Impossible to know FSR TH");
+            set(handles.L_Check_FSR_Text,'String',"NaN");
+            set(handles.R_Check_FSR_Text,'String',"NaN");  % TN 6/13/19
         end
     end
     if (bt.Status=="closed")
         disp("Impossible to know FSR THs");
         set(handles.L_Check_FSR_Text,'String',"NaN");
-        set(handles.R_Check_FSR_Text,'String',"NaN");
+        set(handles.R_Check_FSR_Text,'String',"NaN");   % TN 6/13/19
     end
     handles.GUI_Variables = GUI_Variables;
     guidata(hObject, handles);
-
+    
 
 function L_Send_FSR_Edit_Callback(~, ~, ~)
 % hObject    handle to L_Send_FSR_Edit (see GCBO)
@@ -2096,45 +2203,49 @@ function L_Send_FSR_Th_Callback(hObject, ~, handles)
     GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
-
+% TN 6/13/19
     if (bt.Status=="open")
         try
             fwrite(bt,'R'); % char 35 -> #, 36 -> $, 74-> J
             LFSRTH = str2double(get(handles.L_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
+            RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
             fwrite(bt,LFSRTH,'double'); %Sends the new Torque Value to Arduino
+            fwrite(bt,RFSRTH,'double'); % Sends the new Torque Value to Arduino  
+            %R_Check_FSR_Th_Callback(hObject, 0, handles);
             L_Check_FSR_Th_Callback(hObject, 0, handles);
         catch
-            disp("Impossible to set FSR th parameters for Left");
+            disp("Impossible to set FSR th parameters");
         end
     end
 
-% --- Executes on button press in R_Check_FSR_Th.
-function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-    rfsr=0;
-    if (bt.Status=="open")
-        try
-            fwrite(bt,char('q')); % send the character "Q"
-            [message,data] = get_message(bt);
-            if message == 'q'
-                Curr_TH_R = data(1);
-                set(handles.R_Check_FSR_Text,'String',Curr_TH_R);
-                disp("Right Current FSR th ");
-                disp(Curr_TH_R);
-                rfsr=Curr_TH_R;
-            end
-        catch
-            disp("Impossible to know R FSR TH");
-            set(handles.R_Check_FSR_Text,'String',"NaN");
-        end
-    end
-
-    if (bt.Status=="closed")
-        disp("Impossible to know FSR THs");
-        set(handles.L_Check_FSR_Text,'String',"NaN");
-        set(handles.R_Check_FSR_Text,'String',"NaN");
-    end
+               
+% % --- Executes on button press in R_Check_FSR_Th.
+% function rfsr=R_Check_FSR_Th_Callback(~, ~, handles)
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+%     rfsr=0;
+%     if (bt.Status=="open")
+%         try
+%             fwrite(bt,char('q')); % send the character "Q"
+%             [message,data] = get_message(bt);
+%             if message == 'q'
+%                 Curr_TH_R = data(1);
+%                 set(handles.R_Check_FSR_Text,'String',Curr_TH_R);
+%                 disp("Right Current FSR th ");
+%                 disp(Curr_TH_R);
+%                 rfsr=Curr_TH_R;
+%             end
+%         catch
+%             disp("Impossible to know R FSR TH");
+%             set(handles.R_Check_FSR_Text,'String',"NaN");
+%         end
+%     end
+% 
+%     if (bt.Status=="closed")
+%         disp("Impossible to know FSR THs");
+%         set(handles.L_Check_FSR_Text,'String',"NaN");
+%         set(handles.R_Check_FSR_Text,'String',"NaN");
+%     end
 
 
 function R_Send_FSR_Edit_Callback(hObject, ~, ~)
@@ -2162,26 +2273,26 @@ function R_Send_FSR_Edit_CreateFcn(hObject, ~, ~)
         set(hObject,'BackgroundColor','white');
     end
 
-
-% --- Executes on button press in R_Send_FSR_Th.
-function R_Send_FSR_Th_Callback(hObject, ~, handles)
-% hObject    handle to R_Send_FSR_Th (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-
-    if (bt.Status=="open")
-        try
-            fwrite(bt,'r'); % char 35 -> #, 36 -> $, 74-> J
-            RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
-            fwrite(bt,RFSRTH,'double'); % Sends the new Torque Value to Arduino
-            R_Check_FSR_Th_Callback(hObject, 0, handles);
-        catch
-            disp("Impossible to set FSR th parameters for Right");
-        end
-    end
+% 
+% % --- Executes on button press in R_Send_FSR_Th.
+% function R_Send_FSR_Th_Callback(hObject, ~, handles)
+% % hObject    handle to R_Send_FSR_Th (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+% 
+% 
+%     if (bt.Status=="open")
+%         try
+%             fwrite(bt,'r'); % char 35 -> #, 36 -> $, 74-> J
+%             RFSRTH = str2double(get(handles.R_Send_FSR_Edit,'String')); % Gets the Value entered into the edit Box in the G
+%             fwrite(bt,RFSRTH,'double'); % Sends the new Torque Value to Arduino
+%             R_Check_FSR_Th_Callback(hObject, 0, handles);
+%         catch
+%             disp("Impossible to set FSR th parameters for Right");
+%         end
+%     end
 
 % --- Executes on button press in Enable_Arduino_Trig.
 function Enable_Arduino_Trig_Callback(~, ~, ~)
@@ -2468,22 +2579,24 @@ function Load_From_File_Callback(hObject, eventdata, handles)
         end
 
         set(handles.L_Send_KF_Edit,'String',lkf);
-        L_Send_KF_Callback(hObject, eventdata, handles);
-        pause(0.4);
         set(handles.R_Send_KF_Edit,'String',rkf);
-        R_Send_KF_Callback(hObject, eventdata, handles);
+        L_Send_KF_Callback(hObject, eventdata, handles);
+%         pause(0.4);
+%         set(handles.R_Send_KF_Edit,'String',rkf);
+%         R_Send_KF_Callback(hObject, eventdata, handles);
         pause(0.4);
 
         set(handles.L_Kp_Edit,'String',lkp);
         set(handles.L_Kd_Edit,'String',lkd);
         set(handles.L_Ki_Edit,'String',lki);
-        L_Set_PID_Callback(hObject, eventdata, handles);
-        pause(0.8);
+       
+        %pause(0.8);
 
         set(handles.R_Kp_Edit,'String',rkp);
         set(handles.R_Kd_Edit,'String',rkd);
         set(handles.R_Ki_Edit,'String',rki);
-        R_Set_PID_Callback(hObject, eventdata, handles);
+        L_Set_PID_Callback(hObject, eventdata, handles);
+        %R_Set_PID_Callback(hObject, eventdata, handles);
         pause(0.8);
 
         set(handles.N1_Edit,'String',n1);
@@ -2493,12 +2606,13 @@ function Load_From_File_Callback(hObject, eventdata, handles)
         pause(0.8);
 
         set(handles.L_Send_FSR_Edit,'String',lfsr);
+        set(handles.R_Send_FSR_Edit,'String',rfsr);
         L_Send_FSR_Th_Callback(hObject, eventdata, handles);
         pause(0.4);
 
-        set(handles.R_Send_FSR_Edit,'String',rfsr);
-        R_Send_FSR_Th_Callback(hObject, eventdata, handles);
-        pause(0.4);
+        
+%         R_Send_FSR_Th_Callback(hObject, eventdata, handles);
+%         pause(0.4);
 
         flushinput(bt);
         pause(.5);
@@ -2569,44 +2683,44 @@ function R_InverseSign_RadioButton_Callback(hObject, ~, handles)
 
 
 % --- Executes on button press in R_Check_Gain.
-function R_Check_Gain_Callback(hObject, ~, handles)
-% hObject    handle to R_Check_Gain (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if(bt.Status=="open")
-        fwrite(bt,']');
-    end
-
-    if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-        
-        GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
-
-    end
-    handles.GUI_Variables = GUI_Variables;
-    guidata(hObject, handles);
-
-% --- Executes on button press in R_Set_Gain.
-function R_Set_Gain_Callback(~, ~, handles)
-% hObject    handle to R_Set_Gain (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    if(bt.Status=="open")
-        fwrite(bt,'[');
-    end
-
-    try
-        R_New_Gain = str2double(get(handles.R_Set_Gain_Edit,'String')); % Gets the Value entered into the edit Box in the G
-        fwrite(bt,R_New_Gain,'double');
-        disp('Send to arduino Right Prop Gain');
-        disp(R_New_Gain);
-    catch
-    end
+% function R_Check_Gain_Callback(hObject, ~, handles)
+% % hObject    handle to R_Check_Gain (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+% 
+%     if(bt.Status=="open")
+%         fwrite(bt,']');
+%     end
+% 
+%     if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
+%         
+%         GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+% 
+%     end
+%     handles.GUI_Variables = GUI_Variables;
+%     guidata(hObject, handles);
+% 
+% % --- Executes on button press in R_Set_Gain.
+% function R_Set_Gain_Callback(~, ~, handles)
+% % hObject    handle to R_Set_Gain (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+% 
+%     if(bt.Status=="open")
+%         fwrite(bt,'[');
+%     end
+% 
+%     try
+%         R_New_Gain = str2double(get(handles.R_Set_Gain_Edit,'String')); % Gets the Value entered into the edit Box in the G
+%         fwrite(bt,R_New_Gain,'double');
+%         disp('Send to arduino Right Prop Gain');
+%         disp(R_New_Gain);
+%     catch
+%     end
 
 
 
@@ -2671,6 +2785,11 @@ function L_Set_Gain_Callback(~, ~, handles)
         end
         L_New_Gain = str2double(get(handles.L_Set_Gain_Edit,'String')); % Gets the Value entered into the edit Box in the G
         fwrite(bt,L_New_Gain,'double');
+ % TN 6/13/19       
+        R_New_Gain = str2double(get(handles.R_Set_Gain_Edit,'String')); % Gets the Value entered into the edit Box in the G
+        fwrite(bt,R_New_Gain,'double');
+%         disp('Send to arduino Right Prop Gain');
+%         disp(R_New_Gain);
     catch
     end
 
@@ -2744,39 +2863,11 @@ function Activate_Balance_Callback(~, ~, handles)
 
 
 
-
-% --- Executes on button press in radiobutton12.
-function radiobutton12_Callback(~, ~, ~)
-% hObject    handle to radiobutton12 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton12
-
-
-% --- Executes on button press in radiobutton11.
-function radiobutton11_Callback(~, ~, ~)
-% hObject    handle to radiobutton11 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton11
-
-
 % --- Executes during object creation, after setting all properties.
-function R_Torque_CreateFcn(~, ~, ~)
+% function R_Torque_CreateFcn(~, ~, ~)
 % hObject    handle to R_Torque (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-
-
-% --- Executes on button press in Activate_Balance.
-function radiobutton13_Callback(~, ~, ~)
-% hObject    handle to Activate_Balance (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of Activate_Balance
 
 
 % --- Executes on button press in L_Auto_KF.
@@ -2991,6 +3082,10 @@ function L_Set_Zero_Modif_Callback(~, ~, handles)
         L_Zero_Modif = str2double(get(handles.L_Zero_Modif_Edit,'String')); % Gets the Value entered into the edit Box in the G
         fwrite(bt,L_Zero_Modif,'double');
         disp(L_Zero_Modif);
+     % TN 6/13/19   
+        R_Zero_Modif = str2double(get(handles.R_Zero_Modif_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+        fwrite(bt,R_Zero_Modif,'double');
+        disp(R_Zero_Modif);
     catch
     end
 
@@ -3017,24 +3112,24 @@ function R_Zero_Modif_Edit_CreateFcn(hObject, ~, ~)
     end
 
 
-% --- Executes on button press in R_Set_Zero_Modif.
-function R_Set_Zero_Modif_Callback(~, ~, handles)
-% hObject    handle to R_Set_Zero_Modif (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'X');
-        end
-
-        R_Zero_Modif = str2double(get(handles.R_Zero_Modif_Edit,'String'));               %Gets the Value entered into the edit Box in the G
-        fwrite(bt,R_Zero_Modif,'double');
-        disp(R_Zero_Modif);
-    catch
-    end
+% % --- Executes on button press in R_Set_Zero_Modif.
+% function R_Set_Zero_Modif_Callback(~, ~, handles)
+% % hObject    handle to R_Set_Zero_Modif (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+%     GUI_Variables = handles.GUI_Variables;
+%     bt = GUI_Variables.BT;
+% 
+%     try
+%         if(bt.Status=="open")
+%             fwrite(bt,'X');
+%         end
+% 
+%         R_Zero_Modif = str2double(get(handles.R_Zero_Modif_Edit,'String'));               %Gets the Value entered into the edit Box in the G
+%         fwrite(bt,R_Zero_Modif,'double');
+%         disp(R_Zero_Modif);
+%     catch
+%     end
 
 
 % --- Executes on button press in Balance_Baseline.
@@ -3277,16 +3372,6 @@ function BT_Auto_Reconnection_Callback(~, ~, handles)
         end
         set(handles.BT_Text,'String','On')
     end
-
-
-
-% --- Executes on button press in radiobutton23.
-function radiobutton23_Callback(~, ~, ~)
-% hObject    handle to radiobutton23 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton23
 
 
 
@@ -3754,60 +3839,72 @@ function Torque_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
         
-        set(handles.L_Torque,'Visible','on');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
+        %set(handles.L_Torque,'Visible','on');
+        %set(handles.L_PID,'Visible','off');
+        %set(handles.L_Adj,'Visible','off');
+        %set(handles.L_Proportional_Ctrl,'Visible','off');
         set(handles.Optimization_Panel,'Visible','off');
         set(handles.Balance_panel,'Visible','off');        
         
-        set(handles.R_Torque,'Visible','on');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
+        %set(handles.R_Torque,'Visible','on');
+        %set(handles.R_PID,'Visible','off');
+        %set(handles.R_Adj,'Visible','off');
         set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
+        %set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
         
-        
+        set(handles.Prop_Ctrl_Panel,'Visible','off');
+        set(handles.PID_Panel,'Visible','off');
+        set(handles.Torque_Panel,'Visible','on');
+        set(handles.Adj_Panel,'Visible','off');
 % --- Executes on button press in PID.
 function PID_Callback(hObject, eventdata, handles)
 % hObject    handle to PID (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','on');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
+        %set(handles.L_Torque,'Visible','off');
+        %set(handles.L_PID,'Visible','on');
+        %set(handles.L_Adj,'Visible','off');
+        %set(handles.L_Proportional_Ctrl,'Visible','off');
         set(handles.Optimization_Panel,'Visible','off');
         set(handles.Balance_panel,'Visible','off');
         
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','on');
-        set(handles.R_Adj,'Visible','off');
+        %set(handles.R_Torque,'Visible','off');
+        %set(handles.R_PID,'Visible','on');
+        %set(handles.R_Adj,'Visible','off');
         set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
+        %set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
         
+        set(handles.Prop_Ctrl_Panel,'Visible','off');
+        set(handles.PID_Panel,'Visible','on');
+        set(handles.Torque_Panel,'Visible','off');
+        set(handles.Adj_Panel,'Visible','off');
 % --- Executes on button press in Adj.
 function Adj_Callback(hObject, eventdata, handles)
 % hObject    handle to Adj (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','on');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
+        %set(handles.L_Torque,'Visible','off');
+        %set(handles.L_PID,'Visible','off');
+        %set(handles.L_Adj,'Visible','on');
+        %set(handles.L_Proportional_Ctrl,'Visible','off');
         set(handles.Optimization_Panel,'Visible','off');
         set(handles.Balance_panel,'Visible','off');
         
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','on');
+        %set(handles.R_Torque,'Visible','off');
+        %set(handles.R_PID,'Visible','off');
+        %set(handles.R_Adj,'Visible','on');
         set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
+        %set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
+        
+        set(handles.Prop_Ctrl_Panel,'Visible','off');
+        set(handles.PID_Panel,'Visible','off');
+        set(handles.Torque_Panel,'Visible','off');
+        set(handles.Adj_Panel,'Visible','on');
         
 % --- Executes on button press in Smoothing.
 function Smoothing_Callback(hObject, eventdata, handles)
@@ -3815,20 +3912,24 @@ function Smoothing_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
+        %set(handles.L_Torque,'Visible','off');
+        %set(handles.L_PID,'Visible','off');
+        %set(handles.L_Adj,'Visible','off');
+        %set(handles.L_Proportional_Ctrl,'Visible','off');
         set(handles.Optimization_Panel,'Visible','off');
         set(handles.Balance_panel,'Visible','off');
         
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
+        %set(handles.R_Torque,'Visible','off');
+        %set(handles.R_PID,'Visible','off');
+        %set(handles.R_Adj,'Visible','off');
         set(handles.R_Smoothing,'Visible','on');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
+        %set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
         
+        set(handles.Prop_Ctrl_Panel,'Visible','off');
+        set(handles.PID_Panel,'Visible','off');
+         set(handles.Torque_Panel,'Visible','off');
+        set(handles.Adj_Panel,'Visible','off');
         
 % --- Executes on button press in Pro_Ctrl.
 function Pro_Ctrl_Callback(hObject, eventdata, handles)
@@ -3837,19 +3938,24 @@ function Pro_Ctrl_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','on');
+        %set(handles.L_Torque,'Visible','off');
+        %set(handles.L_PID,'Visible','off');
+        %set(handles.L_Adj,'Visible','off');
+        %set(handles.L_Proportional_Ctrl,'Visible','on');
         set(handles.Optimization_Panel,'Visible','off');
         set(handles.Balance_panel,'Visible','off');
         
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
+        %set(handles.R_Torque,'Visible','off');
+        %set(handles.R_PID,'Visible','off');
+        %set(handles.R_Adj,'Visible','off');
         set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','on');
+        %set(handles.R_Proportional_Ctrl,'Visible','on');
         set(handles.Bio_Feedback_panel,'Visible','off');
+        
+        set(handles.Prop_Ctrl_Panel,'Visible','on');
+        set(handles.PID_Panel,'Visible','off');
+        set(handles.Torque_Panel,'Visible','off');
+        set(handles.Adj_Panel,'Visible','off');
         
         
                 
@@ -3859,21 +3965,24 @@ function Optimization_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
+        %set(handles.L_Torque,'Visible','off');
+        %set(handles.L_PID,'Visible','off');
+        %set(handles.L_Adj,'Visible','off');
+        %set(handles.L_Proportional_Ctrl,'Visible','off');
         set(handles.Optimization_Panel,'Visible','on');
         set(handles.Balance_panel,'Visible','off');
         
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
+        %set(handles.R_Torque,'Visible','off');
+        %set(handles.R_PID,'Visible','off');
+        %set(handles.R_Adj,'Visible','off');
         set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
+       % set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
         
-        
+        set(handles.Prop_Ctrl_Panel,'Visible','off');
+        set(handles.PID_Panel,'Visible','off');
+        set(handles.Torque_Panel,'Visible','off');
+        set(handles.Adj_Panel,'Visible','off');
                         
 % --- Executes on button press in Balance_Ctrl.
 function Balance_Ctrl_Callback(hObject, eventdata, handles)
@@ -3881,42 +3990,49 @@ function Balance_Ctrl_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
+        %set(handles.L_Torque,'Visible','off');
+        %set(handles.L_PID,'Visible','off');
+        %set(handles.L_Adj,'Visible','off');
+        %set(handles.L_Proportional_Ctrl,'Visible','off');
         set(handles.Optimization_Panel,'Visible','off');
         set(handles.Balance_panel,'Visible','on');
         
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
+        %set(handles.R_Torque,'Visible','off');
+        %set(handles.R_PID,'Visible','off');
+        %set(handles.R_Adj,'Visible','off');
         set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
+        %set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','off');
         
+        set(handles.Prop_Ctrl_Panel,'Visible','off');
+        set(handles.PID_Panel,'Visible','off'); 
+        set(handles.Torque_Panel,'Visible','off');
+        set(handles.Adj_Panel,'Visible','off');
         
-                        
 % --- Executes on button press in Bio_Feedback.
 function Bio_Feedback_Callback(hObject, eventdata, handles)
 % hObject    handle to Bio_Feedback (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-        set(handles.L_Torque,'Visible','off');
-        set(handles.L_PID,'Visible','off');
-        set(handles.L_Adj,'Visible','off');
-        set(handles.L_Proportional_Ctrl,'Visible','off');
+        %set(handles.L_Torque,'Visible','off');
+        %set(handles.L_PID,'Visible','off');
+        %set(handles.L_Adj,'Visible','off');
+        %set(handles.L_Proportional_Ctrl,'Visible','off');
         set(handles.Optimization_Panel,'Visible','off');
         set(handles.Balance_panel,'Visible','off');
         
-        set(handles.R_Torque,'Visible','off');
-        set(handles.R_PID,'Visible','off');
-        set(handles.R_Adj,'Visible','off');
+        %set(handles.R_Torque,'Visible','off');
+        %set(handles.R_PID,'Visible','off');
+        %set(handles.R_Adj,'Visible','off');
         set(handles.R_Smoothing,'Visible','off');
-        set(handles.R_Proportional_Ctrl,'Visible','off');
+        %set(handles.R_Proportional_Ctrl,'Visible','off');
         set(handles.Bio_Feedback_panel,'Visible','on');
 
+        set(handles.Prop_Ctrl_Panel,'Visible','off');
+        set(handles.PID_Panel,'Visible','off');
+        set(handles.Torque_Panel,'Visible','off');
+        set(handles.Adj_Panel,'Visible','off');
 
 % --- Executes on button press in Save_Prop_Prm.
 function Save_Prop_Prm_Callback(hObject, eventdata, handles)
@@ -4017,9 +4133,16 @@ Old_Pro_Prm = importdata(fullfile(pathname, filename));
 
 fwrite(bt,'g'); %send the character "%"
 
+        set(handles.Activate_Prop_Ctrl,'Enable','on');  % TN 7/8/19
+      
+        
+parameters = {'left_plant_peak_mean', 'right_plant_peak_mean', 'left_leg_torque_calibration_value',...
+    'right_leg_torque_calibration_value'};
+
 for i=1:length(Old_Pro_Prm.data)
     fwrite(bt,Old_Pro_Prm.data(i),'double');
-    disp(['Old Proportional Parameters ','[',num2str(i),'] ',num2str(Old_Pro_Prm.data(i))]);
+    disp([parameters(i), num2str(Old_Pro_Prm.data(i))]);
+        
    % pause(0.1);
 end
     catch
@@ -4028,9 +4151,9 @@ end
 end
 
 
-% --- Executes when selected object is changed in Prop_Ctrl_Panel.
-function Prop_Ctrl_Panel_SelectionChangedFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in Prop_Ctrl_Panel 
+% --- Executes when selected object is changed in Prop_Ctrl_sPanel.
+function Prop_Ctrl_sPanel_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in Prop_Ctrl_sPanel 
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -4091,14 +4214,18 @@ if (bt.Status=="open")
 
         if strcmp( str, 'Activate Prop Control' )
             GUI_Variables.PropOn = 1; 
-            fwrite(bt,'l');
-            disp( 'Activate Prop Control' );
-            fwrite(bt,'l');
             set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
             set(handles.Activate_Prop_Pivot,'enable','on'); % GO 5/7/19
             set(handles.Activate_Prop_ID,'enable','on');    % GO 5/7/19
-            set(handles.Prop_Ctrl_Panel,'visible','on');    % GO 5/14/19
+            set(handles.Prop_Ctrl_sPanel,'visible','on');    % GO 5/14/19
+            ATP_value = get(handles.ATP_Mode,'value');
+            if ATP_value == 1
+                set(handles.ATP_Mode,'value',0);
+                fwrite(bt,'o');        % TN 6/17/19
+            end
 
+            disp( 'Activate Prop Control' );
+            fwrite(bt,'l');
             set(handles.Start_ATP,'Enable','on');
             set(handles.Stop_ATP,'Enable','on');
         else
@@ -4106,11 +4233,9 @@ if (bt.Status=="open")
             disp( 'Deactivate Prop Control' );
             fwrite(bt,'^');
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-            set(handles.Activate_Prop_Pivot,'enable','off'); % GO 5/7/19
-            set(handles.Activate_Prop_ID,'enable','off');    % GO 5/7/19
             set(handles.Activate_Prop_Pivot,'value',0);      % GO 5/7/19
             set(handles.Activate_Prop_ID,'value',0);         % GO 5/7/19 
-            set(handles.Prop_Ctrl_Panel,'visible','off');    % GO 5/14/19
+            set(handles.Prop_Ctrl_sPanel,'visible','off');    % GO 5/14/19
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
         
@@ -4248,6 +4373,7 @@ end
 
 
    
+   
 % --- Executes on button press in Stop_ATP.
 function Stop_ATP_Callback(hObject, eventdata, handles)
 % hObject    handle to Stop_ATP (see GCBO)
@@ -4267,18 +4393,29 @@ if bt.Status=="open"
   
 if stop_time > start_time
     
-        LLTRQ = GUI_Variables.LLTRQ;
+%         LLTRQ = GUI_Variables.LLTRQ;
+%         LLFSR = GUI_Variables.LLFSR;
+%         RLTRQ = GUI_Variables.RLTRQ;
+%         RLFSR = GUI_Variables.RLFSR;
+%         
+%         LLTRQ = LLTRQ(start_time:stop_time - 1);
+%         LLFSR = LLFSR(start_time:stop_time - 1); 
+%         RLTRQ = RLTRQ(start_time:stop_time - 1);
+%         RLFSR = RLFSR(start_time:stop_time - 1);
+
+        LLSET = GUI_Variables.LLSET;
         LLFSR = GUI_Variables.LLFSR;
-        RLTRQ = GUI_Variables.RLTRQ;
+        RLSET = GUI_Variables.RLSET;
         RLFSR = GUI_Variables.RLFSR;
         
-        LLTRQ = LLTRQ(start_time:stop_time - 1);
+        LLSET = LLSET(start_time:stop_time - 1);
         LLFSR = LLFSR(start_time:stop_time - 1); 
-        RLTRQ = RLTRQ(start_time:stop_time - 1);
+        RLSET = RLSET(start_time:stop_time - 1);
         RLFSR = RLFSR(start_time:stop_time - 1);
+
         
         dt = .01; % Since the Arduino is set to send values every 10 ms, dt is .01 S
-        t = 1: length(RLTRQ);                                                %Creates a time Vector equal in length to the number of Torque Values Recieved
+        t = 1: length(RLSET);                                                %Creates a time Vector equal in length to the number of Torque Values Recieved
         t = t .* dt; % Scales the time Vector, knowing how often Arduino sends values,
     
     %data = [t,LLTRQ,LLFSR,RLTRQ,RLFSR];
@@ -4293,7 +4430,7 @@ if stop_time > start_time
             'ATP_']),bt.UserData); 
         
         fileID = fopen(Filename,'w');
-        fprintf(fileID,'%6.2f %6.2f %6.2f %6.2f %6.2f \r\n',[t; RLTRQ; RLFSR; LLTRQ; LLFSR]);
+        fprintf(fileID,'%6.2f %6.2f %6.2f %6.2f %6.2f \r\n',[t; RLSET; RLFSR; LLSET; LLFSR]);
         fclose(fileID);
 %        bt.UserData = bt.UserData + 1;
 end
@@ -4304,6 +4441,8 @@ end
 
 
 
+
+
 % --- Executes on button press in Send_ATP.
 function Send_ATP_Callback(hObject, eventdata, handles)
 % hObject    handle to Send_ATP (see GCBO)
@@ -4311,22 +4450,23 @@ function Send_ATP_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-GUI_Variables = handles.GUI_Variables;
-bt = GUI_Variables.BT; 
-
-if (bt.Status=="open")
+% GUI_Variables = handles.GUI_Variables;
+% bt = GUI_Variables.BT; 
+% 
+% if (bt.Status=="open")
    
        
-    [filename, pathname] = uigetfile({'*.mat', 'Matlab Files (*.mat)'; ...
+    [filename, pathname] = uigetfile({'*.txt*', 'Matlab Files (*.mat)'; ...
                 '*.*',                   'All Files (*.*)'});
 
 %This code checks if the user pressed cancel on the dialog.
-        if isequal(filename,0) || isequal(pathname,0)
+if isequal(filename,0) || isequal(pathname,0)
              disp('User pressed cancel')
-        else
+        
+else
              disp(['User selected ', fullfile(pathname, filename)])
 
-        end
+      
         
 ATP_file = fullfile(pathname, filename);
 
@@ -4352,7 +4492,7 @@ plot(0:100,left_torque);title('Averaged left torque profile');
 subplot(2,1,2)
 plot(0:100,right_torque);title('Averaged right torque profile');
    
-ATP = [right_torque,left_torque];
+ATP = [left_torque,right_torque];
 % Arrange it to comma-separated string
 str = num2str(ATP);
 str = regexprep(str,'\s+',',');
@@ -4367,6 +4507,7 @@ end
 
 
 
+
 % --- Executes on button press in ATP_Mode.
 function ATP_Mode_Callback(hObject, eventdata, handles)
 % hObject    handle to ATP_Mode (see GCBO)
@@ -4375,19 +4516,33 @@ function ATP_Mode_Callback(hObject, eventdata, handles)
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT; 
 
+ATP_value = get(handles.ATP_Mode,'value');
+
 if (bt.Status=="open")
    
-fwrite(bt,'j');        % TN 5/8/19
+    if ATP_value == 1
+        if GUI_Variables.PropOn == 0
+            fwrite(bt,'^');
+        end
+        set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
+%         set(handles.Activate_Prop_Pivot,'enable','off'); 
+%         set(handles.Activate_Prop_ID,'enable','off');    
+        set(handles.Activate_Prop_Pivot,'value',0);      
+        set(handles.Activate_Prop_ID,'value',0);         
+        set(handles.Prop_Ctrl_sPanel,'visible','off');    
+        set(handles.Start_ATP,'Enable','off');
+        set(handles.Stop_ATP,'Enable','off');
+            
+        fwrite(bt,'j');        % TN 5/8/19
+        
+    else
+        fwrite(bt,'o');        % TN 5/8/19
+       
+       
+    end
 
-            set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-%             set(handles.Prop_Ctrl_Panel,'visible','off');
-%            set(handles.Activate_Prop_Pivot,'value',0);
-%            set(handles.Activate_Prop_ID,'value',0);
-            set(handles.Take_Baseline,'enable','off');
-            set(handles.Start_ATP,'Enable','off');
-            set(handles.Stop_ATP,'Enable','off');
+
 end
-
 
 
 
@@ -4476,7 +4631,6 @@ function BT_Select_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BT_Select contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BT_Select
-
 %GO 5/23/19
 GUI_Variables = handles.GUI_Variables;
 contents = cellstr(get(hObject,'String'));
@@ -4484,7 +4638,6 @@ bt_name = contents{get(hObject,'Value')};
 GUI_Variables.bt_name = bt_name;
 handles.GUI_Variables = GUI_Variables;
 guidata(hObject, handles);
-
 
 % --- Executes during object creation, after setting all properties.
 function BT_Select_CreateFcn(hObject, eventdata, handles)
