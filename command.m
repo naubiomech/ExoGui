@@ -14,8 +14,6 @@ switch(msg)
     GUI_Variables.RLVOLT(RLCount) = data(4);
     GUI_Variables.RLVOLT_H(RLCount) = data(5);
     GUI_Variables.SIG1(RLCount) = data(11);
-    
-    
     GUI_Variables.SIG3(RLCount) = data(13);
     GUI_Variables.SIG4(RLCount) = data(14);%data(14)/100;
     GUI_Variables.BASER(RLCount)=GUI_Variables.baser;
@@ -45,8 +43,9 @@ switch(msg)
         GUI_Variables.flag_TM_right = 1;        
     end
     GUI_Variables.old_TM_right = GUI_Variables.SIG2(LLCount);
-               
+    
     GUI_Variables.BASEL(LLCount)=GUI_Variables.basel;
+
     GUI_Variables.L_BAL_DYN_HEEL(LLCount)=GUI_Variables.L_Bal_dyn_Heel;
     GUI_Variables.L_BAL_STEADY_HEEL(LLCount)=GUI_Variables.L_Bal_steady_Heel;
     GUI_Variables.L_BAL_DYN_TOE(LLCount)=GUI_Variables.L_Bal_dyn_Toe;
@@ -65,8 +64,8 @@ switch(msg)
     disp("Left Current KF ");
     disp(KF_LL);
 
-  case '~'
-    KF_RL = round(data(1),3);                                          %Gets the Current Arduino Torque Setpoint
+  %case '~' % TN 6/13/19
+    KF_RL = round(data(2),3);                                          %Gets the Current Arduino Torque Setpoint
     set(handles.R_Check_KF_Text,'String',KF_RL);
     disp("Right Current KF ");
     disp(KF_RL);
@@ -75,35 +74,42 @@ switch(msg)
     Setpoint_Dorsi_LL = data(2);
     update_value_handles(Setpoint_LL, handles.L_Setpoint_Text,handles.L_Setpoint_Edit);
     update_value_handles(Setpoint_Dorsi_LL, handles.L_Setpoint_Dorsi_Text,handles.L_Setpoint_Dorsi_Edit);
-  case 'd'
-    Setpoint_RL = data(1);
-    Setpoint_Dorsi_RL = data(2);
+  %case 'd' % TN 6/13/19
+    Setpoint_RL = data(3);
+    Setpoint_Dorsi_RL = data(4);
     update_value_handles(Setpoint_RL, handles.R_Setpoint_Text,handles.R_Setpoint_Edit);
     update_value_handles(Setpoint_Dorsi_RL, handles.R_Setpoint_Dorsi_Text,handles.R_Setpoint_Dorsi_Edit);
   case 'K'
     lkp = data(1);
     lkd = data(2);
     lki = data(3);
+    rkp = data(4);  % TN 6/13/19
+    rkd = data(5);  % TN 6/13/19
+    rki = data(6);  % TN 6/13/19
     update_value_handles(lkp, handles.L_Kp_text, handles.L_Kp_Edit);
     update_value_handles(lkd, handles.L_Kd_text, handles.L_Kd_Edit);
     update_value_handles(lki, handles.L_Ki_text, handles.L_Ki_Edit);
-  case 'k'
-    rkp = data(1);
-    rkd = data(2);
-    rki = data(3);
-    update_value_handles(rkp, handles.R_Kp_text, handles.R_Kp_Edit);
-    update_value_handles(rkd, handles.R_Kd_Text, handles.R_Kd_Edit);
-    update_value_handles(rki, handles.R_Ki_Text, handles.R_Ki_Edit);
+    update_value_handles(rkp, handles.R_Kp_text, handles.R_Kp_Edit);  % TN 6/13/19
+    update_value_handles(rkd, handles.R_Kd_Text, handles.R_Kd_Edit);  % TN 6/13/19
+    update_value_handles(rki, handles.R_Ki_Text, handles.R_Ki_Edit);  % TN 6/13/19
+%   case 'k'
+%     rkp = data(1);
+%     rkd = data(2);
+%     rki = data(3);
+%     update_value_handles(rkp, handles.R_Kp_text, handles.R_Kp_Edit);
+%     update_value_handles(rkd, handles.R_Kd_Text, handles.R_Kd_Edit);
+%     update_value_handles(rki, handles.R_Ki_Text, handles.R_Ki_Edit);
   case 'Q'
     FSR_thresh_LL = data(1);
+    FSR_thresh_RL = data(2);
     set(handles.L_Check_FSR_Text,'String',FSR_thresh_LL);
     disp("Left Current FSR th ");
     disp(FSR_thresh_LL);
-  case 'q'
-    Curr_TH_R = data(1);
-    set(handles.R_Check_FSR_Text,'String',Curr_TH_R);
+  %case 'q'
+  %  Curr_TH_R = data(2);    
+    set(handles.R_Check_FSR_Text,'String',FSR_thresh_RL);
     disp("Right Current FSR th ");
-    disp(Curr_TH_R);
+    disp(FSR_thresh_RL);
   case '('
     N1 = data(1);
     N2 = data(2);
@@ -114,9 +120,11 @@ switch(msg)
   case '}' %Send Left Gain to Arduino
     L_Gain = data(1);
     set(handles.L_Check_Gain_Text,'String',L_Gain);
-  case ']' % Send Right Gain to Arduino
-    R_Gain = data(1);
-    set(handles.R_Check_Gain_Text,'String',R_Gain);
+    R_Gain = data(2);  % TN 6/13/19
+    set(handles.R_Check_Gain_Text,'String',R_Gain);  % TN 6/13/19
+%   case ']' % Send Right Gain to Arduino
+%     R_Gain = data(1);
+%     set(handles.R_Check_Gain_Text,'String',R_Gain);
   case 'B'
     val=strcmp(get(handles.Balance_Text,'String'),'On');
     get(handles.Activate_BioFeedback_Text,'String');
@@ -215,7 +223,8 @@ switch(msg)
     case 'n'
         
         set(handles.Activate_Prop_Ctrl,'enable','on');  
-        set(handles.Check_Baseline,'enable','on');
+        set(handles.Prop_Ctrl_sPanel,'visible','on');  % TN 7/5/19
+        set(handles.Check_Baseline,'Enable','on');  % TN 7/5/19
         set(handles.statusText,'string','Baseline complete.');
         
         
