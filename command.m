@@ -31,6 +31,19 @@ switch(msg)
     GUI_Variables.LLVOLT_H(LLCount) = data(10);
     GUI_Variables.SIG2(LLCount) = data(12);
 
+    GUI_Variables.TM_left = GUI_Variables.SIG1(RLCount);
+    if GUI_Variables.TM_left == 1 && GUI_Variables.old_TM_left == 0 && GUI_Variables.PtbOn == 1
+        GUI_Variables.flag_TM_left = 1;
+    end
+    GUI_Variables.old_TM_left = GUI_Variables.SIG1(RLCount);
+    
+    %disp(['before GUI_Variables.old_TM_right =', num2str(GUI_Variables.old_TM_right)]); 
+    GUI_Variables.TM_right = GUI_Variables.SIG2(LLCount);
+    if GUI_Variables.TM_right == 1 && GUI_Variables.old_TM_right == 0 && GUI_Variables.PtbOn == 1
+        GUI_Variables.flag_TM_right = 1;        
+    end
+    GUI_Variables.old_TM_right = GUI_Variables.SIG2(LLCount);
+    
     GUI_Variables.BASEL(LLCount)=GUI_Variables.basel;
 
     GUI_Variables.L_BAL_DYN_HEEL(LLCount)=GUI_Variables.L_Bal_dyn_Heel;
