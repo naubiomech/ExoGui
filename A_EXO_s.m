@@ -22,9 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-
 % Last Modified by GUIDE v2.5 13-Jun-2019 14:36:08
-
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -994,18 +992,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
         Reset_Timer_Callback(0, 0, handles);
         set(handles.L_Get_Setpoint,'Enable','on');
-        %set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
         set(handles.Calibrate_FSR,'Enable','on');
         set(handles.Calibrate_Torque,'Enable','on');
         set(handles.Check_Memory,'Enable','on');
         set(handles.Clean_Memory,'Enable','on');
         set(handles.L_Get_PID,'Enable','on');
-        %set(handles.R_Get_PID,'Enable','on');
         set(handles.L_Check_KF,'Enable','on');
-        %set(handles.R_Check_KF,'Enable','on');
         set(handles.L_Check_FSR_Th,'Enable','on');
-        %set(handles.R_Check_FSR_Th,'Enable','on');
         set(handles.Start_Trial,'Enable','on');
         set(handles.End_Trial,'Enable','off'); % Disables the button to stop the trial
         set(handles.Start_Trial,'Enable','on');
@@ -1015,16 +1009,9 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Start_Timer,'enable','Off');
         
         if GUI_Variables.LapBaseline == 1% TN 5/8/19
-%             set(handles.Activate_Prop_Pivot,'value',0);
-%             set(handles.Activate_Prop_ID,'value',0);
-%             set(handles.Activate_Prop_Pivot,'enable','off');
-%             set(handles.Activate_Prop_ID,'enable','off');
             set(handles.Prop_Ctrl_sPanel,'visible','off');
-%             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
             set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/13/19
             set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
-
-%            fwrite(bt,'^');  % TN 5/8/19
         end
 
 
@@ -1032,18 +1019,14 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
         Reset_Timer_Callback(0, 0, handles);
         set(handles.L_Get_Setpoint,'Enable','on');
-        %set(handles.R_Get_Setpoint,'Enable','on');
         set(handles.Get_Smoothing,'Enable','on');
         set(handles.Calibrate_FSR,'Enable','on');
         set(handles.Calibrate_Torque,'Enable','on');
         set(handles.Check_Memory,'Enable','on');
         set(handles.Clean_Memory,'Enable','on');
         set(handles.L_Get_PID,'Enable','on');
-        %set(handles.R_Get_PID,'Enable','on');
         set(handles.L_Check_KF,'Enable','on');
-        %set(handles.R_Check_KF,'Enable','on');
         set(handles.L_Check_FSR_Th,'Enable','on');
-        %set(handles.R_Check_FSR_Th,'Enable','on');
         set(handles.Start_Trial,'Enable','on');
         set(handles.End_Trial,'Enable','off');                                      %Disables the button to stop the trial
         set(handles.Start_Trial,'Enable','on');
@@ -1054,25 +1037,15 @@ function End_Trial_Callback(hObject, eventdata, handles)
 
         set(handles.Activate_Prop_Pivot,'value',0);
         set(handles.Activate_Prop_ID,'value',0);
+        set(handles.Resistance_Ctrl,'value',0);
         set(handles.Activate_Prop_Pivot,'enable','off');
         set(handles.Activate_Prop_ID,'enable','off');
+        set(handles.Resistance_Ctrl,'enable','off');
         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
         set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/13/19
         set(handles.Check_Baseline,'enable','off');
         fwrite(bt,'^');  % TN 5/8/19
         
-%         if GUI_Variables.LapBaseline == 1% TN 5/8/19
-%             set(handles.Activate_Prop_Pivot,'value',0);
-%             set(handles.Activate_Prop_ID,'value',0);
-%             set(handles.Activate_Prop_Pivot,'enable','off');
-%             set(handles.Activate_Prop_ID,'enable','off');
-%             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
-%             set(handles.Check_Baseline,'enable','off');  % TN 5/13/19
-%             set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/13/19
-%          %   set(handles.Prop_Ctrl_sPanel,'visible','off');
-%             fwrite(bt,'^');  % TN 5/8/19
-%         end
- 
     end
     
     handles.GUI_Variables = GUI_Variables;
@@ -4131,6 +4104,7 @@ bt = GUI_Variables.BT;
 
 value_Pivot = get(handles.Activate_Prop_Pivot,'value');
 value_ID = get(handles.Activate_Prop_ID,'value');
+value_Resistance = get(handles.Resistance_Ctrl,'value');
 
 if (bt.Status=="open")
 
@@ -4145,6 +4119,12 @@ if (bt.Status=="open")
         elseif (value_ID == 1)
                 fwrite(bt,'c');
                 disp('ID Prop Ctrl');
+                set(handles.Take_Baseline,'Enable','on');
+                disp('Activate Prop ID Ctrl');
+                
+        elseif (value_Resistance == 1)
+                fwrite(bt,'S');
+                disp('Activate Resistance Control'); %JL
                 set(handles.Take_Baseline,'Enable','on');
             
         end
@@ -4185,6 +4165,7 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Ctrl,'string','Deactivate Prop Control');
             set(handles.Activate_Prop_Pivot,'enable','on'); % GO 5/7/19
             set(handles.Activate_Prop_ID,'enable','on');    % GO 5/7/19
+            set(handles.Resistance_Ctrl,'enable','on');
             set(handles.Prop_Ctrl_sPanel,'visible','on');    % GO 5/14/19
             ATP_value = get(handles.ATP_Mode,'value');
             if ATP_value == 1
@@ -4203,6 +4184,7 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
             set(handles.Activate_Prop_Pivot,'value',0);      % GO 5/7/19
             set(handles.Activate_Prop_ID,'value',0);         % GO 5/7/19 
+            set(handles.Resistance_Ctrl,'value',0);
             set(handles.Prop_Ctrl_sPanel,'visible','off');    % GO 5/14/19
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');

@@ -227,7 +227,6 @@ switch(msg)
         set(handles.Check_Baseline,'Enable','on');  % TN 7/5/19
         set(handles.statusText,'string','Baseline complete.');
         
-        
   otherwise
     %Do nothing
 end
