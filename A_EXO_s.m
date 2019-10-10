@@ -4449,7 +4449,7 @@ str = num2str(ATP);
 str = regexprep(str,'\s+',',');
 % Save as 'sample.h' file
 cur_d = cd;
-new_file = strrep(cur_d,'GUI','Exo\ATP.h');
+new_file = strrep(cur_d,'Gui','Exo\ATP.h');
 %new_file = 'G:\Shared drives\Biomech_Lab\Thang\Biomech_taryn\new code\Exo\ATP.h';
 fid = fopen(new_file,'w');
 fprintf(fid,'double ATP[202] = {%s};\n',str);
