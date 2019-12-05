@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 13-Jun-2019 14:36:08
+% Last Modified by GUIDE v2.5 04-Dec-2019 16:59:16
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -4742,3 +4742,18 @@ elseif strcmp( perturbation_side, 'left' )
     pause(5*T2);
     setTreadmill(LS,RS,newLA,RA,IN)
 end
+
+
+% --- Executes on button press in OLCurrentControl.
+function OLCurrentControl_Callback(~, ~, handles)
+% hObject    handle to OLCurrentControl (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)% function [rkp,rkd,rki]=R_Get_PID_Callback(~, ~, handles)
+% SEND 'k' char 107
+    GUI_Variables = handles.GUI_Variables;
+    bt = GUI_Variables.BT;
+
+    if(bt.Status=="open")
+        fwrite(bt,char(107));
+    end
+% Hint: get(hObject,'Value') returns toggle state of OLCurrentControl
