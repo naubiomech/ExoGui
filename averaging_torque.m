@@ -1,4 +1,4 @@
-function [right_torque,left_torque]=averaging_torque(data_name)
+function [right_torque,left_torque,RL_mean_time,LL_mean_time]=averaging_torque(data_name)
 A=importdata(data_name);%GO_Auto_19-Feb-2019_Trial_Number__3');
 %time=A.data(:,2);
 RLTRQ=A(:,2);
@@ -8,12 +8,12 @@ LL_State=A(:,5);
 %n=length(time);
 
 
-left_torque=averaging(LL_State,LLTRQ,'left');
+[left_torque,LL_mean_time]=averaging(LL_State,LLTRQ,'left');
 
-right_torque=averaging(RL_State,RLTRQ,'right');
+[right_torque,RL_mean_time]=averaging(RL_State,RLTRQ,'right');
 end
 
-function averaged_torque=averaging(state,torque,mode) 
+function [averaged_torque,mean_time]=averaging(state,torque,mode) 
 n = length(state);
 te = [];
 ts = [];
