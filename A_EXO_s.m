@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 13-Jun-2019 14:36:08
+% Last Modified by GUIDE v2.5 03-Jan-2020 15:29:29
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -86,7 +86,8 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1,'LapBaseline',0,...
-                           'PtbOn',0,'old_TM_right',0,'TM_right',0,'old_TM_left',0,'TM_left',0,'flag_TM_left',0,'flag_TM_right',0,'TM_counter',1);
+                           'PtbOn',0,'old_TM_right',0,'TM_right',0,'old_TM_left',0,'TM_left',0,'flag_TM_left',0,'flag_TM_right',0,'TM_counter',1,...
+                           'flag_down_TM_left',0,'flag_down_TM_right',0,'ATP',zeros(1,202));
     
     if get(handles.Activate_Prop_Pivot,'Value') %GO 5/7/19 - GUIDE is not cooperating so brute force
         set(handles.Activate_Prop_Pivot,'Value',0); 
@@ -176,6 +177,8 @@ function Start_Trial_Callback(hObject, eventdata, handles)
     set(handles.Start_Trial,'Enable','off');
     set(handles.End_Trial,'Enable','on');
     set(handles.ATP_Mode,'Enable','on');
+    set(handles.varying_state3,'Enable','on');
+    set(handles.fixed_state3,'Enable','on');
     set(handles.Start_Timer,'Enable','on');
     %set(handles.Check_Baseline,'Enable','on');  % tn 5/13/19
     set(handles.Take_Baseline,'Enable','on');   % TN 5/6/19
@@ -224,27 +227,87 @@ function Start_Trial_Callback(hObject, eventdata, handles)
             handles=guidata(hObject);
             GUI_Variables = handles.GUI_Variables;
             if GUI_Variables.PtbOn == 1 %TH 5/17/19
+                
 %                 disp(['GUI_Variables.flag_TM_right =', num2str(GUI_Variables.flag_TM_right)]);
                 if (GUI_Variables.flag_TM_right == 1 && get(handles.R_Leg_Select,'value') == 1)
-                    moveTreadmill(GUI_Variables.TM_counter, handles, 'right');
+                    moveTreadmill(GUI_Variables.TM_counter, handles, 'right'); 
+                    set(handles.statusText,'String',['Perturbation ' num2str(GUI_Variables.TM_counter)]);
+                    if GUI_Variables.TM_counter == 13  && GUI_Variables.flag_TM_right == 1 % TN 11/14/19
+                        set(handles.statusText,'String','Hard stop - 12 Perturbations Complete')
+                        Stop_Ptb_Callback(hObject, 0, handles);
+                        GUI_Variables.TM_counter = 1;                                           
+                    end
+                                
                     GUI_Variables.flag_TM_right = 0;
+                    GUI_Variables.flag_down_TM_right = 0;
                     GUI_Variables.TM_counter = GUI_Variables.TM_counter + 1;
                     if GUI_Variables.TM_counter == 13
-                        GUI_Variables.TM_counter = 1;
-                        pause(0.1);
+                        %GUI_Variables.TM_counter = 1;  % TN 11/13/19
+                        %pause(0.1);
                         set(handles.statusText,'String','12 Perturbations Complete')
 %                         setTreadmill(0,0,1000,1000,0);
                     end
+
+                    
                 elseif (GUI_Variables.flag_TM_left == 1 && get(handles.L_Leg_Select,'value') == 1)
                     moveTreadmill(GUI_Variables.TM_counter, handles, 'left');
+                    set(handles.statusText,'String',['Perturbation ' num2str(GUI_Variables.TM_counter)]);
+                    if GUI_Variables.TM_counter == 13 && GUI_Variables.flag_TM_left == 1 % TN 11/14/19  % TN 11/13/19
+                        set(handles.statusText,'String','Hard stop - 12 Perturbations Complete')
+                        Stop_Ptb_Callback(hObject, 0, handles);
+                        GUI_Variables.TM_counter = 1;
+                    end
+                    
                     GUI_Variables.flag_TM_left = 0; 
+                    GUI_Variables.flag_down_TM_left = 0;
                     GUI_Variables.TM_counter = GUI_Variables.TM_counter + 1;
                     if GUI_Variables.TM_counter == 13
-                        GUI_Variables.TM_counter = 1;
+                        %GUI_Variables.TM_counter = 1;
                         set(handles.statusText,'String','12 Perturbations Complete')
 %                         setTreadmill(0,0,1000,1000,0);
                     end
                 end
+                
+%                 if (GUI_Variables.flag_down_TM_right == 1 && get(handles.R_Leg_Select,'value') == 1)
+%                     moveTreadmill(GUI_Variables.TM_counter, handles, 'right'); 
+%                     set(handles.statusText,'String',['Perturbation ' num2str(GUI_Variables.TM_counter)]);
+%                     if GUI_Variables.TM_counter == 13  && GUI_Variables.flag_down_TM_right == 1 % TN 11/14/19
+%                     set(handles.statusText,'String','Hard stop - 12 Perturbations Complete')
+%                         Stop_Ptb_Callback(hObject, 0, handles);
+%                         GUI_Variables.TM_counter = 1;                                           
+%                     end
+%                                 
+%                     GUI_Variables.flag_TM_right = 0;
+%                     GUI_Variables.flag_down_TM_right = 0;
+%                     GUI_Variables.TM_counter = GUI_Variables.TM_counter + 1;
+%                     if GUI_Variables.TM_counter == 13
+%                         %GUI_Variables.TM_counter = 1;  % TN 11/13/19
+%                         %pause(0.1);
+%                         set(handles.statusText,'String','12 Perturbations Complete')
+%                         setTreadmill(0,0,1000,1000,0);
+%                     end
+% 
+%                     
+%                 elseif (GUI_Variables.flag_down_TM_left == 1 && get(handles.L_Leg_Select,'value') == 1)
+%                     moveTreadmill(GUI_Variables.TM_counter, handles, 'left');
+%                     set(handles.statusText,'String',['Perturbation ' num2str(GUI_Variables.TM_counter)]);
+%                     if GUI_Variables.TM_counter == 13 && GUI_Variables.flag_down_TM_left == 1 % TN 11/14/19  % TN 11/13/19
+%                         set(handles.statusText,'String','Hard stop - 12 Perturbations Complete')
+%                         Stop_Ptb_Callback(hObject, 0, handles);
+%                         GUI_Variables.TM_counter = 1;
+%                     end
+%                     
+%                     GUI_Variables.flag_TM_left = 0; 
+%                     GUI_Variables.flag_down_TM_left = 0;
+%                     GUI_Variables.TM_counter = GUI_Variables.TM_counter + 1;
+%                     if GUI_Variables.TM_counter == 13
+%                         %GUI_Variables.TM_counter = 1;
+%                         set(handles.statusText,'String','12 Perturbations Complete')
+%                         setTreadmill(0,0,1000,1000,0);
+%                     end
+%                 end
+                    
+
             end
             GUI_Variables = Update_GUI(GUI_Variables, handles);
             GUI_Variables = accept_message(bt,handles, GUI_Variables);
@@ -4400,10 +4463,10 @@ function Send_ATP_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% GUI_Variables = handles.GUI_Variables;
-% bt = GUI_Variables.BT; 
-% 
-% if (bt.Status=="open")
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT; 
+
+if (bt.Status=="open")
    
        
     [filename, pathname] = uigetfile({'*.txt*', 'Matlab Files (*.mat)'; ...
@@ -4418,12 +4481,12 @@ else
              disp(['User selected ', fullfile(pathname, filename)])
 
       
-        
+         
 ATP_file = fullfile(pathname, filename);
 
 %fwrite(bt,'g'); %send the character "%"
 
-[right_torque,left_torque]=averaging_torque(ATP_file);
+[right_torque,left_torque,RL_mean_time,LL_mean_time]=averaging_torque(ATP_file);
 % for i=1:101
 % if left_torque(i) < 0
 %     left_torque(i) = 0;
@@ -4442,20 +4505,40 @@ subplot(2,1,1)
 plot(0:100,left_torque);title('Averaged left torque profile');
 subplot(2,1,2)
 plot(0:100,right_torque);title('Averaged right torque profile');
-   
+    
 ATP = [left_torque,right_torque];
 % Arrange it to comma-separated string
 str = num2str(ATP);
 str = regexprep(str,'\s+',',');
+% Duration of state 3 %% TN 1/3/20
+if isnan(RL_mean_time)
+    RL_mean_time = 0;
+end
+if isnan(LL_mean_time)
+    LL_mean_time = 0;
+end
+disp('Time average of the right leg:');
+RL_mean_time/100
+disp('Time average of the left leg:');
+LL_mean_time/100
+State3_mean_time = [10*LL_mean_time,10*RL_mean_time];
+state3_time_str = num2str(State3_mean_time);
+state3_time_str = regexprep(state3_time_str,'\s+',',');
+
 % Save as 'sample.h' file
 cur_d = cd;
-new_file = strrep(cur_d,'Gui','Exo\ATP.h');
+new_folder = strrep(cur_d,'GUI','Exo');
+exo_ATP_file = 'ATP.h';
 %new_file = 'G:\Shared drives\Biomech_Lab\Thang\Biomech_taryn\new code\Exo\ATP.h';
-fid = fopen(new_file,'w');
+fid = fopen(fullfile(new_folder,exo_ATP_file),'w');
 fprintf(fid,'double ATP[202] = {%s};\n',str);
+fprintf(fid,'double state3_time[2] = {%s};\n',state3_time_str);
 fclose(fid);
 
 end
+end
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
 
 
 
@@ -4710,12 +4793,14 @@ set(handles.R_Leg_Select,'value',1);
 disp('Left Leg Perturbations');
 
 
+
+
 function moveTreadmill(counter, handles, perturbation_side)
 
-direction = {'Ant','Ant','Post','Post','Ant','Post','Ant','Post','Post','Ant','Ant','Post'};
+direction = {'Ant','Ant','Post','Post','Ant','Post','Ant','Post','Post','Ant','Ant','Post','Ant'};
 direction_local = direction{counter};
 norm = str2double(get(handles.Edit_Speed,'String'))*1000; %-1000;
-fast = norm+norm*.4;
+fast = norm+norm*.5;
 slow = norm-norm*.5;
 LS = norm;   %mm/s
 RS = LS;
@@ -4742,3 +4827,41 @@ elseif strcmp( perturbation_side, 'left' )
     pause(5*T2);
     setTreadmill(LS,RS,newLA,RA,IN)
 end
+
+
+
+
+% --- Executes on button press in varying_state3.
+function varying_state3_Callback(hObject, eventdata, handles)
+% hObject    handle to varying_state3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of varying_state3
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+if (bt.Status=="open")
+    fwrite(bt,'[');
+    set(handles.fixed_state3,'value',0);
+end
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
+
+
+
+% --- Executes on button press in fixed_state3.
+function fixed_state3_Callback(hObject, eventdata, handles)
+% hObject    handle to fixed_state3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of fixed_state3
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+if (bt.Status=="open")
+    fwrite(bt,']');
+    set(handles.varying_state3,'value',0);
+end
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
