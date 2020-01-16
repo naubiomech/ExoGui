@@ -4527,7 +4527,7 @@ state3_time_str = regexprep(state3_time_str,'\s+',',');
 
 % Save as 'sample.h' file
 cur_d = cd;
-new_folder = strrep(cur_d,'GUI','Exo');
+new_folder = strrep(cur_d,'Gui','Exo');
 exo_ATP_file = 'ATP.h';
 %new_file = 'G:\Shared drives\Biomech_Lab\Thang\Biomech_taryn\new code\Exo\ATP.h';
 fid = fopen(fullfile(new_folder,exo_ATP_file),'w');
