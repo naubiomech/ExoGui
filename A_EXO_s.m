@@ -308,7 +308,6 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                         fwrite(GUI_Variables.BT,'F');
                         fwrite(GUI_Variables.BT,0,'double');
                         fwrite(GUI_Variables.BT,0,'double');
-                        fwrite(GUI_Variables.BT,'f');
                         fwrite(GUI_Variables.BT,0,'double');
                         fwrite(GUI_Variables.BT,0,'double');
                         fwrite(GUI_Variables.BT,'h');           %Optimization done
@@ -320,7 +319,6 @@ function GUI_Variables = Update_GUI(GUI_Variables, handles)
                                 fwrite(GUI_Variables.BT,'F');                   %Left leg setpoints
                                 fwrite(GUI_Variables.BT,Trq_Setpoint,'double'); %Plantarflexion
                                 fwrite(GUI_Variables.BT,0,'double');            %Dorsiflexion
-                                fwrite(GUI_Variables.BT,'f');                   %Right leg setpoints
                                 fwrite(GUI_Variables.BT,Trq_Setpoint,'double'); %Plantarflexion
                                 fwrite(GUI_Variables.BT,0,'double');            %Dorsiflexion
                                 disp(['Sent Data: ',num2str(Trq_Setpoint)]);
@@ -2914,7 +2912,6 @@ try
         fwrite(bt,'F');
         fwrite(bt,-1,'double');
         fwrite(bt,-1,'double');
-        fwrite(bt,'f');
         fwrite(bt,-1,'double');
         fwrite(bt,-1,'double');
     end
@@ -2940,7 +2937,6 @@ try
         fwrite(bt,'F');
         fwrite(bt,0,'double');
         fwrite(bt,0,'double');
-        fwrite(bt,'f');
         fwrite(bt,0,'double');
         fwrite(bt,0,'double');
     end
