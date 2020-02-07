@@ -4771,9 +4771,9 @@ else
     set(findall(handles.MotorParamSelect,'-property','value'),'value',0);
 end
 
-% if(bt.Status=="open")
-%     fwrite(bt,char(107));
-% end
+if(bt.Status=="open")
+    fwrite(bt,char(107));
+end
 % Hint: get(hObject,'Value') returns toggle state of OLCurrentControl
 
 
