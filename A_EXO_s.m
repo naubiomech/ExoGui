@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 15-Jan-2020 13:23:43
+% Last Modified by GUIDE v2.5 07-Feb-2020 17:13:43
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -86,7 +86,8 @@ function A_EXO_s_OpeningFcn(hObject, ~, handles, varargin)
                            'L_BAL_DYN_TOE',20*ones(1,60000),'L_BAL_DYN_HEEL',30*ones(1,60000),'L_BAL_STEADY_TOE',40*ones(1,60000),'L_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'R_BAL_DYN_TOE',20*ones(1,60000),'R_BAL_DYN_HEEL',30*ones(1,60000),'R_BAL_STEADY_TOE',40*ones(1,60000),'R_BAL_STEADY_HEEL',50*ones(1,60000),...
                            'PropOn',0,'SSID','No_ID','TimeStamp',' ','ReuseBaseline',1,'LapBaseline',0,...
-                           'PtbOn',0,'old_TM_right',0,'TM_right',0,'old_TM_left',0,'TM_left',0,'flag_TM_left',0,'flag_TM_right',0,'TM_counter',1);  
+                           'PtbOn',0,'old_TM_right',0,'TM_right',0,'old_TM_left',0,'TM_left',0,'flag_TM_left',0,'flag_TM_right',0,'TM_counter',1,...
+                           'MotorParams',0);  
     
     set(findall(handles.MotorParamSelect,'-property','value'),'value',0);
     if get(handles.Activate_Prop_Pivot,'Value') %GO 5/7/19 - GUIDE is not cooperating so brute force
@@ -1352,6 +1353,8 @@ function valBT=Check_Bluetooth_Callback(hObject, ~, handles)
                 set(handles.axes8,'Color',[0 0 0])
                 set(handles.axes10,'Color',[0 0 0])
                 set(handles.EXP_Params_axes,'Color',[0 0 0])
+                set(findall(handles.MotorParamSelect,'-property','value'),'value',0);
+                set(GUI_Variables.MotorParams,0);
                 valBT=0;
                 fclose(bt);
             end
@@ -1364,6 +1367,8 @@ function valBT=Check_Bluetooth_Callback(hObject, ~, handles)
                 valBT=0;
                 fclose(bt);
                 set(handles.statusText,'String',"MATLAB was unable to communicate with the Bluetooth");
+                set(findall(handles.MotorParamSelect,'-property','value'),'value',0);
+                set(GUI_Variables.MotorParams,0);
             catch
             end
         end
@@ -1434,6 +1439,8 @@ function Connect_BT_Callback(hObject, ~, handles)
             set(handles.axes10,'Color',[0 0 0])
             set(handles.EXP_Params_axes,'Color',[0 0 0])
             set(handles.statusText,'String',"Could Not Connect to the Right Ankle Bluetooth :(  Try Again! (If it fails 3+ times attempt a power cycle)");
+            set(findall(handles.MotorParamSelect,'-property','value'),'value',0);
+            set(GUI_Variables.MotorParams,0);
         end
         handles.GUI_Variables = GUI_Variables;
         guidata(hObject, handles);
@@ -4748,30 +4755,31 @@ function OLCurrentControl_Callback(hObject, ~, handles)
 % handles    structure with handles and user data (see GUIDATA)
 % SEND 'k' char 107
 
-GUI_Variables = handles.GUI_Variables;
-bt = GUI_Variables.BT;
-    
-if get(hObject,'Value')
-    set(handles.L_Get_Setpoint,'String','Get Current');
-    set(handles.L_Set_Setpoint,'String','Set Current');
-    set(handles.Torque_Panel,'Title','Open-Loop Current Control');
-    set(handles.CurrentDiagnosticsCheckbox,'Enable','off');
-    set(handles.statusText,'String','Select Motor Parameters!');
-    set(handles.MotorParamSelect,'Visible',1);
-else
-    set(handles.L_Get_Setpoint,'String','Get Setpoint');
-    set(handles.L_Set_Setpoint,'String','Set Setpoint');
-    set(handles.Torque_Panel,'Title','Torque');
-    set(handles.CurrentDiagnosticsCheckbox,'Enable','on');
-    set(handles.MotorParamSelect,'Visible',0);
-    set(findall(handles.MotorParamSelect,'-property','value'),'value',0);
-end
-
-if(bt.Status=="open")
-    fwrite(bt,char(107));
-end
 % Hint: get(hObject,'Value') returns toggle state of OLCurrentControl
 
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+if GUI_Variables.MotorParams == 1
+    if get(hObject,'Value')
+        set(handles.L_Get_Setpoint,'String','Get Setpoint');
+        set(handles.L_Set_Setpoint,'String','Set Setpoint');
+        set(handles.Torque_Panel,'Title','Open-Loop Current Control');
+        set(handles.CurrentDiagnosticsCheckbox,'Value',0);
+        set(handles.ModelCurrentCtrl,'Value',0);
+    else
+        set(handles.Torque_Panel,'Title','Closed-Loop Torque Control');
+    end
+    if (bt.Status=="open")
+        fwrite(bt,'k');
+        fwrite(bt,0);
+    end
+else
+    set(handles.statusText,'String','Select Motor Parameters First!');
+    set(handles.CurrentDiagnosticsCheckbox,'Value',0);
+    set(handles.ModelCurrentCtrl,'Value',0);
+    set(handles.OLCurrentControl,'Value',0);
+end
 
 % --- Executes on button press in CurrentDiagnosticsCheckbox.
 function CurrentDiagnosticsCheckbox_Callback(hObject, ~, handles)
@@ -4783,23 +4791,79 @@ function CurrentDiagnosticsCheckbox_Callback(hObject, ~, handles)
 GUI_Variables = handles.GUI_Variables;
 bt = GUI_Variables.BT;
 
-if get(hObject,'Value')
-    set(handles.L_Get_Setpoint,'String','Get Current');
-    set(handles.L_Set_Setpoint,'String','Set Current');
-    set(handles.Torque_Panel,'Title','Benchtop Current Control Testing');
-    set(handles.OLCurrentControl,'Enable','off');
-    set(handles.statusText,'String','Select Motor Parameters!');
-    set(handles.MotorParamSelect,'Visible',1);
+if GUI_Variables.MotorParams == 1
+    if get(hObject,'Value')
+        set(handles.L_Get_Setpoint,'String','Get Current');
+        set(handles.L_Set_Setpoint,'String','Set Current');
+        set(handles.Torque_Panel,'Title','Benchtop Current Control Testing');
+        set(handles.OLCurrentControl,'Value',0);
+        set(handles.ModelCurrentCtrl,'Value',0);
+    else
+        set(handles.L_Get_Setpoint,'String','Get Setpoint');
+        set(handles.L_Set_Setpoint,'String','Set Setpoint');
+        set(handles.Torque_Panel,'Title','Closed-Loop Torque Control');
+    end
+    if (bt.Status=="open")
+        fwrite(bt,'k');
+        fwrite(bt,1);
+    end
 else
-    set(handles.L_Get_Setpoint,'String','Get Setpoint');
-    set(handles.L_Set_Setpoint,'String','Set Setpoint');
-    set(handles.Torque_Panel,'Title','Torque');
-    set(handles.OLCurrentControl,'Enable','on');
-    set(handles.MotorParamSelect,'Visible',0);
-    set(findall(handles.MotorParamSelect,'-property','value'),'value',0);
+    set(handles.statusText,'String','Select Motor Parameters First!');
+    set(handles.CurrentDiagnosticsCheckbox,'Value',0);
+    set(handles.ModelCurrentCtrl,'Value',0);
+    set(handles.OLCurrentControl,'Value',0);
 end
 
-% if(bt.Status=="Open")
-%     fwrite(bt,char(108));
-% end
 
+% --- Executes on button press in ModelCurrentCtrl.
+function ModelCurrentCtrl_Callback(hObject, ~, handles)
+% hObject    handle to ModelCurrentCtrl (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of ModelCurrentCtrl
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+if GUI_Variables.MotorParams == 1
+    if get(hObject,'Value')
+        set(handles.L_Get_Setpoint,'String','Get Setpoint');
+        set(handles.L_Set_Setpoint,'String','Set Setpoint');
+        set(handles.Torque_Panel,'Title','Model-Based Current Control');
+        set(handles.OLCurrentControl,'Value',0);
+        set(handles.CurrentDiagnosticsCheckbox,'Value',0);
+    else
+        set(handles.Torque_Panel,'Title','Closed-Loop Torque Control');
+    end
+    if (bt.Status=="open")
+        fwrite(bt,'k');
+        fwrite(bt,2);
+    end
+else
+    set(handles.statusText,'String','Select Motor Parameters First!');
+    set(handles.CurrentDiagnosticsCheckbox,'Value',0);
+    set(handles.ModelCurrentCtrl,'Value',0);
+    set(handles.OLCurrentControl,'Value',0);
+end
+
+
+% --- Executes when selected object is changed in MotorParamSelect.
+function MotorParamSelect_SelectionChangedFcn(hObject, ~, handles)
+% hObject    handle to the selected object in MotorParamSelect 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+value = get(get(handles.MotorParamSelect,'SelectedObject'),'UserData');
+GUI_Variables.MotorParams = 1;
+
+if (bt.Status=="Open")
+    fwrite(bt,'f');
+    fwrite(bt,value);
+end
+
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject,handles);
