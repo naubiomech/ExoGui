@@ -1440,7 +1440,7 @@ function Connect_BT_Callback(hObject, ~, handles)
             set(handles.EXP_Params_axes,'Color',[0 0 0])
             set(handles.statusText,'String',"Could Not Connect to the Right Ankle Bluetooth :(  Try Again! (If it fails 3+ times attempt a power cycle)");
             set(findall(handles.MotorParamSelect,'-property','value'),'value',0);
-            set(GUI_Variables.MotorParams,0);
+            GUI_Variables.MotorParams=0;
         end
         handles.GUI_Variables = GUI_Variables;
         guidata(hObject, handles);
@@ -4772,7 +4772,7 @@ if GUI_Variables.MotorParams == 1
     end
     if (bt.Status=="open")
         fwrite(bt,'k');
-        fwrite(bt,0);
+        fwrite(bt,0,'int8');
     end
 else
     set(handles.statusText,'String','Select Motor Parameters First!');
@@ -4805,7 +4805,7 @@ if GUI_Variables.MotorParams == 1
     end
     if (bt.Status=="open")
         fwrite(bt,'k');
-        fwrite(bt,1);
+        fwrite(bt,1,'int8');
     end
 else
     set(handles.statusText,'String','Select Motor Parameters First!');
@@ -4838,7 +4838,7 @@ if GUI_Variables.MotorParams == 1
     end
     if (bt.Status=="open")
         fwrite(bt,'k');
-        fwrite(bt,2);
+        fwrite(bt,2,'int8');
     end
 else
     set(handles.statusText,'String','Select Motor Parameters First!');
@@ -4859,10 +4859,11 @@ bt = GUI_Variables.BT;
 
 value = get(get(handles.MotorParamSelect,'SelectedObject'),'UserData');
 GUI_Variables.MotorParams = 1;
+disp(value);
 
-if (bt.Status=="Open")
+if (bt.Status=="open")
     fwrite(bt,'f');
-    fwrite(bt,value);
+    fwrite(bt,value,'int8');
 end
 
 handles.GUI_Variables = GUI_Variables;
