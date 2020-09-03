@@ -179,7 +179,7 @@ switch(msg)
     elseif board == 2
         boardStr = 'Quad Board (PWM)';
     elseif board == 3
-        boardStr = 'IMU Board (Analog)';
+        boardStr = 'Dual Board Rev3 (PWM)';
     elseif board == 4
         boardStr = 'Dual Board (PWM)';
     else
