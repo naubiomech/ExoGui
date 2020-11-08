@@ -62,13 +62,24 @@ switch(msg)
     KF_LL = round(data(1),3);                                          %Gets the Current Arduino Torque Setpoint
     set(handles.L_Check_KF_Text,'String',KF_LL);
     disp("Left Current KF ");
-    disp(KF_LL);
+    disp(KF_LL);  
 
   %case '~' % TN 6/13/19
     KF_RL = round(data(2),3);                                          %Gets the Current Arduino Torque Setpoint
     set(handles.R_Check_KF_Text,'String',KF_RL);
     disp("Right Current KF ");
     disp(KF_RL);
+  
+  case '~' %GO 11/8/20
+    BatteryVoltage = data(1);
+    if BatteryVoltage > 2160
+        set(handles.BatteryAxes,'Color',[0 1 0]); %Green
+    elseif BatteryVoltage <= 2160 && BatteryVoltage > 1920
+        set(handles.BatteryAxes,'Color',[1 1 0]); %Yellow
+    elseif BatteryVoltage <= 1920
+        set(handles.BatteryAxes,'Color',[1 0 0]); %Red
+    end
+    
   case 'D'
     Setpoint_LL = data(1);
     Setpoint_Dorsi_LL = data(2);
@@ -175,7 +186,7 @@ switch(msg)
     version = round(data(1));
     board = data(2);
     if board == 1
-        boardStr = 'Two Leg Board (Analog)';
+        boardStr = 'Dual Board Rev4 (PWM)';
     elseif board == 2
         boardStr = 'Quad Board (PWM)';
     elseif board == 3
