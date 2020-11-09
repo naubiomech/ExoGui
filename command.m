@@ -72,12 +72,16 @@ switch(msg)
   
   case '~' %GO 11/8/20
     BatteryVoltage = data(1);
+    set(handles.BatteryText,'String',[num2str(BatteryVoltage/100),'V']);
     if BatteryVoltage > 2160
         set(handles.BatteryAxes,'Color',[0 1 0]); %Green
+        %set(handles.BatteryText,'ForegroundColor',[0 1 0]);
     elseif BatteryVoltage <= 2160 && BatteryVoltage > 1920
         set(handles.BatteryAxes,'Color',[1 1 0]); %Yellow
+        %set(handles.BatteryText,'ForegroundColor',[1 1 0]);
     elseif BatteryVoltage <= 1920
         set(handles.BatteryAxes,'Color',[1 0 0]); %Red
+        %set(handles.BatteryText,'ForegroundColor',[1 0 0]);
     end
     
   case 'D'

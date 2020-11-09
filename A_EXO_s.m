@@ -1052,7 +1052,6 @@ function End_Trial_Callback(hObject, eventdata, handles)
     guidata(hObject, handles);
 
 
-
 % --- Executes on button press in Calibrate_Torque.
 function Calibrate_Torque_Callback(~, ~, handles)
 % hObject    handle to Calibrate_Torque (see GCBO)
