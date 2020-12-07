@@ -168,6 +168,9 @@ switch(msg)
     disp(GUI_Variables.baser);
 
     end
+  case '-' % SS  11/14/2020
+    SP = data(1);
+    set(handles.SwingPercentage_Text,'String',SP);
   case 'V'
     steady_val = (data(1));
     set(handles.Steady_Text,'String',steady_val);

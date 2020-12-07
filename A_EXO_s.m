@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 07-Feb-2020 17:13:43
+% Last Modified by GUIDE v2.5 07-Dec-2020 15:46:16
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -4867,3 +4867,67 @@ end
 
 handles.GUI_Variables = GUI_Variables;
 guidata(hObject,handles);
+
+
+% --- Executes on button press in Check_SwingPercentage.
+function Check_SwingPercentage_Callback(hObject, eventdata, handles)
+GUI_Variables = handles.GUI_Variables;
+    bt = GUI_Variables.BT;
+
+    try
+        if(bt.Status=="open")
+            fwrite(bt,'-');
+        end
+
+        if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
+
+            GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
+
+        end
+    catch
+    end
+    handles.GUI_Variables = GUI_Variables;
+    guidata(hObject, handles);
+
+
+% --- Executes on button press in Set_SwingPercentage.
+function Set_SwingPercentage_Callback(hObject, eventdata, handles)
+GUI_Variables = handles.GUI_Variables;
+    bt = GUI_Variables.BT;
+
+    try
+        if(bt.Status=="open")
+            fwrite(bt,'m');
+        end
+        New_SwingPercentage= str2double(get(handles.SwingPercentage_Edit,'String')); % Gets the Value entered into the edit Box in the G
+        fwrite(bt,New_SwingPercentage,'double');
+    catch
+    end
+    
+GUI_Variables.New_SwingPercentage = New_SwingPercentage;
+    
+handles.GUI_Variables = GUI_Variables;
+guidata(hObject, handles);
+
+
+
+function SwingPercentage_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to SwingPercentage_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of SwingPercentage_Edit as text
+%        str2double(get(hObject,'String')) returns contents of SwingPercentage_Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function SwingPercentage_Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SwingPercentage_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
