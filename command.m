@@ -207,6 +207,20 @@ switch(msg)
     str = {str; ['Reported board definition: ', boardStr]};
     set(handles.statusText,'String',str);
     
+    % Battery
+    BatteryVoltage = data(3)/1000;
+    set(handles.BatteryText,'String',[num2str(BatteryVoltage),'V']);
+    if BatteryVoltage > 21.60
+        set(handles.batteryAxes,'Color',[0 1 0]); %Green
+        %set(handles.BatteryText,'ForegroundColor',[0 1 0]);
+    elseif BatteryVoltage <= 21.60 && BatteryVoltage > 19.20
+        set(handles.batteryAxes,'Color',[1 1 0]); %Yellow
+        %set(handles.BatteryText,'ForegroundColor',[1 1 0]);
+    elseif BatteryVoltage <= 19.20
+        set(handles.batteryAxes,'Color',[1 0 0]); %Red
+        %set(handles.BatteryText,'ForegroundColor',[1 0 0]);
+    end
+    
   case 'z'
     set(handles.Motor_Error,'value',data(1));
 
