@@ -15,7 +15,7 @@ switch(msg)
     GUI_Variables.RLVOLT_H(RLCount) = data(5);
     GUI_Variables.SIG1(RLCount) = data(11);
     GUI_Variables.SIG3(RLCount) = data(13);
-    GUI_Variables.SIG4(RLCount) = data(14);%data(14)/100;
+    GUI_Variables.SIG4(RLCount) = data(14);
     GUI_Variables.BASER(RLCount)=GUI_Variables.baser;
 
     GUI_Variables.R_BAL_DYN_HEEL(RLCount)=GUI_Variables.R_Bal_dyn_Heel;
@@ -146,9 +146,9 @@ switch(msg)
     val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
     
     if (val_biofb==1)
-        disp('biofeedback baseline');
-        GUI_Variables.basel_biofb=data(1);
-        disp(GUI_Variables.basel_biofb);
+%         disp('biofeedback baseline');
+%         GUI_Variables.basel_biofb=data(4);
+%         disp(GUI_Variables.basel_biofb);
     elseif (val==1)
         disp('balance baseline');
         GUI_Variables.L_Bal_steady_Toe= data(1);
