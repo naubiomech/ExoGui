@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 05-May-2021 12:38:07
+% Last Modified by GUIDE v2.5 05-May-2021 15:29:38
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -1038,9 +1038,21 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_Prop_Pivot,'value',0);
         set(handles.Activate_Prop_ID,'value',0);
         set(handles.Resistance_Ctrl,'value',0);
+        set(handles.HeelMToe,'value',0);
+        set(handles.HeelMToe4,'value',0);
+        set(handles.Heel,'value',0);
+        set(handles.HeelPToe,'value',0);
+        set(handles.Step,'value',0);
+        set(handles.Line,'value',0);
         set(handles.Activate_Prop_Pivot,'enable','off');
         set(handles.Activate_Prop_ID,'enable','off');
         set(handles.Resistance_Ctrl,'enable','off');
+        set(handles.HeelMToe,'enable','off');
+        set(handles.HeelMToe4,'enable','off');
+        set(handles.Heel,'enable','off');
+        set(handles.HeelPToe,'enable','off');
+        set(handles.Step,'enable','off');
+        set(handles.Line,'enable','off');
         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
         set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/13/19
         set(handles.Check_Baseline,'enable','off');
@@ -4170,6 +4182,14 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_ID,'enable','on');    % GO 5/7/19
             set(handles.Resistance_Ctrl,'enable','on');
             set(handles.Prop_Ctrl_sPanel,'visible','on');    % GO 5/14/19
+            set(handles.HeelMToe,'enable','on');
+            set(handles.HeelMToe4,'enable','on');
+            set(handles.Heel,'enable','on');
+            set(handles.HeelPToe,'enable','on');
+            set(handles.HipStance_Ctrl_sPanel,'visible','on');
+            set(handles.Step,'enable','on');
+            set(handles.Line,'enable','on');
+            set(handles.HipSwing_Ctrl_sPanel,'visible','on');
             ATP_value = get(handles.ATP_Mode,'value');
             if ATP_value == 1
                 set(handles.ATP_Mode,'value',0);
@@ -4189,6 +4209,14 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_ID,'value',0);         % GO 5/7/19 
             set(handles.Resistance_Ctrl,'value',0);
             set(handles.Prop_Ctrl_sPanel,'visible','off');    % GO 5/14/19
+            set(handles.HeelMToe,'value',0);
+            set(handles.HeelMToe4,'value',0);
+            set(handles.Heel,'value',0);
+            set(handles.HeelPToe,'value',0);
+            set(handles.HipStance_Ctrl_sPanel,'visible','off');
+            set(handles.Step,'value',0);
+            set(handles.Line,'value',0);
+            set(handles.HipSwing_Ctrl_sPanel,'visible','off');
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
         
@@ -4485,6 +4513,14 @@ if (bt.Status=="open")
         set(handles.Activate_Prop_Pivot,'value',0);      
         set(handles.Activate_Prop_ID,'value',0);         
         set(handles.Prop_Ctrl_sPanel,'visible','off');    
+        set(handles.HeelMToe,'value',0);
+        set(handles.HeelMToe4,'value',0);
+        set(handles.Heel,'value',0);
+        set(handles.HeelPToe,'value',0);
+        set(handles.HipStance_Ctrl_sPanel,'visible','off');
+        set(handles.Step,'value',0);
+        set(handles.Line,'value',0);
+        set(handles.HipSwing_Ctrl_sPanel,'visible','off');
         set(handles.Start_ATP,'Enable','off');
         set(handles.Stop_ATP,'Enable','off');
             
@@ -4995,3 +5031,59 @@ function LateSwingPercentage_Edit_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+
+
+
+
+% --- Executes when selected object is changed in HipStance_Ctrl_sPanel.
+function HipStance_Ctrl_sPanel_SelectionChangedFcn(hObject, eventdata, handles)
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+    if(bt.Status=="open")
+        fwrite(bt,'+');
+        value_HeelMToe = get(handles.HeelMToe,'value');
+        value_HeelMToe4 = get(handles.HeelMToe4,'value');
+        value_Heel = get(handles.Heel,'value');
+        value_HeelPToe = get(handles.HeelPToe,'value');
+
+        value_Step = get(handles.Step,'value');
+        value_Line = get(handles.Line,'value');
+        
+        fwrite(bt,value_HeelMToe,'double'); % Sends the new Torque Value to Arduino
+        fwrite(bt,value_HeelMToe4,'double');
+        fwrite(bt,value_Heel,'double');
+        fwrite(bt,value_HeelPToe,'double');                                   %Sends the new Torque Value to Arduino
+        
+        fwrite(bt,value_Step,'double');
+        fwrite(bt,value_Line,'double');
+        
+    end
+
+
+% --- Executes when selected object is changed in HipSwing_Ctrl_sPanel.
+function HipSwing_Ctrl_sPanel_SelectionChangedFcn(hObject, eventdata, handles)
+GUI_Variables = handles.GUI_Variables;
+bt = GUI_Variables.BT;
+
+    if(bt.Status=="open")
+        fwrite(bt,'+');
+        value_HeelMToe = get(handles.HeelMToe,'value');
+        value_HeelMToe4 = get(handles.HeelMToe4,'value');
+        value_Heel = get(handles.Heel,'value');
+        value_HeelPToe = get(handles.HeelPToe,'value');
+
+        value_Step = get(handles.Step,'value');
+        value_Line = get(handles.Line,'value');
+        
+        fwrite(bt,value_HeelMToe,'double'); % Sends the new Torque Value to Arduino
+        fwrite(bt,value_HeelMToe4,'double');
+        fwrite(bt,value_Heel,'double');
+        fwrite(bt,value_HeelPToe,'double');                                   %Sends the new Torque Value to Arduino
+        
+        fwrite(bt,value_Step,'double');
+        fwrite(bt,value_Line,'double');
+        
+    end

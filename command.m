@@ -171,9 +171,11 @@ switch(msg)
   case '-' % SS  11/14/2020
     SP = data(1);
     set(handles.SwingPercentage_Text,'String',SP);
+    update_value_handles(SP, handles.SwingPercentage_Text, handles.SwingPercentage_Edit);
   case 'J' % SS  11/14/2020
     LSP = data(1);
     set(handles.LateSwingPercentage_Text,'String',LSP);
+    update_value_handles(LSP, handles.LateSwingPercentage_Text, handles.LateSwingPercentage_Edit);
   case 'V'
     steady_val = (data(1));
     set(handles.Steady_Text,'String',steady_val);
