@@ -201,6 +201,8 @@ switch(msg)
         boardStr = 'Dual Board Rev3 (PWM)';
     elseif board == 4
         boardStr = 'Dual Board (PWM)';
+    elseif board == 5
+        boardStr = 'Dual Board Rev4.1 (PWM)';
     else
         boardStr = 'Board not properly defined';
     end
