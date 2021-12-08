@@ -15,7 +15,7 @@ switch(msg)
     GUI_Variables.RLVOLT_H(RLCount) = data(5);
     GUI_Variables.SIG1(RLCount) = data(11);
     GUI_Variables.SIG3(RLCount) = data(13);
-    GUI_Variables.SIG4(RLCount) = data(14);%data(14)/100;
+    GUI_Variables.SIG4(RLCount) = data(14);
     GUI_Variables.BASER(RLCount)=GUI_Variables.baser;
 
     GUI_Variables.R_BAL_DYN_HEEL(RLCount)=GUI_Variables.R_Bal_dyn_Heel;
@@ -146,9 +146,9 @@ switch(msg)
     val_biofb=strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On');
     
     if (val_biofb==1)
-        disp('biofeedback baseline');
-        GUI_Variables.basel_biofb=data(1);
-        disp(GUI_Variables.basel_biofb);
+%         disp('biofeedback baseline');
+%         GUI_Variables.basel_biofb=data(4);
+%         disp(GUI_Variables.basel_biofb);
     elseif (val==1)
         disp('balance baseline');
         GUI_Variables.L_Bal_steady_Toe= data(1);
@@ -168,14 +168,6 @@ switch(msg)
     disp(GUI_Variables.baser);
 
     end
-  case '-' % SS  11/14/2020
-    SP = data(1);
-    set(handles.SwingPercentage_Text,'String',SP);
-    update_value_handles(SP, handles.SwingPercentage_Text, handles.SwingPercentage_Edit);
-  case 'J' % SS  11/14/2020
-    LSP = data(1);
-    set(handles.LateSwingPercentage_Text,'String',LSP);
-    update_value_handles(LSP, handles.LateSwingPercentage_Text, handles.LateSwingPercentage_Edit);
   case 'V'
     steady_val = (data(1));
     set(handles.Steady_Text,'String',steady_val);
@@ -214,6 +206,20 @@ switch(msg)
     str = sprintf("Reported code version %d.%d.%d", major, minor, sub_minor);
     str = {str; ['Reported board definition: ', boardStr]};
     set(handles.statusText,'String',str);
+    
+    % Battery
+    BatteryVoltage = data(3)/1000;
+    set(handles.BatteryText,'String',[num2str(BatteryVoltage),'V']);
+    if BatteryVoltage > 21.60
+        set(handles.batteryAxes,'Color',[0 1 0]); %Green
+        %set(handles.BatteryText,'ForegroundColor',[0 1 0]);
+    elseif BatteryVoltage <= 21.60 && BatteryVoltage > 19.20
+        set(handles.batteryAxes,'Color',[1 1 0]); %Yellow
+        %set(handles.BatteryText,'ForegroundColor',[1 1 0]);
+    elseif BatteryVoltage <= 19.20
+        set(handles.batteryAxes,'Color',[1 0 0]); %Red
+        %set(handles.BatteryText,'ForegroundColor',[1 0 0]);
+    end
     
   case 'z'
     set(handles.Motor_Error,'value',data(1));

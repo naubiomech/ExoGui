@@ -3,7 +3,7 @@ function varargout = A_EXO_s(varargin)
 %      A_EXO_S, by itself, creates a new A_EXO_S or raises the existing
 %      singleton*.
 %
-%      H = A_EXO_S returns the handle to a new A_EXO_S or the handle to
+%      H = A_EXO_S returns the handle to a new A_EXO_S or thenn handle to
 %      the existing singleton*.
 %
 %      A_EXO_S('CALLBACK',hObject,eventData,handles,...) calls the local
@@ -22,7 +22,7 @@ function varargout = A_EXO_s(varargin)
 
 % Edit the above text to modify the response to help A_EXO_s
 
-% Last Modified by GUIDE v2.5 05-May-2021 15:29:38
+% Last Modified by GUIDE v2.5 06-Dec-2021 13:28:44
 
 % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -479,79 +479,58 @@ function draw_graphs(handles, GUI_Variables)
     
     whichPlotLeft = get(handles.Bottom_Graph,'Value');
     whichPlotRight = get(handles.Top_Graph,'Value');
-    draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
-    draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
-%YF    
+  
+    %YF
     if (strcmp(get(handles.Activate_BioFeedback_Text,'String'),'On')==1)%if biofeedback is on
-        draw_graph_BF(plots, RLCount);
+        draw_graph_BF(plots,handles.BF_side,handles.BF_Axes,RLCount)
+    else
+        draw_graph(whichPlotLeft, plots, titles, handles.Bottom_Axes, RLCount);
+        draw_graph(whichPlotRight, plots, titles, handles.Top_Axes, RLCount);
     end
     drawnow nocallbacks;
-
-%YF
-function draw_graph_BF(plots, RLCount)
-figure(1)
-
-ax=axes('XLim',[-10 10],'YLim',[0,2]);
-grid off;
-ylabel('Ratio')
-
-x1 = [0  , -2, 2];
-y1 = [0,-0.1,-0.1];
-
-g1 = hgtransform;
-patch('XData',x1,'YData',y1,'FaceColor',[0.144 0.852 0.850],'FaceAlpha',0.3,'Parent',g1)
-
-g2 = hgtransform;
-patch('XData',x1,'YData',y1,'FaceColor',[0.988 0.093 0.156],'FaceAlpha',0.3,'Parent',g2)
-
-plotData1 = plots{10};%left update
-plotData3 = plots{9}; %right update
-plotData5 = plots{11};%right score
-plotData6 = plots{12};%left score
-
-dataLength = max(1, RLCount-1000):RLCount-1;
-data1 = cellfun(@(x) x(dataLength), plotData1', 'UniformOutput', false);
-data1 = cat(1,data1{:});
-data3 = cellfun(@(x) x(dataLength), plotData3', 'UniformOutput', false);
-data3 = cat(1,data3{:});
-data5 = cellfun(@(x) x(dataLength), plotData5', 'UniformOutput', false);
-data5 = cat(1,data5{:});
-data6 = cellfun(@(x) x(dataLength), plotData6', 'UniformOutput', false);
-data6 = cat(1,data6{:});
-
-g1.Matrix=makehgtform('translate',[-5, data1(end), 0]);
-g2.Matrix=makehgtform('translate',[5, data3(end), 0]);
-
-hold on
-plot([0 0],[0,2],'Linewidth',2,'Color','black')
-
-%left side text
-if data1(end)<1
-    plot([-10 0],[1,1],'Linewidth',8,'Color','red')
-    text(-9,1.8,['Left score: ' num2str(data6(end))],'fontsize',40);
-    patch([-10 0 0 -10],[0 0 data1(end) data1(end)],'red','FaceAlpha',0.1)
-else
-    plot([-10 0],[1,1],'Linewidth',8,'Color','green')
-    patch([-10 0 0 -10],[0 0 data1(end) data1(end)],'green','FaceAlpha',0.1)
-    text(-9,1.8,['Left score: ' num2str(data6(end))],'fontsize',40);
-    [y,Fs]=audioread('dragon-coin.wav');
-    sound(y,Fs)
-end
-
-%right side text
-if data3(end)<1
-    plot([0 10],[1,1],'Linewidth',8,'Color','red')
-    text(1,1.8,['Right score: ' num2str(data5(end))],'fontsize',40);
-    patch([0 10 10 0],[0 0 data3(end) data3(end)],'red','FaceAlpha',0.1)
-else
-    plot([0 10],[1,1],'Linewidth',8,'Color','green')
-    patch([0 10 10 0],[0 0 data3(end) data3(end)],'green','FaceAlpha',0.1)
-    text(1,1.8,['Right score: ' num2str(data5(end))],'fontsize',40);
-    [y,Fs]=audioread('dragon-coin.wav');
-    sound(y,Fs)
-end
-
     
+    %YF
+    function draw_graph_BF(plots,BFSIDE,axis, RLCount)
+        axes(axis);
+        BFside=get(BFSIDE,'Value');
+        if BFside==1
+            plotData=plots{3};
+            target_BF1=plots{11};
+            BFscore1=plots{9};
+        else
+            plotData=plots{7};
+            target_BF1=plots{12};
+            BFscore1=plots{10};
+        end
+        plotData=plotData(:,2);
+        
+        dataLength = max(1, RLCount-1):RLCount-1;
+        
+        data = cellfun(@(x) x(dataLength), plotData', 'UniformOutput', false);
+        target_BF = cellfun(@(x) x(dataLength), target_BF1', 'UniformOutput', false);
+        BFscore = cellfun(@(x) x(dataLength), BFscore1', 'UniformOutput', false);
+        
+        data = cat(1,data{:});
+        target_BF = cat(1,target_BF{:});
+        BFscore = cat(1,BFscore{:});
+        
+        targetline=target_BF(end);
+        plot([0 2],[targetline targetline],'Linewidth',3,'Color','green')
+        hold on
+        
+        if data(end)>targetline
+            bar(1,data,'red');
+            [y,Fs]=audioread('ding.wav');
+            sound(y,Fs)
+        else
+            %             bar(data(end),'blue');
+            bar(1,data,'blue');
+        end
+        hold off
+        
+        ylim([0,targetline*1.5+100])
+        xlim([0 2])
+        
 function draw_graph(whichPlot, plots, titles, axis, RLCount)
     axes(axis);
     plotData = plots{whichPlot};
@@ -561,8 +540,7 @@ function draw_graph(whichPlot, plots, titles, axis, RLCount)
     data = cellfun(@(x) x(dataLength), plotData', 'UniformOutput', false);
     data = cat(1,data{:});
     
-    plot(dataLength, data);
-    
+   plot(dataLength, data);
     xlim([dataLength(1),RLCount]);
     title(plotTitle);
     
@@ -940,25 +918,25 @@ function End_Trial_Callback(hObject, eventdata, handles)
         left_leg_torque_calibration_value = 0;
         right_leg_torque_calibration_value = 0;
 
-    fwrite(bt,'e');
-          message = fgetl(bt);
-        if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
-            indexes = find(message==44);
-        left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
-        right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
-%         left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
-%         right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
-%         left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
-%         right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
-%         left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
-%         right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
-%         left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
-%         right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
-        left_leg_torque_calibration_value = str2double(message((indexes(3)+1):(indexes(4)-1)));
-        right_leg_torque_calibration_value = str2double(message((indexes(4)+1):(indexes(5)-1)));
-
-        
-        end
+%     fwrite(bt,'e');
+%           message = fgetl(bt);
+%         if message(1) == 83 && message(length(message)-1) == 90 && message(2) == 'P'
+%             indexes = find(message==44);
+%         left_plant_peak_mean = str2double(message((indexes(1)+1):(indexes(2)-1)));
+%         right_plant_peak_mean = str2double(message((indexes(2)+1):(indexes(3)-1)));
+% %         left_leg_Curr_Combined = str2double(message((indexes(3)+1):(indexes(4)-1)));
+% %         right_leg_Curr_Combined = str2double(message((indexes(4)+1):(indexes(5)-1)));
+% %         left_leg_fsr_Combined_peak_ref = str2double(message((indexes(5)+1):(indexes(6)-1)));
+% %         right_leg_fsr_Combined_peak_ref = str2double(message((indexes(6)+1):(indexes(7)-1)));
+% %         left_leg_fsr_Toe_peak_ref = str2double(message((indexes(7)+1):(indexes(8)-1)));
+% %         right_leg_fsr_Toe_peak_ref = str2double(message((indexes(8)+1):(indexes(9)-1)));
+% %         left_leg_fsr_Heel_peak_ref = str2double(message((indexes(9)+1):(indexes(10)-1)));
+% %         right_leg_fsr_Heel_peak_ref = str2double(message((indexes(10)+1):(indexes(11)-1)));
+%         left_leg_torque_calibration_value = str2double(message((indexes(3)+1):(indexes(4)-1)));
+%         right_leg_torque_calibration_value = str2double(message((indexes(4)+1):(indexes(5)-1)));
+% 
+%         
+%         end
             
  %   currDir = cd;       % Current directory
         saveDir_P = [GUI_Variables.SSID,'_',date,'_Proportional_Parameters'];    % Save directory specific to subject and date
@@ -1038,21 +1016,9 @@ function End_Trial_Callback(hObject, eventdata, handles)
         set(handles.Activate_Prop_Pivot,'value',0);
         set(handles.Activate_Prop_ID,'value',0);
         set(handles.Resistance_Ctrl,'value',0);
-        set(handles.HeelMToe,'value',0);
-        set(handles.HeelMToe4,'value',0);
-        set(handles.Heel,'value',0);
-        set(handles.HeelPToe,'value',0);
-        set(handles.Step,'value',0);
-        set(handles.Line,'value',0);
         set(handles.Activate_Prop_Pivot,'enable','off');
         set(handles.Activate_Prop_ID,'enable','off');
         set(handles.Resistance_Ctrl,'enable','off');
-        set(handles.HeelMToe,'enable','off');
-        set(handles.HeelMToe4,'enable','off');
-        set(handles.Heel,'enable','off');
-        set(handles.HeelPToe,'enable','off');
-        set(handles.Step,'enable','off');
-        set(handles.Line,'enable','off');
         set(handles.Activate_Prop_Ctrl,'string','Activate Prop Control');
         set(handles.Activate_Prop_Ctrl,'enable','off');  % TN 5/13/19
         set(handles.Check_Baseline,'enable','off');
@@ -3671,9 +3637,9 @@ function IP_list_CreateFcn(hObject, ~, ~)
     end
 
 
-% --- Executes on button press in BioFeedback_Baseline.
-function BioFeedback_Baseline_Callback(~, ~, handles)
-% hObject    handle to BioFeedback_Baseline (see GCBO)
+% --- Executes on button press in Get_Target.
+function Get_Target_Callback(~, ~, handles)
+% hObject    handle to Get_Target (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     GUI_Variables = handles.GUI_Variables;
@@ -4182,14 +4148,6 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_ID,'enable','on');    % GO 5/7/19
             set(handles.Resistance_Ctrl,'enable','on');
             set(handles.Prop_Ctrl_sPanel,'visible','on');    % GO 5/14/19
-            set(handles.HeelMToe,'enable','on');
-            set(handles.HeelMToe4,'enable','on');
-            set(handles.Heel,'enable','on');
-            set(handles.HeelPToe,'enable','on');
-            set(handles.HipStance_Ctrl_sPanel,'visible','on');
-            set(handles.Step,'enable','on');
-            set(handles.Line,'enable','on');
-            set(handles.HipSwing_Ctrl_sPanel,'visible','on');
             ATP_value = get(handles.ATP_Mode,'value');
             if ATP_value == 1
                 set(handles.ATP_Mode,'value',0);
@@ -4209,14 +4167,6 @@ if (bt.Status=="open")
             set(handles.Activate_Prop_ID,'value',0);         % GO 5/7/19 
             set(handles.Resistance_Ctrl,'value',0);
             set(handles.Prop_Ctrl_sPanel,'visible','off');    % GO 5/14/19
-            set(handles.HeelMToe,'value',0);
-            set(handles.HeelMToe4,'value',0);
-            set(handles.Heel,'value',0);
-            set(handles.HeelPToe,'value',0);
-            set(handles.HipStance_Ctrl_sPanel,'visible','off');
-            set(handles.Step,'value',0);
-            set(handles.Line,'value',0);
-            set(handles.HipSwing_Ctrl_sPanel,'visible','off');
             set(handles.Start_ATP,'Enable','off');
             set(handles.Stop_ATP,'Enable','off');
         
@@ -4513,14 +4463,6 @@ if (bt.Status=="open")
         set(handles.Activate_Prop_Pivot,'value',0);      
         set(handles.Activate_Prop_ID,'value',0);         
         set(handles.Prop_Ctrl_sPanel,'visible','off');    
-        set(handles.HeelMToe,'value',0);
-        set(handles.HeelMToe4,'value',0);
-        set(handles.Heel,'value',0);
-        set(handles.HeelPToe,'value',0);
-        set(handles.HipStance_Ctrl_sPanel,'visible','off');
-        set(handles.Step,'value',0);
-        set(handles.Line,'value',0);
-        set(handles.HipSwing_Ctrl_sPanel,'visible','off');
         set(handles.Start_ATP,'Enable','off');
         set(handles.Stop_ATP,'Enable','off');
             
@@ -4905,185 +4847,52 @@ handles.GUI_Variables = GUI_Variables;
 guidata(hObject,handles);
 
 
-% --- Executes on button press in Check_SwingPercentage.
-function Check_SwingPercentage_Callback(hObject, eventdata, handles)
-GUI_Variables = handles.GUI_Variables;
+% --- Executes on selection change in BF_side.
+function BF_side_Callback(hObject, eventdata, handles)
+% hObject    handle to BF_side (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns BF_side contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from BF_side
+
+
+% --- Executes during object creation, after setting all properties.
+function BF_side_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to BF_side (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in Activate_HipExo.
+function Activate_HipExo_Callback(hObject, eventdata, handles)
+% hObject    handle to Activate_HipExo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    GUI_Variables = handles.GUI_Variables;
     bt = GUI_Variables.BT;
 
-    try
-        if(bt.Status=="open")
+    % BT_auto_reconnect_radiobutton
+    if (bt.Status=="open")
+        HIP=get(handles.Activate_HipExo_Text,'String');
+
+        if strcmp(HIP,'On')
+            %deactivate
             fwrite(bt,'-');
-        end
-
-        if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
-
-            GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
-
-        end
-    catch
-    end
-    handles.GUI_Variables = GUI_Variables;
-    guidata(hObject, handles);
-
-
-% --- Executes on button press in Set_SwingPercentage.
-function Set_SwingPercentage_Callback(hObject, eventdata, handles)
-GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    try
-        if(bt.Status=="open")
+            disp('Switch to Ankle Exo');
+            set(handles.Activate_HipExo_Text,'String','Off')
+        else
+            %activate
             fwrite(bt,'m');
-        end
-        New_SwingPercentage= str2double(get(handles.SwingPercentage_Edit,'String')); % Gets the Value entered into the edit Box in the G
-        fwrite(bt,New_SwingPercentage,'double');
-    catch
-    end
-    
-GUI_Variables.New_SwingPercentage = New_SwingPercentage;
-    
-handles.GUI_Variables = GUI_Variables;
-guidata(hObject, handles);
-
-
-
-function SwingPercentage_Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to SwingPercentage_Edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of SwingPercentage_Edit as text
-%        str2double(get(hObject,'String')) returns contents of SwingPercentage_Edit as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function SwingPercentage_Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to SwingPercentage_Edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in Check_LateSwingPercentage.
-function Check_LateSwingPercentage_Callback(hObject, eventdata, handles)
-GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'J');
+            disp('Switch to Hip Exo');
+            set(handles.Activate_HipExo_Text,'String','On')
         end
 
-        if(strcmp(get(handles.Start_Trial,'Enable'), 'on'))
 
-            GUI_Variables = Receive_Data_Message(GUI_Variables,handles);
-
-        end
-    catch
-    end
-    handles.GUI_Variables = GUI_Variables;
-    guidata(hObject, handles);
-
-
-% --- Executes on button press in Set_LateSwingPercentage.
-function Set_LateSwingPercentage_Callback(hObject, eventdata, handles)
-GUI_Variables = handles.GUI_Variables;
-    bt = GUI_Variables.BT;
-
-    try
-        if(bt.Status=="open")
-            fwrite(bt,'&');
-        end
-        New_LateSwingPercentage= str2double(get(handles.LateSwingPercentage_Edit,'String')); % Gets the Value entered into the edit Box in the G
-        fwrite(bt,New_LateSwingPercentage,'double');
-    catch
-    end
-    
-GUI_Variables.New_LateSwingPercentage = New_LateSwingPercentage;
-    
-handles.GUI_Variables = GUI_Variables;
-guidata(hObject, handles);
-
-
-
-function LateSwingPercentage_Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to LateSwingPercentage_Edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of LateSwingPercentage_Edit as text
-%        str2double(get(hObject,'String')) returns contents of LateSwingPercentage_Edit as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function LateSwingPercentage_Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to LateSwingPercentage_Edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-
-
-
-% --- Executes when selected object is changed in HipStance_Ctrl_sPanel.
-function HipStance_Ctrl_sPanel_SelectionChangedFcn(hObject, eventdata, handles)
-GUI_Variables = handles.GUI_Variables;
-bt = GUI_Variables.BT;
-
-    if(bt.Status=="open")
-        fwrite(bt,'+');
-        value_HeelMToe = get(handles.HeelMToe,'value');
-        value_HeelMToe4 = get(handles.HeelMToe4,'value');
-        value_Heel = get(handles.Heel,'value');
-        value_HeelPToe = get(handles.HeelPToe,'value');
-
-        value_Step = get(handles.Step,'value');
-        value_Line = get(handles.Line,'value');
-        
-        fwrite(bt,value_HeelMToe,'double'); % Sends the new Torque Value to Arduino
-        fwrite(bt,value_HeelMToe4,'double');
-        fwrite(bt,value_Heel,'double');
-        fwrite(bt,value_HeelPToe,'double');                                   %Sends the new Torque Value to Arduino
-        
-        fwrite(bt,value_Step,'double');
-        fwrite(bt,value_Line,'double');
-        
-    end
-
-
-% --- Executes when selected object is changed in HipSwing_Ctrl_sPanel.
-function HipSwing_Ctrl_sPanel_SelectionChangedFcn(hObject, eventdata, handles)
-GUI_Variables = handles.GUI_Variables;
-bt = GUI_Variables.BT;
-
-    if(bt.Status=="open")
-        fwrite(bt,'+');
-        value_HeelMToe = get(handles.HeelMToe,'value');
-        value_HeelMToe4 = get(handles.HeelMToe4,'value');
-        value_Heel = get(handles.Heel,'value');
-        value_HeelPToe = get(handles.HeelPToe,'value');
-
-        value_Step = get(handles.Step,'value');
-        value_Line = get(handles.Line,'value');
-        
-        fwrite(bt,value_HeelMToe,'double'); % Sends the new Torque Value to Arduino
-        fwrite(bt,value_HeelMToe4,'double');
-        fwrite(bt,value_Heel,'double');
-        fwrite(bt,value_HeelPToe,'double');                                   %Sends the new Torque Value to Arduino
-        
-        fwrite(bt,value_Step,'double');
-        fwrite(bt,value_Line,'double');
-        
     end
